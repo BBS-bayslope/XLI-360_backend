@@ -37,7 +37,7 @@ import {Router} from '@angular/router';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://localhost:8000'; // Base API URL
+  private baseUrl = 'http://18.216.104.19'; // Base API URL
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
   selectedCaseDocId: any;
