@@ -1,0 +1,114 @@
+/* General Container */
+.container {
+  width: 80%;
+  margin: 20px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.heading {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.subheading {
+  font-size: 24px;
+  color: #007bff;
+  margin-bottom: 20px;
+}
+
+.toggle-buttons {
+  margin-bottom: 20px;
+}
+
+.toggle-buttons button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: 1px solid #007bff;
+  background-color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggle-buttons button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.plans-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-around;
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: start;
+  justify-content: space-between;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  width: 22%;
+  margin: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.plan-card ul {
+  text-align: left;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.plan-card ul li {
+  margin: 5px 0;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.user-controls button {
+  padding: 5px 10px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.price {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.select-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.select-button2 {
+  padding: 10px 20px;
+  background-color: #3c00ff;
+  border: 5px solid green;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.select-button:hover {
+  background-color: #0056b3;
+}

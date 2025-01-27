@@ -1,0 +1,11 @@
+# Frontend ignores
+frontend/node_modules/
+frontend/build/
+
+# Backend ignores
+backend/venv/
+
+# General ignores
+*.log
+*.pyc
+__pycache__/

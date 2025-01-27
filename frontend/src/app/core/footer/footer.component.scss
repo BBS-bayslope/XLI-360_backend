@@ -1,0 +1,138 @@
+footer {
+  position: relative;
+}
+mat-toolbar {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f7f7f7; /* Customize background color */
+  // color: #E95474; /* Text color */
+  padding: 16px;
+  font-size: 14px;
+
+  position: relative;
+  bottom: 0; /* Stick to the bottom */
+  height: 90px;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  padding-left: 5%;
+  justify-content: center;
+  text-align: center;
+}
+
+.footer-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding-right: 7%;
+}
+
+.footer-center span {
+  margin: 0; /* Remove default margin */
+  color: black;
+  font-size: 18px;
+  font-weight: 400;
+  // line-height: 30px;
+}
+
+.footer-center span a {
+  color: #0744e0;
+}
+.footer-links {
+  display: flex;
+  flex-wrap: wrap; /* Allow links to wrap */
+  gap: 20px; /* Space between links */
+  margin-top: 8px; /* Space between copyright and links */
+  justify-content: center;
+}
+
+.footer-links a {
+  color: #0744e0;
+  text-decoration: underline;
+  font-size: 18px;
+  font-weight: 400;
+  // margin-right: 20px;
+  // line-height: 30px;
+}
+
+.footer-links a:hover {
+  // text-decoration: underline; /* Underline on hover */
+  cursor: pointer;
+}
+
+.right-icon a {
+  margin-right: 20px;
+}
+
+.footer-right b {
+  text-align: left;
+}
+
+.right-icon a img {
+  height: 25px;
+  width: 25px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 868px) {
+  mat-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align sections */
+  }
+
+  .footer-center .footer-right {
+    min-width: 100%; /* Full width on smaller screens */
+    justify-content: center; /* Center items in each section */
+    background-color: whitesmoke;
+  }
+}
+
+@media (max-width: 600px) {
+  // .footer-center  .footer-links {
+  //   // gap: 10px;
+  // }
+  mat-toolbar {
+    height: 200px;
+    background-color: whitesmoke;
+  }
+
+  // .footer-center a {
+  //   flex: 1 1 5%; /* Allow links to take more space and wrap */
+  //   text-align: center; /* Center text inside links */
+  // }
+}
+
+@media (max-width: 355px) {
+  .footer-center {
+    font-size: 13px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+}
+
+/* General styles for social icons */
+.social-icon img {
+  transition: transform 0.3s ease, filter 0.3s ease; /* Smooth transition for effects */
+}
+
+/* Scale the icon and change the color filter on hover */
+.social-icon:hover img {
+  transform: scale(1.1); /* Slightly enlarge the icon */
+  filter: brightness(0) saturate(100%) invert(26%) sepia(91%) saturate(539%)
+    hue-rotate(180deg) brightness(96%) contrast(91%);
+}

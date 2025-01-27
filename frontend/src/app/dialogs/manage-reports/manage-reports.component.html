@@ -1,0 +1,97 @@
+<div style="padding: 20px">
+  <h2>Manage Reports</h2>
+
+  <div>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="fileInput.click()"
+      style="margin-right: 10px"
+    >
+      Select Files
+    </button>
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+      "
+      *ngIf="selectedFiles && selectedFiles.length > 0"
+    >
+      <span>{{ selectedFiles.length }} file(s) selected</span>
+      <div
+        *ngFor="let item of selectedFiles; let i = index"
+        style="margin: 10px 0"
+      >
+        <span>{{ item.name }} - {{ item.type }}</span>
+        <mat-form-field
+          appearance="outline"
+          style="margin-left: 10px; width: 150px"
+        >
+          <mat-label>Price</mat-label>
+          <input
+            matInput
+            type="number"
+            [(ngModel)]="filePrices[i]"
+            placeholder="Enter Price"
+            min="0"
+          />
+        </mat-form-field>
+      </div>
+    </div>
+    <input
+      #fileInput
+      id="file-upload"
+      type="file"
+      multiple
+      (change)="onFileSelected($event)"
+      style="display: none"
+    />
+  </div>
+
+  <p *ngIf="uploadError" class="error">{{ uploadError }}</p>
+
+  <div>
+    <h3>Uploaded Files:</h3>
+    <ul>
+      <li *ngFor="let file of uploadedFiles; let i = index">
+        <span> {{ file.fileName }} ({{ file.fileType }}) </span>
+        <a [href]="file.url" target="_blank" style="margin-left: 10px">View</a>
+        <mat-form-field
+          appearance="outline"
+          style="margin-left: 10px; width: 120px"
+        >
+          <mat-label>Price</mat-label>
+          <input
+            matInput
+            type="number"
+            [(ngModel)]="uploadedFiles[i].price"
+            placeholder="Edit Price"
+            min="0"
+            (change)="updateFilePrice(i)"
+          />
+        </mat-form-field>
+        <button
+          mat-icon-button
+          color="warn"
+          (click)="deleteFile(file, i)"
+          style="margin-left: 10px"
+        >
+          <mat-icon>delete</mat-icon>
+        </button>
+      </li>
+    </ul>
+
+    <p *ngIf="priceUpdate" class="success">{{ priceUpdate }}</p>
+  </div>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="uploadFilesAndUpdate()">
+      Upload and Update
+    </button>
+    <button mat-raised-button color="warn" (click)="closeDialog()">
+      Close
+    </button>
+  </div>
+</div>

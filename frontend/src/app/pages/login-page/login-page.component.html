@@ -1,0 +1,104 @@
+<div style="height: 100%; width: 100%; background-color: white">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title><h2>LITIGATION 99</h2></mat-card-title>
+      <mat-card-subtitle>Log In</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="login()">
+        <mat-form-field appearance="outline">
+          <input
+            matInput
+            type="email"
+            name="email"
+            placeholder="Enter Mail Address*"
+            [(ngModel)]="email"
+            required
+          />
+          <span *ngIf="isPasswordVisible" class="suffix-icon" matSuffix
+            >Edit</span
+          >
+        </mat-form-field>
+
+        <mat-form-field *ngIf="isPasswordVisible" appearance="outline">
+          <input
+            matInput
+            type="password"
+            name="password"
+            [type]="hide() ? 'password' : 'text'"
+            placeholder="Password*"
+            [(ngModel)]="password"
+            required
+          />
+          <span
+            class="suffix-icon"
+            mat-icon-button
+            matSuffix
+            (click)="clickEvent($event)"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide()"
+          >
+            <mat-icon>{{ hide() ? "visibility_off" : "visibility" }}</mat-icon>
+          </span>
+          <mat-hint *ngIf="incorrectPassword" align="start"
+            >Please enter a valid email and password.</mat-hint
+          >
+          <mat-hint *ngIf="incorrectPassword" align="end"
+            ><mat-icon color="warn">warning</mat-icon></mat-hint
+          >
+        </mat-form-field>
+        <p *ngIf="isPasswordVisible" class="forgot-password">
+          <a routerLink="/forgot-password">Forgot your password?</a>
+        </p>
+
+        <button
+          mat-raised-button
+          color="primary"
+          *ngIf="isContinueVisible"
+          [disabled]="!email"
+          type="button"
+          (click)="onContinue()"
+        >
+          Continue
+        </button>
+        <button
+          *ngIf="isPasswordVisible"
+          [disabled]="password === ''"
+          mat-raised-button
+          color="primary"
+          type="submit"
+        >
+          Login
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer>
+      <p>
+        Create new account<span> ? </span>
+        <a
+          style="color: black; text-decoration: underline; cursor: pointer"
+          (click)="navigateToSignUp(email)"
+        >
+          Sign Up
+        </a>
+      </p>
+
+      <div class="divider">
+        <p class="line"></p>
+        <p>OR</p>
+        <p class="line"></p>
+      </div>
+      <button
+        class="login-with-google"
+        style="color: black"
+        mat-button
+        (click)="googleLogin()"
+      >
+        <img src="google.svg" /> Login With Google
+      </button>
+    </mat-card-footer>
+  </mat-card>
+</div>
+
+<!-- <app-footer></app-footer> -->

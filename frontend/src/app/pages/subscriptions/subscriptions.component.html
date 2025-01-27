@@ -1,0 +1,75 @@
+<div class="container">
+  <h1 class="heading">XLI 360</h1>
+  <h2 class="subheading">Subscription</h2>
+
+  <div
+    *ngIf="errorMessage"
+    style="
+      color: red;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 5px;
+    "
+  >
+    {{ errorMessage }}
+    <button mat-icon-button (click)="errorMessage = null">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Toggle between Monthly and Annual -->
+  <div class="toggle-buttons">
+    <button
+      mat-raised-button
+      (click)="isAnnual = true"
+      [class.active]="isAnnual"
+    >
+      Annually
+    </button>
+    <button
+      mat-raised-button
+      (click)="isAnnual = false"
+      [class.active]="!isAnnual"
+    >
+      Monthly
+    </button>
+  </div>
+
+  <!-- Plans List -->
+  <div class="plans-container">
+    <div *ngFor="let plan of plans; let i = index" class="plan-card">
+      <h3>{{ plan.planName }}</h3>
+
+      <ul>
+        <li *ngFor="let feature of plan.included">- {{ feature }}</li>
+      </ul>
+      <p *ngIf="plan.complimentaryReport">1 Prior Art Report Complimentary</p>
+      <p *ngIf="!plan.complimentaryReport"><br /><br /></p>
+      <p>Email Type: {{ plan.emailType }}</p>
+
+      <!-- User Count Controls -->
+      <div class="user-controls">
+        <button mat-raised-button (click)="decrementUser(i)">-</button>
+        <span style="margin: 0px 10px">{{ userCount[i] }}</span>
+        <button mat-raised-button (click)="incrementUser(i)">+</button>
+      </div>
+
+      <!-- Price Display -->
+      <p class="price">USD: {{ getPlanPrice(plan, i) }} $</p>
+
+      <!-- Select Button -->
+      <button
+        mat-raised-button
+        *ngIf="purchasedPlans"
+        (click)="selectPlan(plan, i)"
+        [color]="getButtonState(plan).color"
+      >
+        {{ getButtonState(plan).label }}
+      </button>
+    </div>
+  </div>
+</div>

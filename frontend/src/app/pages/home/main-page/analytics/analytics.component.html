@@ -1,0 +1,362 @@
+<div
+  class="chart-container"
+  *ngIf="excelData && filterDataForAnalytics; else loading"
+>
+  <!-- Total Litigation Cases & Status -->
+  <div class="chart-item">
+    <strong>Total Litigation Cases & Status</strong>
+    <canvas
+      baseChart
+      [data]="doughnutChartDataTotalCases"
+      [type]="doughnutChartTypeTotalCases"
+      [options]="doughnutChartOptionsTotalCases"
+    >
+    </canvas>
+  </div>
+  <!-- Total Litigation Cases Filed by Plaintiff according to Plaintiff type. -->
+  <div class="chart-item">
+    <strong
+      >Total Litigation Cases Filed by Plaintiff according to Plaintiff
+      type.</strong
+    >
+    <canvas
+      baseChart
+      [data]="plaintiffTypeAndSizeChartData"
+      [type]="plaintiffTypeAndSizeChartType"
+      [options]="plaintiffTypeAndSizeChartOptions"
+    >
+    </canvas>
+  </div>
+  <!-- Total Litigation Cases Filed by Defendent according to Defendent type. -->
+  <div class="chart-item">
+    <strong
+      >Total Litigation Cases Filed by Defendent according to Defendent
+      type.</strong
+    >
+    <canvas
+      baseChart
+      [data]="defendantTypeAndSizeChartData"
+      [type]="defendantTypeAndSizeChartType"
+      [options]="defendantTypeAndSizeChartOptions"
+    >
+    </canvas>
+  </div>
+  <!-- Total Cases by OC -->
+  <div class="chart-item">
+    <strong>Total Cases by OC</strong>
+    <canvas
+      baseChart
+      [data]="caseByOcChartData"
+      [type]="caseByOcChartType"
+      [options]="caseByOcChartOptions"
+    >
+    </canvas>
+  </div>
+  <!-- Industry. -->
+  <div class="chart-item">
+    <strong>Industry</strong>
+    <canvas
+      baseChart
+      [data]="industryChartData"
+      [type]="industryChartType"
+      [options]="industryChartOptions"
+    >
+    </canvas>
+  </div>
+  <!-- Tech Category -->
+  <div class="chart-item">
+    <strong>Tech Category</strong>
+    <canvas
+      baseChart
+      [data]="barChartDataTechCategory"
+      [type]="barChartTypeTechCategory"
+      [options]="barChartOptionsTechCategory"
+    >
+    </canvas>
+  </div>
+  <!-- Top Plaintiff -->
+  <div class="chart-item">
+    <strong>Top Plaintiff</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInTopPlaintiff"
+        (selectionChange)="onItemsToShowChangeInTopPlaitiff()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <mat-list-item *ngFor="let plaintiff of filteredTopPlaintiffs">
+          <span style="text-wrap: wrap"
+            >{{ plaintiff.name | titlecase }} - {{ plaintiff.count }}</span
+          >
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+
+  <!-- Top Defendants -->
+  <div class="chart-item">
+    <strong>Top Defendants</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInTopDefendant"
+        (selectionChange)="onItemsToShowChangeInTopDefendant()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <mat-list-item *ngFor="let defendant of filteredTopDefendant">
+          <span style="text-wrap: wrap">
+            {{ defendant.name | titlecase }} - {{ defendant.count }}</span
+          >
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+
+  <!-- All Plaintiff -->
+  <div class="chart-item">
+    <strong>All Plaintiff</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInAllPlaintiff"
+        (selectionChange)="onItemsToShowChangeInAllPlaitiff()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <mat-list-item *ngFor="let plaintiff of filteredAllPlaintiffs">
+          <span style="text-wrap: wrap"> {{ plaintiff | titlecase }}</span>
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+
+  <!-- All Defendent -->
+  <div class="chart-item">
+    <strong>All Defendent</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInAllDefendent"
+        (selectionChange)="onItemsToShowChangeInAllDefendent()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <mat-list-item *ngFor="let defendent of filteredAllDefendent">
+          <span style="text-wrap: wrap"> {{ defendent | titlecase }}</span>
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+  <!-- Total cases transferred from OC to NPE -->
+  <div class="chart-item">
+    <strong>Total cases transferred from OC to NPE</strong>
+    <canvas
+      baseChart
+      [data]="casesTransferredFromOCToNPEChartData"
+      [type]="casesTransferredFromOCToNPEChartType"
+      [options]="casesTransferredFromOCToNPEChartOptions"
+    >
+    </canvas>
+  </div>
+  <!-- Most Sued Tech Areas -->
+  <div class="chart-item">
+    <strong>Most Sued Tech Areas</strong>
+    <canvas
+      baseChart
+      [data]="barChartDataMostSuedTechAreas"
+      [type]="barChartTypeMostSuedTechAreas"
+      [options]="barChartOptionsMostSuedTechAreas"
+      (chartHover)="chartHovered($event)"
+      (chartClick)="chartClicked($event)"
+    >
+    </canvas>
+  </div>
+
+  <div class="chart-item">
+    <strong>Most Sued Companies</strong>
+    <canvas
+      baseChart
+      [data]="mostSuedCompaniesChartData"
+      [type]="mostSuedCompaniesChartType"
+      [options]="mostSuedCompaniesChartOptions"
+    >
+    </canvas>
+  </div>
+
+  <!-- Top Plaintiff Law Firm -->
+  <div class="chart-item">
+    <strong>Top Plaintiff Law Firm</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInTopPlaintiffLawFirm"
+        (selectionChange)="onItemsToShowChangeInTopPlaintiffLawFirm()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <mat-list-item
+          *ngFor="let topPlaintiffLawFirm of filteredTopPlaintiffLawFirm"
+        >
+          {{ topPlaintiffLawFirm.name }}
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+  <!-- Top Defendant Law Firm -->
+  <div class="chart-item">
+    <strong>Top Defendant Law Firm</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInTopDefendentLawFirm"
+        (selectionChange)="onItemsToShowChangeInTopDefendentLawFirm()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <p
+          *ngFor="let topDefendantLawFirm of filteredTopDefendentLawFirm"
+          class="full-text"
+        >
+          {{ topDefendantLawFirm.name }}
+        </p>
+        <!-- <mat-list-item *ngFor="let topDefendantLawFirm of filteredTopDefendentLawFirm"  class="full-text">
+                  {{ topDefendantLawFirm.name }}
+                </mat-list-item> -->
+      </mat-list>
+    </div>
+  </div>
+  <!-- Overlapping Law Firm -->
+  <div class="chart-item">
+    <strong>Overlapping Law Firm</strong>
+    <mat-form-field appearance="outline">
+      <mat-label>Select Number of Items</mat-label>
+      <mat-select
+        [(value)]="itemsToShowInOverlappingLawFirm"
+        (selectionChange)="onItemsToShowChangeInOverlappingLawFirm()"
+      >
+        <mat-option value="2">2</mat-option>
+        <mat-option value="3">3</mat-option>
+        <mat-option value="4">4</mat-option>
+        <mat-option value="6">6</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Displaying the List -->
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <p
+          *ngFor="let overlappingLawFirm of filteredOverlappingLawFirm"
+          class="full-text"
+        >
+          {{ overlappingLawFirm }}
+        </p>
+        <!-- <mat-list-item *ngFor="let topDefendantLawFirm of filteredTopDefendentLawFirm"  class="full-text">
+                  {{ topDefendantLawFirm.name }}
+                </mat-list-item> -->
+      </mat-list>
+    </div>
+  </div>
+  <!-- Startup Cases -->
+  <div class="chart-item">
+    <strong>Startup Cases</strong>
+    <div class="scrollable-list">
+      <mat-list role="list">
+        <mat-list-item *ngFor="let plaintiff of uniquePlaintiff">
+          {{ plaintiff }}
+        </mat-list-item>
+      </mat-list>
+    </div>
+  </div>
+
+  <!-- Total cases of Company as Plaintiff -->
+  <!-- <div class="chart-item">
+    <strong>Total cases of Company as Plaintiff</strong>
+    <canvas
+      baseChart
+      [data]="barChartDataTotalCaseOfPlaintiff"
+      [type]="barChartTypeTotalCaseOfPlaintiff"
+      [options]="barChartOptionsTotalCaseOfPlaintiff"
+    >
+    </canvas>
+  </div> -->
+  <!-- Total cases of Company as  Defendant -->
+  <!-- <div class="chart-item">
+    <strong>Total cases of Company as Defendant</strong>
+    <canvas
+      baseChart
+      [data]="barChartDataTotalCaseOfDefendent"
+      [type]="barChartTypeTotalCaseOfDefendent"
+      [options]="barChartOptionsTotalCaseOfDefendent"
+    >
+    </canvas>
+  </div> -->
+
+  <!-- <div class="chart-item"></div> -->
+</div>
+
+<ng-template #loading>
+  <div
+    style="
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      padding: 20px;
+      height: 150vh;
+    "
+  >
+    <div><mat-spinner></mat-spinner></div>
+    <div><p>Loading Analytics...</p></div>
+  </div>
+</ng-template>

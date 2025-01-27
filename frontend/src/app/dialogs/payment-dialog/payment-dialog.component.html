@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Payment</h1>
+<div mat-dialog-content>
+  <p>
+    You are purchasing: <strong>{{ data.plan.planName }}</strong>
+  </p>
+  <p>
+    Seats Selected: <strong>{{ data.plan.seatSelected }}</strong>
+  </p>
+  <p>
+    Total Amount: <strong>{{ getTotalPrice() }} USD</strong>
+  </p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onPaymentSuccess()">Payment Success</button>
+  <button mat-button color="warn" (click)="onPaymentFailure()">
+    Payment Failure
+  </button>
+</div>

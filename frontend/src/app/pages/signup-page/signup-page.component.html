@@ -1,0 +1,102 @@
+<mat-card class="example-card" appearance="outlined">
+  <mat-icon class="arrow" routerLink="/login">arrow_back</mat-icon>
+  <mat-card-header>
+    <mat-card-title
+      ><h2 style="margin-top: 0">LITIGATION 99</h2></mat-card-title
+    >
+    <mat-card-subtitle>Sign Up</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <form (ngSubmit)="register()">
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          type="email"
+          name="email"
+          placeholder="Enter Mail Address*"
+          [(ngModel)]="email"
+          required
+        />
+        <span *ngIf="emailEnter" class="suffix-icon" matSuffix
+          ><mat-icon>warning</mat-icon></span
+        >
+        <mat-hint *ngIf="emailEnter" align="start"
+          >This Email Does not Exist.</mat-hint
+        >
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          [type]="getInputType()"
+          name="password"
+          placeholder="Create Password*"
+          [(ngModel)]="password"
+          required
+        />
+        <span
+          class="suffix-icon"
+          mat-icon-button
+          matSuffix
+          (click)="clickEvent($event)"
+          [attr.aria-label]="'Hide password'"
+          [attr.aria-pressed]="hide()"
+        >
+          <mat-icon>{{ hide() ? "visibility_off" : "visibility" }}</mat-icon>
+        </span>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input
+          matInput
+          [type]="getInputType()"
+          name="password"
+          placeholder="Confirm Password*"
+          [(ngModel)]="confirmPassword"
+          (input)="checkPasswordMatch()"
+          required
+        />
+        <span *ngIf="matchPassword" class="suffix-icon" matSuffix
+          ><mat-icon>warning</mat-icon></span
+        >
+        <mat-hint *ngIf="matchPassword" align="start">
+          Passwords do not match</mat-hint
+        >
+      </mat-form-field>
+      <div class="checkbox-container">
+        <mat-checkbox color="primary"> Remember me </mat-checkbox>
+      </div>
+
+      <!-- <p>Status: {{ isChecked ? 'Checked' : 'Unchecked' }}</p>  -->
+      <button
+        color="primary"
+        [disabled]="
+          !email ||
+          !password ||
+          !confirmPassword ||
+          password !== confirmPassword
+        "
+        mat-raised-button
+        type="submit"
+      >
+        Sign Up
+      </button>
+    </form>
+  </mat-card-content>
+
+  <mat-card-footer>
+    <div class="divider">
+      <p class="line"></p>
+      <p>OR</p>
+      <p class="line"></p>
+    </div>
+    <button
+      class="login-with-google"
+      style="color: black"
+      mat-button
+      (click)="googleLogin()"
+    >
+      <img src="google.svg" /> Login With Google
+    </button>
+  </mat-card-footer>
+</mat-card>

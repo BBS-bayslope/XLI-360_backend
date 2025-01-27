@@ -1,0 +1,34 @@
+
+ <div class="main-container" style="text-align: center;">
+    <h1>Welcome to the Home Page!</h1>
+    <button mat-raised-button color="warn" routerLink="/admin">Admin</button>
+    <button mat-raised-button color="warn" (click)="logout()">Sign Out</button>
+   </div>
+
+
+   <div class="fetchData">
+    <!-- data-table.component.html -->
+<table mat-table [dataSource]="excelData" class="mat-elevation-z8">
+
+  <!-- Column Definitions -->
+  <ng-container matColumnDef="srNo">
+    <th mat-header-cell *matHeaderCellDef> srNo </th>
+    <td mat-cell *matCellDef="let element"> {{ element.srNo || 'N/A' }} </td>
+  </ng-container>
+
+  
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+   </div>
+
+   <ul>
+    <li *ngFor="let item of excelData ">
+      {{ item.id }}: {{ item.data | json }}
+    </li>
+  </ul> 
+    
+
+

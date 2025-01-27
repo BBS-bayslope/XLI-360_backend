@@ -1,0 +1,475 @@
+<div class="inputExcel">
+  <h3>Select File</h3>
+  <button mat-button (click)="downloadTemplate()">Download Template</button>
+  <input
+    #fileInput
+    type="file"
+    (change)="onFileChange2($event)"
+    accept=".xlsx, .xls"
+  />
+
+  <div *ngIf="excelData.length > 0">
+    <!-- <button mat-button (click)="onFileSubmit()">Submit</button> -->
+  </div>
+</div>
+
+<!-- <div *ngIf="validationErrors.length > 0" class="error-box">
+  <h3>Validation Errors:</h3>
+  <ul>
+    <li *ngFor="let error of validationErrors">{{ error }}</li>
+  </ul>
+</div> -->
+
+<div
+  class="case-search-container"
+  style="
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin: auto;
+  "
+>
+  <label for="caseNumberInput">Enter Case Number:</label>
+  <input
+    id="caseNumberInput"
+    type="text"
+    [(ngModel)]="caseNumber"
+    placeholder="Enter Case Number"
+    style="padding: 8px; border: 1px solid #ccc; border-radius: 4px"
+  />
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="searchByCaseNumber()"
+    style="width: 100px; align-self: center"
+  >
+    Search
+  </button>
+  <!-- <div *ngIf="searchResult" style="margin-top: 20px">
+    <h3>Search Result:</h3>
+    <p><strong>Collection Name:</strong> {{ searchResult.collectionName }}</p>
+    <pre>{{ searchResult.data | json }}</pre>
+  </div> -->
+  <div *ngIf="searchError" style="margin-top: 20px; color: red">
+    <strong>Error:</strong> {{ searchError }}
+  </div>
+</div>
+
+<div *ngIf="excelData.length > 0 && validationErrors.length === 0">
+  <mat-table
+    [dataSource]="excelData.slice(0, 100)"
+    class="mat-table custom-table"
+  >
+    <ng-container matColumnDef="refID">
+      <th mat-header-cell *matHeaderCellDef>Ref ID</th>
+      <td mat-cell *matCellDef="let element">{{ element.refID }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="caseComplaintDate">
+      <th mat-header-cell *matHeaderCellDef>Case Complaint Date</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseDetails?.caseComplaintDate | date : "shortDate" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="caseNumber">
+      <th mat-header-cell *matHeaderCellDef>Case Number</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseDetails?.caseNumber }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="caseName">
+      <th mat-header-cell *matHeaderCellDef>Case Name</th>
+      <td mat-cell *matCellDef="let element">
+        <span style="width: 150px">{{ element.caseDetails?.caseName }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="techCategory">
+      <th mat-header-cell *matHeaderCellDef>Tech Category</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.techCategory }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="courtNames">
+      <th mat-header-cell *matHeaderCellDef>Court Names</th>
+      <td mat-cell *matCellDef="let element">{{ element.courtNames }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="technologyKeywords">
+      <th mat-header-cell *matHeaderCellDef>Technology Keywords</th>
+      <td mat-cell *matCellDef="let element">
+        <!-- {{ element.patentDetails?.technologyKeywords }} -->
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="quickSearchReport">
+      <th mat-header-cell *matHeaderCellDef>Quick Search Report</th>
+      <td mat-cell *matCellDef="let element">
+        <span *ngFor="let item of element.quickSearchReport"
+          >{{ item.fileName }} ></span
+        >
+        <button
+          style="margin: 20px; width: 200px"
+          mat-button
+          color="primary"
+          (click)="openManageReportsDialog(element.id, element.collectionName)"
+        >
+          Manage Reports
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseDetails?.status }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="litigationVenues">
+      <th mat-header-cell *matHeaderCellDef>
+        Litigation Venues & Judicial Authorities
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseDetails?.litigationVenues }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="relatedOriginatingCases">
+      <th mat-header-cell *matHeaderCellDef>Related/Originating Cases</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseDetails?.relatedOriginatingCases }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="caseClosedDate">
+      <th mat-header-cell *matHeaderCellDef>Case Closed Date</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseDetails?.caseClosedDate | date : "shortDate" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="patentNo">
+      <th mat-header-cell *matHeaderCellDef>Patent No</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.patentNo }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="techCentre">
+      <th mat-header-cell *matHeaderCellDef>Tech Centre</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.techCentre }}
+      </td>
+    </ng-container>
+
+    <!-- Accused Product -->
+    <ng-container matColumnDef="accusedProduct">
+      <th mat-header-cell *matHeaderCellDef>Accused Product</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.accusedProduct }}
+      </td>
+    </ng-container>
+
+    <!-- Chances of Winning -->
+    <ng-container matColumnDef="chancesOfWinning">
+      <th mat-header-cell *matHeaderCellDef>Chances of Winning</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.chancesOfWinning }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="patentIssuedDate">
+      <th mat-header-cell *matHeaderCellDef>Patent Issued Date</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.patentIssuedDate | date : "shortDate" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="patentExpiryDate">
+      <th mat-header-cell *matHeaderCellDef>Patent Expiry Date</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.patentExpiryDate | date : "shortDate" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="acquiredPatentOrOrganicPatent">
+      <th mat-header-cell *matHeaderCellDef>
+        Acquired Patent or Organic patent?
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.acquiredPatentOrOrganicPatent }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="activityTimeline">
+      <th mat-header-cell *matHeaderCellDef>Activity Timeline</th>
+      <td mat-cell *matCellDef="let element">{{ element.activityTimeline }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="numberOfInfringedClaims">
+      <th mat-header-cell *matHeaderCellDef>Number of Infringed Claims</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.numberOfInfringedClaims }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="plaintiffPersons">
+      <th mat-header-cell *matHeaderCellDef>Plaintiff Persons</th>
+      <td mat-cell *matCellDef="let element">
+        <!-- *ngFor="let person of element.legalEntities?.plaintiffPersons" -->
+
+        <ng-container>
+          <!-- {{ person.name }} - Phone: {{ person.phone }}, Email:
+          {{ person.email }} -->
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="defendantPersons">
+      <th mat-header-cell *matHeaderCellDef>Defendant Persons</th>
+      <td mat-cell *matCellDef="let element">
+        <!-- <ng-container
+          *ngFor="let person of element.legalEntities?.defendantPersons"
+        >
+          {{ person.name }} - Phone: {{ person.phone }}, Email:
+          {{ person.email }}
+        </ng-container> -->
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="numberOfDefendants">
+      <th mat-header-cell *matHeaderCellDef>Number of Defendants</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.numberOfDefendants }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="otherDefendants">
+      <th mat-header-cell *matHeaderCellDef>Other Defendants</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.otherDefendants }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="originalAssignee">
+      <th mat-header-cell *matHeaderCellDef>Original Assignee</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.originalAssignee }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="currentAssignee">
+      <th mat-header-cell *matHeaderCellDef>Current Assignee</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.currentAssignee }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="assigneeTimeline">
+      <th mat-header-cell *matHeaderCellDef>Assignee Timeline</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.patentDetails?.assigneeTimeline }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="standardEssentialPatent">
+      <th mat-header-cell *matHeaderCellDef>Standard Essential Patent</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.standardEssentialPatent }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="semiconductorPatent">
+      <th mat-header-cell *matHeaderCellDef>Semiconductor Patent</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.semiconductorPatent }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="artUnit">
+      <th mat-header-cell *matHeaderCellDef>Art Unit</th>
+      <td mat-cell *matCellDef="let element">{{ element.artUnit }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="reasonOfAllowance">
+      <th mat-header-cell *matHeaderCellDef>Reason of Allowance</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.reasonOfAllowance }}
+      </td>
+    </ng-container>
+
+    <!-- Plaintiff/Petitioner -->
+    <ng-container matColumnDef="plaintiffOrPetitioner">
+      <th mat-header-cell *matHeaderCellDef>Plaintiff/Petitioner</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.legalEntities?.plaintiffOrPetitioner }}
+      </td>
+    </ng-container>
+
+    <!-- Plaintiff's Law Firm Name -->
+    <ng-container matColumnDef="plaintiffsLawFirmName">
+      <th mat-header-cell *matHeaderCellDef>Plaintiff's Law Firm Name</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.legalEntities?.plaintiffsLawFirmName }}
+      </td>
+    </ng-container>
+
+    <!-- Defendant -->
+    <ng-container matColumnDef="defendant">
+      <th mat-header-cell *matHeaderCellDef>Defendant</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.legalEntities?.defendant }}
+      </td>
+    </ng-container>
+
+    <!-- Plaintiff's Law Firm Name -->
+    <ng-container matColumnDef="defendantLawFirmName">
+      <th mat-header-cell *matHeaderCellDef>Defendant's Law Firm Name</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.legalEntities?.defendantLawFirmName }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="causeOfAction">
+      <th mat-header-cell *matHeaderCellDef>Cause of Action</th>
+      <td mat-cell *matCellDef="let element">{{ element.causeOfAction }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="listOfPriorArt">
+      <th mat-header-cell *matHeaderCellDef>List of Prior Art</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseOutcome?.listOfPriorArt }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="thirdPartyFundingInvolved">
+      <th mat-header-cell *matHeaderCellDef>3rd Party Funding Involved</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.thirdPartyFundingInvolved }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="backwardCitation">
+      <th mat-header-cell *matHeaderCellDef>Backward Citation</th>
+      <td mat-cell *matCellDef="let element">
+        <!-- {{ element.citationDetails?.backwardCitation }} -->
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="forwardCitation">
+      <th mat-header-cell *matHeaderCellDef>Forward Citation</th>
+      <td mat-cell *matCellDef="let element">
+        <!-- {{ element.citationDetails?.forwardCitation }} -->
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="judge">
+      <th mat-header-cell *matHeaderCellDef>Judge</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.administrativeDetails?.judge }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="typeOfPatent">
+      <th mat-header-cell *matHeaderCellDef>Type of Patent</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.administrativeDetails?.typeOfPatent }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="plaintiffTypeAndSize">
+      <th mat-header-cell *matHeaderCellDef>Plaintiff Type & Size</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.administrativeDetails?.plaintiffTypeAndSize }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="defendantTypeAndSize">
+      <th mat-header-cell *matHeaderCellDef>Defendant Type & Size</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.administrativeDetails?.defendantTypeAndSize }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="recentAction">
+      <th mat-header-cell *matHeaderCellDef>Recent Action</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseOutcome?.recentAction }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="winningAmount">
+      <th mat-header-cell *matHeaderCellDef>Winning Amount</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseOutcome?.winningAmount }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="caseStrengthLevel">
+      <th mat-header-cell *matHeaderCellDef>Case Strength Level</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.caseStrengthLevel }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="singlePatentOrFamilyInvolved">
+      <th mat-header-cell *matHeaderCellDef>
+        Single Patent or Family Involved?
+      </th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.singlePatentOrFamilyInvolved }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="winningParty">
+      <th mat-header-cell *matHeaderCellDef>Winning Party</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseOutcome?.winningParty }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="typeOfInfringement">
+      <th mat-header-cell *matHeaderCellDef>Type of Infringement</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.infringementDetails?.typeOfInfringement }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="otherPossibleInfringer">
+      <th mat-header-cell *matHeaderCellDef>Other Possible Infringer</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.caseOutcome?.otherPossibleInfringer }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="industry">
+      <th mat-header-cell *matHeaderCellDef>Industry</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.industry }}
+      </td>
+    </ng-container>
+
+    <!-- Assigned Judge -->
+    <ng-container matColumnDef="assignedJudge">
+      <th mat-header-cell *matHeaderCellDef>Assigned Judge</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.administrativeDetails?.assignedJudge || "N/A" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="stage">
+      <th mat-header-cell *matHeaderCellDef>Stage</th>
+      <td mat-cell *matCellDef="let element">
+        {{ element.administrativeDetails?.stage }}
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </mat-table>
+</div>

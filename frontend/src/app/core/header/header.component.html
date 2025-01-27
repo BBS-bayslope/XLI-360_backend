@@ -1,0 +1,134 @@
+<header>
+  <div
+    style="
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 10px 10px;
+      background-color: #f7f7f7;
+    "
+  >
+    <div
+      style="
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+        gap: 10px;
+      "
+      [routerLink]="['/']"
+      routerLinkActive="router-link-active"
+      (click)="onLogoClick()"
+    >
+      <!-- <h2
+        routerLinkActive="router-link-active"
+        style="color: #505050; margin: 0"
+      >
+        Litigation99
+      </h2> -->
+      <img height="60px" width="auto" src="/logo-main.svg" alt="" />
+      <!-- <h3 style="margin: 0; margin-top: 3px">XLI 360</h3> -->
+    </div>
+    <div
+      style="
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        gap: 5px;
+        width: 100%;
+      "
+    >
+      <button
+        color="primary"
+        mat-raised-button
+        style="padding: 20px; margin-left: 10px"
+        routerLink="subscriptions"
+      >
+        Subscribe
+      </button>
+      <button
+        [routerLink]="user ? '/account-settings' : 'login'"
+        mat-icon-button
+        class="hover-icon"
+      >
+        <mat-icon>account_circle</mat-icon>
+      </button>
+      <button mat-icon-button class="hover-icon">
+        <mat-icon>headphones</mat-icon>
+      </button>
+      <button routerLink="/" mat-icon-button class="hover-icon">
+        <mat-icon>home</mat-icon>
+      </button>
+      <button
+        [cdkMenuTriggerFor]="menu"
+        class="example-standalone-trigger"
+        mat-stroked-button
+      >
+        Buy / Sell Patents
+      </button>
+      <ng-template #menu>
+        <div class="example-menu" cdkMenu>
+          <button
+            mat-raised-button
+            style="margin-bottom: 5px; background-color: #0cd138; color: white"
+            cdkMenuItem
+          >
+            Buy Patents
+          </button>
+          <button mat-raised-button color="primary" cdkMenuItem>
+            Sell Patents
+          </button>
+        </div>
+      </ng-template>
+    </div>
+
+    <div
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      "
+    >
+      <!-- <p style="margin: 0; font-size: medium">Interested in</p>
+      <div style="display: flex; flex-direction: row; gap: 10px">
+        <button
+          style="background-color: #0cd138; color: white; padding: 0px 30px"
+          mat-button
+        >
+          Buy Patent
+        </button>
+        <button
+          style="background-color: #0744e0; color: white; padding: 0px 30px"
+          mat-button
+        >
+          Sell Patent
+        </button>
+      </div> -->
+    </div>
+  </div>
+
+  <!--      
+      <div style="display: grid;grid-template-columns:  1fr 4fr 1fr;grid-template-rows: 1fr;padding: 20px;padding-bottom: 10px;">
+        <div style="grid-column: 2/3;display: flex;flex-direction: row; justify-content: center;gap:15px; align-items: flex-start;">
+          <mat-form-field appearance="outline" style="width: 70%;">
+            <mat-label>Search</mat-label>
+            <input [disabled]="options === []" type="search"   matNativeControl [formControl]="searchControl"  [matAutocomplete]="auto">
+            
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let option of filteredOptions | async" [value]="option.data?.plaintiffAttorney"> 
+                {{ option.data?.caseNumber }} - {{ option.data?.caseName }} - {{option.data?.sources? option.data?.sources:'No source'}} - Industry: {{option.data?.industry}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          
+            <button style="border-radius: 5px;height: 70%; color: black;border: 1px solid grey; background-color:rgb(241, 241, 241);" mat-raised-button><mat-icon>sort</mat-icon>Advanced Search</button>
+        </div>
+        <div style="display: flex;flex-direction: row;align-items: center;justify-content: space-around;margin-bottom: 13px;"> 
+          <button mat-raised-button style="background-color: #E3214B;border-radius: 5px;height: 82%;margin-bottom: 10px;width: 70%; color: white; ">Subscribe</button>
+          <button mat-icon-button style="width: 50px;height: 50px;"><mat-icon style="font-size: 30px;height: 30px;width: 30px;">headphones</mat-icon></button>     
+  
+        </div>
+      </div> -->
+</header>

@@ -1,0 +1,73 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-evenly;
+  padding: 20px 0;
+  margin: 10px 0 10px 0;
+  height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 30%;
+}
+
+.sidebar button {
+  width: 60%;
+}
+
+.sidebar .my-account-button {
+  margin-top: 30px;
+}
+
+.main-content {
+  width: 70%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 20px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-container {
+  margin-bottom: 20px;
+}
+
+.card {
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 60%;
+}
+
+.details-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding-right: 20px;
+}
+
+.info-text {
+  color: grey;
+}
+
+.subscribe-button {
+  margin-left: 10px;
+}

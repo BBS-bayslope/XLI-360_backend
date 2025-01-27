@@ -1,0 +1,289 @@
+<div class="container">
+  <div class="sidebar">
+    <button
+      mat-raised-button
+      class="my-account-button"
+      [color]="currentSection === 'myAccount' ? 'primary' : null"
+      (click)="showSection('myAccount')"
+    >
+      My Account
+    </button>
+    <button
+      mat-raised-button
+      [color]="currentSection === 'organisations' ? 'primary' : null"
+      (click)="showSection('organisations')"
+    >
+      Subscriptions
+    </button>
+    <button
+      mat-raised-button
+      [color]="currentSection === 'purchaseHistory' ? 'primary' : null"
+      (click)="showSection('purchaseHistory')"
+    >
+      Purchase History
+    </button>
+    <button *ngIf="user" mat-stroked-button color="warn" (click)="logout()">
+      Logout
+    </button>
+  </div>
+  <div class="main-content">
+    <!-- My Account Section -->
+    <div *ngIf="currentSection === 'myAccount'">
+      <h1>My Account</h1>
+      <form
+        [formGroup]="profileForm"
+        (ngSubmit)="onSubmit()"
+        style="display: flex; flex-direction: column; gap: 5px; width: 60%"
+      >
+        <mat-form-field appearance="outline">
+          <mat-label>Account ID</mat-label>
+          <input
+            [readonly]="true"
+            matInput
+            id="uid"
+            formControlName="uid"
+            type="text"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input
+            [readonly]="true"
+            matInput
+            id="email"
+            formControlName="email"
+            type="email"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Display Name</mat-label>
+          <input
+            matInput
+            id="displayName"
+            formControlName="displayName"
+            type="text"
+          />
+        </mat-form-field>
+
+        <ng-container formGroupName="location">
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-around;
+              align-items: center;
+              gap: 5px;
+            "
+          >
+            <mat-form-field style="width: 100%" appearance="outline">
+              <mat-label>Enter to search address on Google Maps</mat-label>
+              <input
+                appGooglePlaces
+                (addressChange)="onAddressChange($event)"
+                matInput
+                formControlName="address"
+              />
+            </mat-form-field>
+            <button
+              (click)="getMyLocation()"
+              style="margin-bottom: 20px"
+              mat-icon-button
+            >
+              <mat-icon>my_location</mat-icon>
+            </button>
+          </div>
+
+          <mat-form-field style="width: 100%" appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" placeholder="City" />
+          </mat-form-field>
+
+          <mat-form-field style="width: 100%" appearance="outline">
+            <mat-label>State</mat-label>
+            <input matInput formControlName="state" placeholder="State" />
+          </mat-form-field>
+
+          <mat-form-field style="width: 100%" appearance="outline">
+            <mat-label>Country</mat-label>
+            <input matInput formControlName="country" placeholder="Country" />
+          </mat-form-field>
+        </ng-container>
+
+        <div>
+          <button
+            *ngIf="isUpdated"
+            type="submit"
+            mat-raised-button
+            color="primary"
+            style="padding: 0px 80px; margin-right: 20px"
+          >
+            Save
+          </button>
+          <button
+            *ngIf="isUpdated"
+            type="button"
+            mat-stroked-button
+            color="warn"
+            (click)="discardChanges()"
+          >
+            Discard All Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Organisations Section -->
+    <div *ngIf="currentSection === 'organisations'">
+      <!-- Main Content Section -->
+      <div *ngIf="!orgDetailsActive">
+        <header class="header">
+          <h1>Subscriptions</h1>
+        </header>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+          <button mat-icon-button (click)="errorMessage = null">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- My Subscriptions -->
+        <ng-container *ngIf="myOrgs.length > 0; else noMyOrgs">
+          <div *ngFor="let item of myOrgs" class="card-container">
+            <mat-card class="card">
+              <span
+                >{{ item.planNamePurchased }} owned by
+                {{ item.createdBy }}</span
+              >
+              <button mat-raised-button (click)="openOrgPage(item.id)">
+                Manage
+              </button>
+            </mat-card>
+          </div>
+        </ng-container>
+
+        <ng-template #noMyOrgs>
+          <p>
+            You have not purchased any subscription!!
+            <button
+              [routerLink]="'/subscriptions'"
+              mat-button
+              color="primary"
+              class="subscribe-button"
+            >
+              Subscribe
+            </button>
+          </p>
+        </ng-template>
+
+        <!-- Membership Subscriptions -->
+        <section *ngIf="membershipOrgs.length > 0">
+          <h3>Other Subscriptions</h3>
+          <p class="info-text">
+            These are subscriptions purchased by others and they have added you
+            to their member list.
+          </p>
+          <div *ngFor="let item of membershipOrgs" class="card-container">
+            <mat-card class="card">
+              <span
+                >{{ item.planNamePurchased }} owned by
+                {{ item.createdBy }}</span
+              >
+              <button mat-raised-button (click)="openOrgPage2(item.id)">
+                Open
+              </button>
+            </mat-card>
+          </div>
+        </section>
+      </div>
+
+      <!-- Organisation Details Section -->
+      <div *ngIf="orgDetailsActive">
+        <div class="details-header">
+          <button mat-button color="warn" (click)="orgDetailsActive = false">
+            ← Back
+          </button>
+          <h2>{{ currentOrg?.planNamePurchased }} Details</h2>
+        </div>
+
+        <p>Plan Type: {{ currentOrg?.planType }}</p>
+        <p>Expiration Date: {{ currentOrg?.expirationDate | date }}</p>
+        <p>Status: {{ currentOrg?.status }}</p>
+        <p>Total Active Seats: {{ currentOrg?.purchasedSeats }}</p>
+        <p>
+          Unassigned Seats:
+          {{ currentOrg?.purchasedSeats - currentOrg.members.length }}
+        </p>
+
+        <h3>Members</h3>
+        <ul>
+          <li *ngFor="let member of currentOrg?.members">{{ member }}</li>
+        </ul>
+
+        <!-- Add Member Section -->
+        <div *ngIf="currentOrg.createdBy === user?.email">
+          <mat-form-field>
+            <mat-label>Add Member</mat-label>
+            <input matInput placeholder="Email" [(ngModel)]="newMemberEmail" />
+          </mat-form-field>
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="addMemberToOrg(currentOrg?.id, newMemberEmail)"
+          >
+            Add Member
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="currentSection === 'purchaseHistory'">
+      <span
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: flex-start;
+          gap: 30px;
+          align-items: center;
+          padding-right: 20px;
+        "
+      >
+        <h1>Purchase History</h1></span
+      >
+      <div *ngFor="let item of myOrgs">
+        <mat-card
+          style="
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 60%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+          "
+          appearance="raised"
+        >
+          <span>
+            Purchased {{ item.planNamePurchased }} by paying
+            {{ item.amountPaid }} on
+            {{ item?.createdOn?.toDate() | date : "medium" }}
+          </span>
+
+          <span>
+            <button
+              style="text-wrap: nowrap"
+              mat-raised-button
+              (click)="downloadInvoice(item.id)"
+            >
+              Download Invoice
+            </button>
+          </span>
+        </mat-card>
+      </div>
+      <p *ngIf="myOrgs.length === 0">No Purchases!</p>
+    </div>
+  </div>
+</div>

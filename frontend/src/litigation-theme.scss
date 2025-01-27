@@ -1,0 +1,146 @@
+@use "@angular/material" as mat;
+
+// Initialize Material core styles
+@include mat.core();
+
+// Define primary palette
+$litigation-primary: mat.m2-define-palette(
+  (
+    50: #e3f1fd,
+    // Lightest shade
+    100: #b8dcfb,
+    // Lighter shade
+    200: #8ac5f8,
+    // Light shade
+    300: #5caff6,
+    // Slightly lighter than main primary
+    400: #379af4,
+    // Close to main primary
+    500: #2074f3,
+    // Main Primary Color
+    600: #1d68db,
+    // Slightly darker
+    700: #1a5cc4,
+    // Darker shade
+    800: #174fad,
+    // Even darker
+    900: #123c80,
+    // Darkest shade
+    A100: #4d9df5,
+    // Accent lighter primary
+    A200: #2074f3,
+    // Main primary accent
+    A400: #1a5cc4,
+    // Accent darker primary
+    A700: #174fad,
+    // Darkest accent
+    contrast:
+      (
+        50: #000000,
+        100: #000000,
+        200: #000000,
+        300: #000000,
+        400: #ffffff,
+        500: #ffffff,
+        // White text on the main primary color
+        600: #ffffff,
+        700: #ffffff,
+        800: #ffffff,
+        900: #ffffff,
+        A100: #ffffff,
+        A200: #ffffff,
+        A400: #ffffff,
+        A700: #ffffff,
+      ),
+  )
+);
+
+// Define warn palette
+$litigation-warn: mat.m2-define-palette(
+  (
+    50: #f9e2e2,
+    100: #f3b6b6,
+    200: #ed8787,
+    300: #e75858,
+    400: #e33131,
+    500: #d00d0d,
+    // Warn
+    600: #bd0c0c,
+    700: #a80b0b,
+    800: #940909,
+    900: #760707,
+    A100: #ff8080,
+    A200: #ff4d4d,
+    A400: #ff1a1a,
+    A700: #e60000,
+    contrast: (
+      50: #000000,
+      100: #000000,
+      200: #000000,
+      300: #ffffff,
+      400: #ffffff,
+      500: #ffffff,
+      600: #ffffff,
+      700: #ffffff,
+      800: #ffffff,
+      900: #ffffff,
+      A100: #000000,
+      A200: #000000,
+      A400: #000000,
+      A700: #ffffff,
+    ),
+  )
+);
+
+// Define secondary palette
+$litigation-secondary: mat.m2-define-palette(
+  (
+    50: #f2f2f2,
+    100: #d9d9d9,
+    200: #bfbfbf,
+    300: #a6a6a6,
+    400: #8c8c8c,
+    500: #646464,
+    // Secondary
+    600: #4d4d4d,
+    700: #333333,
+    800: #1a1a1a,
+    900: #000000,
+    // Secondary dark
+    A100: #b4b4b4,
+    // Other lighter color
+    A200: #8c8c8c,
+    A400: #646464,
+    A700: #4d4d4d,
+    contrast: (
+      50: #000000,
+      100: #000000,
+      200: #000000,
+      300: #000000,
+      400: #ffffff,
+      500: #ffffff,
+      600: #ffffff,
+      700: #ffffff,
+      800: #ffffff,
+      900: #ffffff,
+      A100: #000000,
+      A200: #000000,
+      A400: #000000,
+      A700: #ffffff,
+    ),
+  )
+);
+
+// Define the theme
+$litigation-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $litigation-primary,
+      accent: $litigation-secondary,
+      warn: $litigation-warn,
+    ),
+  )
+);
+
+// Apply the theme to all Material components
+@include mat.all-component-themes($litigation-theme);

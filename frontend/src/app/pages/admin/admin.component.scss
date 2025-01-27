@@ -1,0 +1,85 @@
+.inputExcel {
+  // display: flex;
+  text-align: center;
+  // justify-content: center;
+  margin-bottom: 10px;
+}
+.error-box {
+  border: 1px solid red;
+  background-color: #ffe6e6;
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 5px;
+  color: red;
+}
+
+.error-box h3 {
+  margin: 0 0 10px;
+}
+
+.custom-cell {
+  padding: 12px; /* Padding around cell content */
+  border: 1px solid #ddd; /* Border for cells */
+}
+
+.custom-row:nth-child(even) {
+  background-color: #f2f2f2; /* Alternate row color */
+}
+
+.custom-row:hover {
+  background-color: #e0e0e0; /* Highlight on hover */
+}
+img {
+  height: 40px;
+  width: 40px;
+}
+
+/* Ensure table respects fixed column widths */
+mat-table {
+  width: 100%; /* Full width table */
+  table-layout: fixed; /* Enforce fixed column widths */
+  border-collapse: collapse; /* Optional: Cleaner borders */
+}
+
+/* Fixed height for all rows */
+mat-header-row,
+mat-row {
+  height: 100px !important; /* Fixed row height */
+}
+
+/* Fixed width and scrollable content for cells */
+th,
+td {
+  width: 150px; /* Fixed cell width */
+  height: 100px; /* Fixed cell height */
+  overflow: auto; /* Enable scrolling for overflowing content */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+  white-space: normal;
+  padding: 8px; /* Padding for better spacing */
+  text-align: left; /* Align text to the left */
+  vertical-align: middle; /* Vertically align content */
+  border: 1px solid #e0e0e0; /* Optional: Add a border */
+}
+
+/* Optional: Add a hover effect for rows */
+mat-row:hover {
+  background-color: #f5f5f5; /* Light gray background on hover */
+}
+
+/* Custom scrollbars for cells */
+th::-webkit-scrollbar,
+td::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+th::-webkit-scrollbar-thumb,
+td::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+th::-webkit-scrollbar-thumb:hover,
+td::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}

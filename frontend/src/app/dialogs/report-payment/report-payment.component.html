@@ -1,0 +1,13 @@
+<div class="report-purchase-dialog">
+  <h3>Purchase Report</h3>
+  <p><strong>Document ID:</strong> {{ data.docId }}</p>
+  <p><strong>User:</strong> {{ data.user?.email }}</p>
+  <p><strong>Price:</strong> $ {{ data.price }}</p>
+
+  <button mat-raised-button color="primary" (click)="onPaymentSuccess()">
+    Confirm Purchase
+  </button>
+  <button mat-raised-button color="warn" (click)="onPaymentFailure()">
+    Cancel
+  </button>
+</div>

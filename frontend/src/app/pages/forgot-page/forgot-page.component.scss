@@ -1,0 +1,179 @@
+.mat-mdc-card {
+  max-width: 400px;
+  text-align: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: #f0f0f0;
+  border-radius: 5px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 15px;
+  padding-bottom: 20px;
+}
+
+mat-card-header {
+  text-align: left;
+  margin-bottom: 30px;
+}
+.mat-mdc-card-title {
+  margin-top: -10px;
+  text-align: center;
+  color: black;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 72px;
+  margin-bottom: -5px;
+}
+.mat-mdc-card-subtitle {
+  line-height: 28.5px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+mat-card-header span {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 21px;
+}
+
+mat-form-field {
+  box-shadow: 0px 2px 9.9px 0px #00000040;
+  height: 40px;
+  // margin-top: 30px;
+  margin-bottom: 40px;
+
+  width: 360px;
+  height: 46px;
+  top: 337px;
+  left: 540px;
+  gap: 0px;
+  border-radius: 3px 0px 0px 0px;
+  opacity: 0px;
+}
+
+.forgot-password a {
+  padding-top: 25px;
+  height: 21px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 21px;
+  text-align: left;
+  color: #000000;
+  display: block;
+  margin-top: 15px;
+  text-decoration: none;
+}
+.arrow {
+  margin-top: 10px;
+  margin-inline-start: 10px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.suffix-icon {
+  padding-right: 5px;
+}
+
+mat-hint {
+  font-size: 14px;
+}
+
+.mat-mdc-card-header {
+  display: unset;
+}
+.login-with-google {
+  margin-top: 0px;
+  border: 1px solid #9f9e9e;
+  color: #000000;
+  background: white;
+}
+.login-with-google img {
+  width: 36px;
+  height: 36px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+//or
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%; /* Full width container */
+  margin: 15px 0; /* Add some space above and below */
+}
+
+.line {
+  margin: 8px;
+  flex: 1; /* Take up equal space for each line */
+  border: 1px solid #7c7979;
+}
+
+//change mat-form-field inside input with text postion
+:host ::ng-deep .mat-mdc-input-element {
+  top: -5px !important;
+  position: relative !important;
+  border-radius: 3px 0px 0px 0px;
+}
+//change mat-input border color and width
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled)
+  .mdc-notched-outline__trailing {
+  border: none;
+}
+//hovwer to change y
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(
+    .mdc-text-field-focused
+  ):hover
+  .mdc-notched-outline
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(
+    .mdc-text-field-focused
+  ):hover
+  .mdc-notched-outline
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled):not(
+    .mdc-text-field-focused
+  ):hover
+  .mdc-notched-outline
+  .mdc-notched-outline__trailing {
+  border: none;
+}
+// focuus to change
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(
+    .mdc-text-field--disabled
+  ).mdc-text-field--focused
+  .mdc-notched-outline__leading,
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(
+    .mdc-text-field--disabled
+  ).mdc-text-field--focused
+  .mdc-notched-outline__notch,
+:host
+  ::ng-deep
+  .mdc-text-field--outlined:not(
+    .mdc-text-field--disabled
+  ).mdc-text-field--focused
+  .mdc-notched-outline__trailing {
+  border: none;
+}
