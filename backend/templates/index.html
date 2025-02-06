@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Excel</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #message { margin-top: 20px; font-weight: bold; color: green; }
+    </style>
+</head>
+<body>
+
+    <h2>Upload an Excel File</h2>
+    <input type="file" id="fileInput" accept=".xlsx, .xls">
+    <button onclick="uploadFile()">Upload</button>
+    <p id="message"></p>
+
+    <script>
+        function uploadFile() {
+            let fileInput = document.getElementById('fileInput');
+            let file = fileInput.files[0];
+            let messageElem = document.getElementById("message");
+        
+            if (!file) {
+                alert("Please select an Excel file to upload.");
+                return;
+            }
+        
+            // Show Loader
+            messageElem.textContent = "Uploading...";
+            messageElem.style.color = "blue";
+        
+            let formData = new FormData();
+            formData.append("file", file);
+        
+            fetch("/api/uploadNew/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                messageElem.textContent = "Excel file uploaded successfully!";
+                messageElem.style.color = "green";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                messageElem.textContent = "Upload failed!";
+                messageElem.style.color = "red";
+            });
+        }
+        
+    </script>
+
+</body>
+</html>

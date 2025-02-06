@@ -39,6 +39,7 @@ import {
   ProgressSpinnerMode,
   MatProgressSpinnerModule,
 } from '@angular/material/progress-spinner';
+import { debounce } from 'lodash';
 
 import {
   collection,
@@ -138,6 +139,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   collectionIndex: number = 0; // Track current collection
   litigationVenueOptions: string[] = [];
+  selectedCourtNames: string[] = [];
+  searchText: string = ''; // Stores search query
+  refilteredCourtName: string[] = [];
   filters: { [key: string]: any } = {}; // Active filters
 
   searchQuery: string = ''; // Store the current search query
@@ -157,6 +161,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   acquisition_types: any = [];
   totalCount: number = 0;
   currentPage: number = 1;
+  loader: boolean = false;
   constructor(private cdr: ChangeDetectorRef, private firestore: Firestore) { }
 
   ngOnInit() {
@@ -180,10 +185,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.getAllStandardEssentialPatent();
     // this.getAllSemiconductorPatent();
 
-    const dates = this.getAllCaseHistory();
+    // const dates = this.getAllCaseHistory();
     this.dataSource.data = this.excelData;
     // this.getAllIndustry();
-    this.fetchAndMergeAnalyticsData();
+    // this.fetchAndMergeAnalyticsData();
 
     this.applyFilters();
 
@@ -203,30 +208,47 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     },
   ];
 
+  filterCourtNames() {
+    if (!this.searchText) {
+      this.filteredCourtName = [...this.courtNameArrays];
+    } else {
+      this.filteredCourtName = this.courtNameArrays.filter(court => 
+        court.toLowerCase().includes(this.searchText.toLowerCase())
+      );
+    }
+  }
+
   fetchFilterData(): void {
+    this.loader=true;
     this.api.getFilterData().subscribe((response: any) => {
       this.litigationVenueOptions = response.litigation_venues;
       this.industryArrays = response.industry;
       this.caseStatusOptions = response.case_status;
-      this.filteredCourtName = response.courtName;
+      this.courtNameArrays = response.courtName;
       this.patent_types = response.patentType;
       this.acquisition_types = response.acquisition_type;
-      this.filteredPatentNos = response.patent_no;
-      this.filteredCaseNumbers = response.case_no;
-      this.filteredPlaintiff = response.plaintiff;
-      this.filteredDefendants = response.defendants;
-      this.filteredTechnologyKeywords = response.tech_keywords;
-      this.filteredTechCategory = response.tech_categories;
+      this.patentNoArrays = response.patent_no;
+      this.caseNumbers = response.case_no;
+      this.plaintiffArrays = response.plaintiff;
+      this.defendantArrays = response.defendants;
+      this.technologyKeywordsArrays = response.tech_keywords;
+      this.techCategoryArrays = response.tech_categories;
+      this.courtNameArrays = response.courtName;
+      this.causeOfActionArrays=response.cause_of_action;
+      this.standardEssentialPatentArrays=response.standard_patent;
+      this.semiconductorPatentArrays=response.semiconductor_patent;
+      this.loader=false;
+      this.cdr.detectChanges(); // Force UI to update
     },
       (error) => {
-        this.isLoading = false
+        this.loader = false
         console.error('Error fetching data', error);
       }
     )
   }
   //ye mera code hai
   fetchData(): void {
-    this.isLoading = true
+    this.loader = true
     this.api.getTableData(this.payload)
       .subscribe(
         (response: any) => {
@@ -252,16 +274,17 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
           //     console.error('Error fetching data', error);
           //   }
           // )
-          this.isLoading = false
+          this.loader = false
+          this.cdr.detectChanges(); // Force UI to update
         },
         (error) => {
-          this.isLoading = false
+          this.loader = false
           console.error('Error fetching data', error);
         }
       );
   }
 
-
+  
   // yha tak
   getFileDetails(
     files: { fileName: string; fileType: string; url: string }[],
@@ -732,51 +755,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     localStorage.clear(); // Clear all cached data
     console.log('Cache has been cleared.');
   }
-
-  // async getAllLitigationVenues(): Promise<void> {
-  //   this.isLoadingFilters = true;
-  //   try {
-  //     const collectionNames = [
-  //       'excelDataPrimary',
-  //       'excelDataHigh',
-  //       'excelDataMedium',
-  //       'excelDataLow',
-  //     ];
-
-  //     const venuePromises = collectionNames.map(async (name) => {
-  //       const collectionRef = collection(this.firestore, name);
-  //       const querySnapshot = await getDocs(collectionRef);
-
-  //       const venues = new Set<string>();
-  //       querySnapshot.forEach((doc) => {
-  //         const venue = doc.data()?.['caseDetails']?.litigationVenues;
-  //         if (venue) {
-  //           venues.add(venue);
-  //         }
-  //       });
-
-  //       return Array.from(venues);
-  //     });
-
-  //     // Aggregate venues from all collections
-  //     const venueArrays = await Promise.all(venuePromises);
-
-  //     // Flatten and deduplicate venues
-  //     const allVenues = new Set<string>();
-  //     venueArrays.forEach((venues) => {
-  //       venues.forEach((venue) => allVenues.add(venue));
-  //     });
-
-  //     this.litigationVenueOptions = Array.from(allVenues);
-
-  //     console.log('Litigation Venues:', this.litigationVenueOptions);
-  //     this.isLoadingFilters = false;
-  //     this.cdr.detectChanges();
-  //   } catch (error) {
-  //     console.error('Error fetching litigation venues:', error);
-  //   }
-  // }
-
   getCachedCount(collectionName: string): number {
     const cachedCounts = JSON.parse(
       localStorage.getItem('cachedCounts') || '{}'
@@ -851,68 +829,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.payload.litigation_venues = Array.from(this.selectedSources)
     this.fetchData();
     console.log('Current Selected Sources:', Array.from(this.selectedSources));
-    this.fetchFilteredData(); // Fetch data from the backend
   }
 
   isFilteredLoading: boolean = false;
 
-  async fetchFilteredData(): Promise<void> {
-    this.isLoading = true;
-    this.isFilteredLoading = this.selectedSources.size > 0; // Set filtered loading only for filtered results
-
-    try {
-      const collectionName = this.collectionNames[this.collectionIndex];
-      const collectionRef = collection(this.firestore, collectionName);
-
-      if (this.selectedSources.size > 0) {
-        const selectedVenuesArray = Array.from(this.selectedSources);
-
-        // Step 1: Calculate the total count of matching documents
-        const countQuery = query(
-          collectionRef,
-          where('caseDetails.status', '==', this.selectedCaseStatus),
-          where('caseDetails.litigationVenues', 'in', selectedVenuesArray)
-        );
-
-        const countSnapshot = await getDocs(countQuery);
-        this.totalLength = countSnapshot.size; // Update total length for paginator
-
-        // Step 2: Fetch paginated data for the selected venues
-        const paginatedQuery = query(
-          collectionRef,
-          where('caseDetails.litigationVenues', 'in', selectedVenuesArray),
-          orderBy('caseDetails.litigationVenues'),
-          startAfter(this.paginator.pageIndex * this.pageSize),
-          limit(this.pageSize)
-        );
-
-        const snapshot = await getDocs(paginatedQuery);
-
-        const results = snapshot.docs.map((doc, index) => ({
-          id: doc.id,
-          srNo: this.paginator.pageIndex * this.pageSize + index + 1,
-          data: doc.data(),
-        }));
-
-        this.dataSource.data = results;
-      } else {
-        // Default case: Load unfiltered data
-        console.log('No filters selected. Resetting to initial load state.');
-        this.totalLength = null; // Reset paginator length
-        await this.getTotalCount();
-        await this.loadPage(0, this.pageSize); // Load initial data
-        this.cdr.detectChanges();
-      }
-
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error fetching filtered data:', error);
-    } finally {
-      this.isLoading = false;
-      this.isFilteredLoading = false;
-      this.cdr.detectChanges();
-    }
-  }
 
   onCaseStatusChange(): void {
     if (this.selectedCaseStatus === 'All') {
@@ -924,376 +844,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.fetchData()
     // this.fetchFilteredDataByCaseStatus(); // Fetch data based on the selected case status
   }
-
-  // async fetchFilteredDataByCaseStatus(): Promise<void> {
-  //   this.isLoading = true;
-  //   this.isFilteredLoading = !!this.selectedCaseStatus; // Set filtered loading only if a status is selected
-
-  //   try {
-  //     const allResults: any[] = []; // Array to hold results from all collections
-
-  //     for (const collectionName of this.collectionNames) {
-  //       const collectionRef = collection(this.firestore, collectionName);
-
-  //       if (
-  //         this.selectedCaseStatus === 'open' ||
-  //         this.selectedCaseStatus === 'closed'
-  //       ) {
-  //         console.log(
-  //           `Fetching data for case status: ${this.selectedCaseStatus}`
-  //         );
-
-  //         // Query directly for "open" or "closed"
-  //         const statusQuery = query(
-  //           collectionRef,
-  //           where('caseDetails.status', '==', this.selectedCaseStatus),
-  //           limit(this.pageSize)
-  //         );
-
-  //         const snapshot = await getDocs(statusQuery);
-
-  //         // Map the results
-  //         const results = snapshot.docs.map((doc, index) => ({
-  //           id: doc.id,
-  //           srNo: allResults.length + index + 1,
-  //           data: doc.data(),
-  //         }));
-
-  //         console.log('Results:', results);
-
-  //         allResults.push(...results);
-  //       } else if (this.selectedCaseStatus) {
-  //         console.log(
-  //           `Fetching data excluding "open" and "closed" for status: ${this.selectedCaseStatus}`
-  //         );
-
-  //         // Use `not-in` condition to exclude "open" and "closed"
-  //         const notInQuery = query(
-  //           collectionRef,
-  //           where('caseDetails.status', 'not-in', ['open', 'closed']),
-  //           limit(this.pageSize)
-  //         );
-
-  //         const snapshot = await getDocs(notInQuery);
-
-  //         // Map the results
-  //         const intermediateResults = snapshot.docs.map((doc, index) => ({
-  //           id: doc.id,
-  //           srNo: allResults.length + index + 1,
-  //           data: doc.data(),
-  //         }));
-
-  //         // Further filter for the exact selectedCaseStatus
-  //         const filteredResults = intermediateResults.filter(
-  //           (item) =>
-  //             item.data['caseDetails']?.status == this.selectedCaseStatus
-  //         );
-
-  //         console.log('Filtered Results:', filteredResults);
-
-  //         allResults.push(...filteredResults);
-  //       } else {
-  //         console.log(
-  //           'No case status filter selected for collection:',
-  //           collectionName
-  //         );
-
-  //         // Default case: Load unfiltered data
-  //         const allQuery = query(collectionRef, limit(this.pageSize));
-  //         const snapshot = await getDocs(allQuery);
-
-  //         const unfilteredResults = snapshot.docs.map((doc, index) => ({
-  //           id: doc.id,
-  //           srNo: allResults.length + index + 1,
-  //           data: doc.data(),
-  //         }));
-
-  //         allResults.push(...unfilteredResults);
-  //       }
-  //     }
-
-  //     // Update data source and paginator
-  //     this.dataSource.data = allResults;
-  //     this.totalLength = allResults.length;
-  //     console.log('Final Aggregated Results:', allResults);
-
-  //     this.cdr.detectChanges();
-  //   } catch (error) {
-  //     console.error('Error fetching filtered data by case status:', error);
-  //   } finally {
-  //     this.isLoading = false;
-  //     this.isFilteredLoading = false;
-  //     this.cdr.detectChanges();
-  //   }
-  // }
-
-  async fetchFilteredDataByCaseStatus(): Promise<void> {
-    this.isLoading = true;
-    this.isFilteredLoading = !!this.selectedCaseStatus; // Set filtered loading only if a status is selected
-
-    try {
-      const results: any[] = []; // Array to hold results
-      let remainingLimit = this.pageSize; // Keep track of remaining results needed
-      let totalResults = 0;
-
-      for (const collectionName of this.collectionNames) {
-        if (remainingLimit <= 0) break; // Stop searching when enough results are fetched
-
-        const collectionRef = collection(this.firestore, collectionName);
-
-        if (
-          this.selectedCaseStatus === 'open' ||
-          this.selectedCaseStatus === 'closed'
-        ) {
-          console.log(
-            `Fetching data for case status: ${this.selectedCaseStatus}`
-          );
-
-          // Query directly for "open" or "closed"
-          console.log(this.selectedCaseStatus, "sdfghjuyt")
-          const statusQuery = query(
-            collectionRef,
-            where('caseDetails.status', '==', this.selectedCaseStatus),
-            limit(this.pageSize)
-          );
-
-          const snapshot = await getDocs(statusQuery);
-
-          const fetchedResults = snapshot.docs.map((doc, index) => ({
-            id: doc.id,
-            srNo: totalResults + index + 1,
-            data: doc.data(),
-          }));
-
-          results.push(...fetchedResults);
-          totalResults += fetchedResults.length;
-          remainingLimit -= fetchedResults.length; // Update remaining limit
-        } else if (this.selectedCaseStatus) {
-          console.log(
-            `Fetching data excluding "open" and "closed" for status: ${this.selectedCaseStatus}`
-          );
-
-          // Use `not-in` condition to exclude "open" and "closed"
-          const notInQuery = query(
-            collectionRef,
-            where('caseDetails.status', 'not-in', ['open', 'closed'])
-          );
-
-          const snapshot = await getDocs(notInQuery);
-
-          const intermediateResults = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            data: doc.data(),
-          }));
-
-          // Filter for the exact `selectedCaseStatus`
-          // Further filter based on similarity
-          const similarityThreshold = 90; // 90% similarity
-          const filteredResults = intermediateResults.filter((item) => {
-            const caseStatus = item.data['caseDetails']?.status || '';
-            const similarity = calculateSimilarity(
-              caseStatus,
-              this.selectedCaseStatus
-            );
-            console.log(
-              `Comparing "${caseStatus}" with "${this.selectedCaseStatus}": ${similarity}% similarity`
-            );
-            return similarity >= similarityThreshold;
-          });
-
-          results.push(
-            ...filteredResults.map((item, index) => ({
-              id: item.id,
-              srNo: totalResults + index + 1,
-              data: item.data,
-            }))
-          );
-
-          totalResults += filteredResults.length;
-          remainingLimit -= filteredResults.length; // Update remaining limit
-        } else {
-          console.log(
-            `No case status filter selected for collection: ${collectionName}`
-          );
-
-          // Default case: Load unfiltered data
-          const allQuery = query(collectionRef, limit(remainingLimit));
-          const snapshot = await getDocs(allQuery);
-
-          const fetchedResults = snapshot.docs.map((doc, index) => ({
-            id: doc.id,
-            srNo: totalResults + index + 1,
-            data: doc.data(),
-          }));
-
-          results.push(...fetchedResults);
-          totalResults += fetchedResults.length;
-          remainingLimit -= fetchedResults.length; // Update remaining limit
-        }
-      }
-
-      // Update data source and paginator
-      this.dataSource.data = results;
-      this.totalLength = totalResults;
-      console.log('Final Results:', results);
-
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error fetching filtered data by case status:', error);
-    } finally {
-      this.isLoading = false;
-      this.isFilteredLoading = false;
-      this.cdr.detectChanges();
-    }
-  }
-
   caseStatusOptions: string[] = [];
 
-  async getAllCaseStatus(refresh: boolean = false): Promise<void> {
-    this.isLoadingFilters = true;
-
-    try {
-      if (!refresh) {
-        // Check localStorage for cached data
-        const cachedData = localStorage.getItem('caseStatus');
-        if (cachedData) {
-          this.caseStatusOptions = JSON.parse(cachedData);
-          console.log(
-            'Using cached case statuses from localStorage:',
-            this.caseStatusOptions
-          );
-          this.isLoadingFilters = false;
-          this.cdr.detectChanges();
-          return;
-        }
-      }
-
-      // Fetch data from the backend
-      const collectionNames = [
-        'excelDataPrimary',
-        'excelDataHigh',
-        'excelDataMedium',
-        'excelDataLow',
-      ];
-
-      const statusPromises = collectionNames.map(async (name) => {
-        const collectionRef = collection(this.firestore, name);
-        const querySnapshot = await getDocs(collectionRef);
-
-        const statuses = new Set<string>();
-        querySnapshot.forEach((doc) => {
-          const status = doc.data()?.['caseDetails']?.status;
-          if (status) {
-            statuses.add(status);
-          }
-        });
-
-        return Array.from(statuses);
-      });
-
-      // Aggregate statuses from all collections
-      const statusArrays = await Promise.all(statusPromises);
-
-      // Flatten and deduplicate statuses
-      const allStatuses = new Set<string>();
-      statusArrays.forEach((statuses) => {
-        statuses.forEach((status) => allStatuses.add(status));
-      });
-
-      this.caseStatusOptions = Array.from(allStatuses);
-
-      // Save fetched data to localStorage
-      localStorage.setItem(
-        'caseStatus',
-        JSON.stringify(this.caseStatusOptions)
-      );
-
-      console.log(
-        'Fetched and saved case statuses to localStorage:',
-        this.caseStatusOptions
-      );
-    } catch (error) {
-      console.error('Error fetching case statuses:', error);
-    } finally {
-      this.isLoadingFilters = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  async getAllLitigationVenues(refresh: boolean = false): Promise<void> {
-    this.isLoadingFilters = true;
-
-    try {
-      if (!refresh) {
-        // Check localStorage for cached data
-        const cachedData = localStorage.getItem('litigationVenues');
-        if (cachedData) {
-          this.litigationVenueOptions = JSON.parse(cachedData);
-          console.log(
-            'Using cached litigation venues from localStorage:',
-            this.litigationVenueOptions
-          );
-          this.isLoadingFilters = false;
-          this.cdr.detectChanges();
-          return;
-        }
-      }
-
-      // Fetch data from the backend
-      const collectionNames = [
-        'excelDataPrimary',
-        'excelDataHigh',
-        'excelDataMedium',
-        'excelDataLow',
-      ];
-
-      const venuePromises = collectionNames.map(async (name) => {
-        const collectionRef = collection(this.firestore, name);
-        const querySnapshot = await getDocs(collectionRef);
-
-        const venues = new Set<string>();
-        querySnapshot.forEach((doc) => {
-          const venue = doc.data()?.['caseDetails']?.litigationVenues;
-          if (venue) {
-            venues.add(venue);
-          }
-        });
-
-        return Array.from(venues);
-      });
-
-      // Aggregate venues from all collections
-      const venueArrays = await Promise.all(venuePromises);
-
-      // Flatten and deduplicate venues
-      const allVenues = new Set<string>();
-      venueArrays.forEach((venues) => {
-        venues.forEach((venue) => allVenues.add(venue));
-      });
-
-      this.litigationVenueOptions = Array.from(allVenues);
-
-      // Save fetched data to localStorage
-      localStorage.setItem(
-        'litigationVenues',
-        JSON.stringify(this.litigationVenueOptions)
-      );
-
-      console.log(
-        'Fetched and saved litigation venues to localStorage:',
-        this.litigationVenueOptions
-      );
-    } catch (error) {
-      console.error('Error fetching litigation venues:', error);
-    } finally {
-      this.isLoadingFilters = false;
-      this.cdr.detectChanges();
-    }
-  }
-
-  //
-  //
-  //
   //
   //
 
@@ -1339,8 +891,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   //
   //
 
-  max!: number;
-  min!: number;
+  max: number=5;
+  min: number=0;
   showTicks = false;
   step = 1;
   thumbLabel = false;
@@ -1406,6 +958,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   standardEssentialPatentArrays: string[] = [];
   filteredStandardEssentialPatents: string[] = [];
   standardEssentialPatentInputValue: string = '';
+  selectedStandardPatent: string = '';
+  selectedSemiconductorpatent: string = '';
 
   selectedSemiconductorPatent: Set<string> = new Set();
   semiconductorPatentArrays: string[] = [];
@@ -1450,16 +1004,23 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     switch (filterType) {
       case 'status':
         this.selectedCaseStatus = ''; // Clear case status filter
+        delete this.payload.case_status;
+        this.fetchData()
         break;
 
       case 'litigationVenues':
         if (value) {
           this.selectedSources.delete(value); // Remove specific source filter
+          this.payload.litigation_venues=Array.from(this.selectedSources)
+          this.fetchData()
         }
         break;
 
       case 'caseHistory':
         this.yearValueSelected = undefined; // Clear case history filter
+        this.valueSlider=0
+        this.payload.filed_date_list=[]
+        this.fetchData()
         break;
 
       case 'caseFilledDate':
@@ -1468,7 +1029,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedFilledEndDate = null;
         this.caseFilledDateArrays = [];
         this.resetDate();
-
+        this.payload.filed_date_list=[]
+        this.fetchData()
         break;
 
       case 'caseClosedDate':
@@ -1477,91 +1039,95 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedClosedEndDate = null;
         this.caseClosedDateArrays = [];
         this.resetDateClose();
-
+        this.payload.case_closed_data_list=[]
+        this.fetchData()
         break;
 
       case 'caseNumber':
         if (value) {
-          this.selectedCaseNumbers.delete(value);
-          this.clearSearchCaseNumber();
+          this.removeCaseNo(value)
         }
         break;
 
       case 'plaintiffOrPetitioner':
         if (value) {
-          this.selectedPlaintiff.delete(value);
-          this.clearPlaintiffSearch();
+          this.removePlaintiff(value)
+          // this.clearPlaintiffSearch();
         }
         break;
 
       case 'defendant':
         if (value) {
-          this.selectedDefendant.delete(value);
-          this.clearDefendantSearch();
+          this.removeDefandant(value)
         }
         break;
 
       case 'industry':
         if (value) {
-          this.selectedIndustry.delete(value);
+          // this.selectedIndustry.delete(value);
+          this.removeIndustry(value)
         }
         break;
 
       case 'techCategory':
         if (value) {
-          this.selectedTechCategory.delete(value);
+          // this.selectedTechCategory.delete(value);
+          this.removeCategory(value)
         }
         break;
 
       case 'technologyKeywords':
         if (value) {
-          this.selectedTechnologyKeywords.delete(value);
-          this.clearTechnologyKeywordsSearch();
+          // this.selectedTechnologyKeywords.delete(value);
+          // this.clearTechnologyKeywordsSearch();
+          this.removeKeyword(value)
         }
         break;
 
       case 'courtNames':
         if (value) {
-          this.selectedCourtName.delete(value);
+          // this.selectedCourtName.delete(value);
+          this.removeCourt(value)
         }
         break;
 
       case 'acquiredPatentOrOrganicPatent':
         this.selectedAcquisitionType = '';
-        this.cdr.detectChanges();
-        this.applyFilters();
+        this.payload.acquisition_type=''
+        this.fetchData()
         break;
 
       case 'typeOfPatent':
         this.selectedPatentType = '';
-
+        this.payload.patent_type=""
+        this.fetchData()
         break;
 
       case 'patentNo':
         if (value) {
-          this.selectedpatentNo.delete(value);
-          this.clearPatentNoSearch();
+          this.removePatentNo(value)
         }
         break;
 
       case 'causeOfAction':
         if (value) {
-          this.selectedCauseOfAction.delete(value);
-          this.clearCauseOfActionSearch();
+          this.removeactions(value)
         }
         break;
 
       case 'standardEssentialPatent':
         if (value) {
-          this.selectedStandardEssentialPatent.delete(value);
-          this.clearStandardEssentialPatentSearch();
+          this.selectedStandardPatent=''
+          this.payload.standard_patent=""
+          this.fetchData()
         }
         break;
 
       case 'semiconductorPatent':
         if (value) {
-          this.selectedSemiconductorPatent.delete(value);
-          this.clearSemiconductorPatentSearch();
+          this.selectedSemiconductorpatent=''
+          this.payload.semiconductor_patent=''
+          this.fetchData()
         }
         break;
 
@@ -1570,7 +1136,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Re-apply the filters after removing the specific one
     this.applyFilters();
-    this.fetchFilteredData();
   }
 
   filterDataForAnalytics!: any;
@@ -1626,46 +1191,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     console.log('Prepared Excel Data:', this.excelData);
   }
-
-  // ngOnInit() {
-  //   this.authService.getData('excelDataPrimary').subscribe((result) => {
-  //     this.options = result;
-
-  //     // console.log(this.options)
-  //     this.filterDataForAnalytics = result;
-  //     console.log(this.filterDataForAnalytics);
-  //     this.excelData = Object.values(result).map((item, index) => ({
-  //       ...item,
-  //       data: {
-  //         ...item.data, // Preserve the existing data
-  //         srNo: index + 1, // Add srNo based on the index
-  //       },
-  //     }));
-
-  //     this.excelData.forEach((item, index) => {
-  //       console.log(`Item ${index + 1}:`, item);
-  //     });
-
-  //     this.getAllIndustry();
-  //     this.getAllTechCategory();
-  //     this.getAllCourtName();
-  //     this.getAllCaseNumber();
-  //     this.getAllPlaintiff();
-  //     this.getAllDefendant();
-  //     this.getAllTechnologyKeywords();
-  //     this.getAllPatentNo();
-  //     this.getAllCauseOfAction();
-  //     this.getAllStandardEssentialPatent();
-  //     this.getAllSemiconductorPatent();
-
-  //     const dates = this.getAllCaseHistory();
-
-  //     this.dataSource.data = this.excelData;
-  //     // console.log(this.dataSource.data)
-  //     this.paginator.pageSize = 10; // Set default page size to 7
-  //     this.paginator.pageIndex = 0; // Reset to the first page
-  //   });
-  // }
 
   resetDate() {
     this.dateControl.reset(); // Clears the date picker value
@@ -1827,129 +1352,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     return values;
   }
 
-  //get all unique tech category name
-  getAllTechCategory() {
-    const values = this.uniqueList('patentDetails.techCategory');
-    this.techCategoryArrays = values;
-    console.log(this.techCategoryArrays);
-    return values;
-  }
-  //get all unique Court name
-  getAllCourtName() {
-    const values = this.uniqueList('caseDetails.courtNames');
-    this.courtNameArrays = values;
-    return values;
-  }
-
-  //get all unique Court number
-  getAllCaseNumber() {
-    const values = this.uniqueList('caseDetails.caseNumber');
-    this.caseNumbers = values;
-    console.log('casenumbers:-' + this.caseNumbers);
-    return values;
-  }
-
-  //get all unique plaintiff
-  getAllPlaintiff() {
-    const values = this.uniqueList('legalEntities.plaintiffOrPetitioner');
-    this.plaintiffArrays = values;
-    console.log('casenumbers:-' + this.plaintiffArrays);
-    return values;
-  }
-
-  //get all unique Defendant
-  getAllDefendant() {
-    const values = this.uniqueList('legalEntities.defendant');
-    this.defendantArrays = values;
-    console.log('Defendant:-' + this.defendantArrays);
-    return values;
-  }
-
-  //get all unique technologyKeywords
-  getAllTechnologyKeywords() {
-    // Retrieve unique list of technology keywords
-    const values = this.uniqueList('patentDetails.technologyKeywords');
-
-    // Initialize an empty array to hold all split keywords
-    let splitKeywordsArray: string[] = [];
-
-    // Iterate over the retrieved values, split by comma, and trim whitespace
-    values.forEach((value: string) => {
-      if (value) {
-        // Split by comma, trim each keyword, and concatenate into the result array
-        splitKeywordsArray = splitKeywordsArray.concat(
-          value.split(',').map((keyword) => keyword.trim())
-        );
-      }
-    });
-
-    // Assign the split keywords array to technologyKeywordsArrays
-    this.technologyKeywordsArrays = splitKeywordsArray;
-
-    console.log('technologyKeywordsArrays:-', this.technologyKeywordsArrays);
-    return splitKeywordsArray;
-  }
-
-  //get all unique Patent No.
-  getAllPatentNo() {
-    const values = this.uniqueList('patentDetails.patentNo');
-    this.patentNoArrays = values;
-    // console.log("patentNo:-"+this.patentNoArrays)
-    return values;
-  }
-
-  //get all unique causeOfAction.
-  getAllCauseOfAction() {
-    const values = this.uniqueList('causeOfAction');
-    this.causeOfActionArrays = values;
-    console.log('causeOfActionArrays:-' + this.causeOfActionArrays);
-    return values;
-  }
-
-  //get all unique standardEssentialPatent.
-  getAllStandardEssentialPatent() {
-    const values = this.uniqueList('standardEssentialPatent');
-    this.standardEssentialPatentArrays = values;
-    console.log(
-      'standardEssentialPatent:-' + this.standardEssentialPatentArrays
-    );
-    return values;
-  }
-
-  //get all unique semiconductorPatent.
-  getAllSemiconductorPatent() {
-    const values = this.uniqueList('semiconductorPatent');
-    this.semiconductorPatentArrays = values;
-    console.log('semiconductorPatent:-' + this.semiconductorPatentArrays);
-    return values;
-  }
-
-  getAllCaseHistory() {
-    const values = this.uniqueList('caseDetails.caseComplaintDate');
-    const yearsArray: number[] = [];
-    const currentDate = new Date();
-    this.max = 0;
-    values.forEach((res) => {
-      if (res) {
-        const convertedDate = this.convertToDate(res);
-
-        if (convertedDate && convertedDate <= currentDate) {
-          const yearsPassed = this.calculateYearsDifference(
-            convertedDate,
-            currentDate
-          );
-          yearsArray.push(yearsPassed);
-          if (yearsPassed > this.max) {
-            this.max = yearsPassed;
-          }
-        } else {
-          console.log(`Skipping future date: ${convertedDate}`);
-        }
-      }
-    });
-    this.max += 6;
-    return yearsArray;
-  }
 
   formatDateISO(date: Date): string {
     return date.toISOString().split('T')[0]; // Convert to 'YYYY-MM-DD'
@@ -2275,6 +1677,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // function for  selectedPlaintiff
   filterPlaintiff() {
     const searchTerm = this.plaintiffInputValue.toLowerCase(); // Get the input value
+    console.log()
     this.filteredPlaintiff = this.plaintiffArrays.filter(
       (Plaintiff) => Plaintiff.toLowerCase().includes(searchTerm) // Filter based on the input
     );
@@ -2283,7 +1686,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectPlaintiff(plaintiff: string) {
     if (!this.selectedPlaintiff.has(plaintiff)) {
       this.selectedPlaintiff.add(plaintiff); // Add to selection if not already selected
+      this.payload.plaintiff=Array.from(this.selectedPlaintiff);
+      this.fetchData()
     }
+    this.plaintiffInputValue=""
     console.log(
       'Currently selected plaintiff:',
       Array.from(this.selectedPlaintiff)
@@ -2291,10 +1697,25 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
+  removePlaintiff(plaintiff:string){
+    this.selectedPlaintiff.delete(plaintiff);
+    this.payload.plaintiff = Array.from(this.selectedPlaintiff);
+    this.fetchData()
+  }
+
+  removeDefandant(defendant:string){
+    this.selectedDefendant.delete(defendant);
+    this.payload.defendants = Array.from(this.selectedDefendant);
+    this.fetchData()
+  }
+
   selectDefendant(defendant: string) {
     if (!this.selectedDefendant.has(defendant)) {
       this.selectedDefendant.add(defendant); // Add to selection if not already selected
+      this.payload.defendants = Array.from(this.selectedDefendant);
+      this.fetchData()
     }
+    this.defendantInputValue=""
     console.log(
       'defendant selected plaintiff:',
       Array.from(this.selectedDefendant)
@@ -2309,19 +1730,18 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       : '';
 
     // Flatten all keywords into a single array
-    const allKeywords = this.technologyKeywordsArrays
-      .map(
-        (keywords) =>
-          keywords.split(',').map((keyword) => keyword.trim().toLowerCase()) // Normalize case and trim
-      )
-      .flat();
+    // const allKeywords = this.technologyKeywordsArrays
+    //   .map(
+    //     (keywords) =>
+    //       keywords.split(',').map((keyword) => keyword.trim().toLowerCase()) // Normalize case and trim
+    //   )
+    //   .flat();
 
     // Filter and remove duplicates
     this.filteredTechnologyKeywords = Array.from(
-      new Set(allKeywords.filter((keyword) => keyword.includes(searchTerm)))
+      new Set(this.technologyKeywordsArrays.filter((keyword) => keyword.includes(searchTerm)))
     );
 
-    console.log('Filtered Unique Keywords:', this.filteredTechnologyKeywords);
   }
 
   onTechnologyKeywordChanged(keyword: string, isChecked: boolean) {
@@ -2332,7 +1752,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords)
     this.fetchData()
-    this.updateDataSource(); // Update the dataSource based on the selected keywords
+    // this.updateDataSource(); // Update the dataSource based on the selected keywords
+  }
+
+  removeKeyword(keyword: string){
+    this.selectedTechnologyKeywords.delete(keyword);
+    this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords)
+    this.fetchData()
   }
 
   updateDataSource() {
@@ -2361,7 +1787,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectPatentNo(patentNo: string) {
     if (!this.selectedpatentNo.has(patentNo)) {
       this.selectedpatentNo.add(patentNo); // Add to selection if not already selected
+      this.payload.patent_no=Array.from(this.selectedpatentNo)
+      this.fetchData()
     }
+    this.patentNoInputValue=''
     console.log(
       'patentNo selected technologyKeywords:',
       Array.from(this.selectedpatentNo)
@@ -2372,12 +1801,20 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectCauseOfAction(causeOfAction: string) {
     if (!this.selectedCauseOfAction.has(causeOfAction)) {
       this.selectedCauseOfAction.add(causeOfAction); // Add to selection if not already selected
+      this.payload.causeOfaction=Array.from(this.selectedCauseOfAction)
+      this.fetchData()
     }
     console.log(
       'causeOfAction selected causeOfAction:',
       Array.from(this.selectedCauseOfAction)
     );
     this.applyFilters();
+  }
+
+  removeactions(action:string){
+    this.selectedCauseOfAction.delete(action);
+    this.payload.causeOfaction=Array.from(this.selectedCauseOfAction)
+    this.fetchData()
   }
 
   // function for  selected standardEssentialPatent
@@ -2421,6 +1858,12 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
+  removeCaseNo(no: string){
+    this.selectedCaseNumbers.delete(no); // Add to selection if not already selected
+      this.payload.case_no=Array.from(this.selectedCaseNumbers);
+      this.fetchData();
+  }
+
   // function for  selectedCaseNumber
   filterCaseNumbers() {
     const searchTerm = this.caseNumberInputValue.toLowerCase(); // Get the input value
@@ -2429,11 +1872,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  selectCaseNumber(caseNumber: string) {
-    if (!this.selectedCaseNumbers.has(caseNumber)) {
-      this.selectedCaseNumbers.add(caseNumber); // Add to selection if not already selected
+  selectCaseNumber(caseNo: string) {
+    console.log(caseNo)
+    if (!this.selectedCaseNumbers.has(caseNo)) {
+      this.selectedCaseNumbers.add(caseNo); // Add to selection if not already selected
+      this.payload.case_no=Array.from(this.selectedCaseNumbers);
+      this.fetchData();
     }
-
+    this.caseNumberInputValue=""
     console.log(
       'Currently selected case numbers:',
       Array.from(this.selectedCaseNumbers)
@@ -2471,6 +1917,11 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
+  removeCategory(category: string) {
+    this.selectedTechCategory.delete(category);
+    this.payload.tech_category = Array.from(this.selectedTechCategory)
+    this.fetchData()
+  }
   // function for  selectedTechCategory
   filterTechCategory() {
     const searchTerm = this.techCategoryInputValue.toLowerCase(); // Get the input value
@@ -2488,6 +1939,12 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.payload.tech_category = Array.from(this.selectedTechCategory)
     this.fetchData()
     this.applyFilters();
+  }
+
+  removeCourt(court: string) {
+    this.selectedCourtName.delete(court);
+    this.payload.court_name = Array.from(this.selectedCourtName)
+    this.fetchData()
   }
 
   // function for  selectedCourtName
@@ -2516,9 +1973,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // Format the dates as ISO strings (or customize as needed)
     const startDate = pastDate.toISOString().split('T')[0];
     const endDate = today.toISOString().split('T')[0];
-    this.payload.filed_date_list=[];
-    this.payload.filed_date_list.add(startDate);
-    this.payload.filed_date_list.add(endDate);
+    if(yearValueSelected===0){
+      this.payload.filed_date_list=[];
+    }
+    else{
+      this.payload.filed_date_list=[];
+      this.payload.filed_date_list.push(startDate);
+      this.payload.filed_date_list.push(endDate);
+    }
     this.fetchData()
     console.log('Selected Date Range:', { startDate, endDate });
 
@@ -2546,21 +2008,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.payload.acquisition_type = this.selectedAcquisitionType;
     this.fetchData()
     // Filter data directly based on acquisition type
-    if (this.selectedAcquisitionType) {
-      this.dataSource.data = this.excelData.filter((item) => {
-        // Safeguard against null or undefined fields
-        const acquisition =
-          item.data?.patentDetails?.acquiredPatentOrOrganicPatent || '';
-        return (
-          acquisition.toLowerCase() ===
-          this.selectedAcquisitionType.toLowerCase()
-        );
-      });
-    } else {
-      this.applyFilters(); // Apply general filters if no acquisition type is selected
-    }
-
-    console.log('Filtered Data:', this.dataSource.data);
+    
+    this.applyFilters(); // Apply general filters if no acquisition type is selected
   }
 
   onPatentTypeChange() {
@@ -2570,6 +2019,28 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     console.log('Selected Patent Type:', this.selectedPatentType);
     this.payload.patent_type = this.selectedPatentType
+    this.fetchData()
+    this.applyFilters();
+  }
+
+  onStandardPatentChange() {
+    if (this.selectedStandardPatent === 'All') {
+      this.selectedStandardPatent = ''; // Clear filter if "All" is selected
+    }
+
+    console.log('Selected Patent Type:', this.selectedStandardPatent);
+    this.payload.standard_patent = this.selectedStandardPatent
+    this.fetchData()
+    this.applyFilters();
+  }
+
+  onSemiconductorPatentChange() {
+    if (this.selectedSemiconductorpatent === 'All') {
+      this.selectedSemiconductorpatent = ''; // Clear filter if "All" is selected
+    }
+
+    console.log('Selected Patent Type:', this.selectedSemiconductorpatent);
+    this.payload.semiconductor_patent = this.selectedSemiconductorpatent
     this.fetchData()
     this.applyFilters();
   }
@@ -2687,18 +2158,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   onSearchCaseNumberInput(caseNumberText: string) {
     const lowerCaseTerm = caseNumberText.toLowerCase();
     this.filteredCaseNumbers = [];
-
-    this.excelData.forEach((item) => {
-      const caseNumber = item.data.caseDetails?.caseNumber;
-
-      if (
-        typeof caseNumber === 'string' &&
-        caseNumber.toLowerCase().includes(lowerCaseTerm)
-      ) {
-        this.filteredCaseNumbers.push(caseNumber);
-      }
-    });
-
+    this.filteredCaseNumbers=this.caseNumbers.filter(
+      (item)=>item.toLowerCase()
+      .includes(lowerCaseTerm)
+    )
     // Remove duplicates
     this.filteredCaseNumbers = Array.from(new Set(this.filteredCaseNumbers));
   }
@@ -2729,18 +2192,12 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Logic for searching Plaintiffs
   onSearchPlaintiffInput(plaintiffText: string) {
     const lowerCaseTerm = plaintiffText.toLowerCase();
-    this.filteredPlaintiff = this.excelData
+    this.filteredPlaintiff = this.plaintiffArrays
       .filter(
         (item) =>
-          item.data.legalEntities?.plaintiffOrPetitioner &&
-          item.data.legalEntities.plaintiffOrPetitioner
-            .toLowerCase()
+          item.toLowerCase()
             .includes(lowerCaseTerm)
-      )
-      .map((item) => ({
-        plaintiff: item.data.legalEntities.plaintiffOrPetitioner,
-        caseNumber: item.data.caseDetails?.caseNumber || 'N/A',
-      }));
+      );
 
     // Remove duplicates based on plaintiff and caseNumber combination
     // this.filteredPlaintiff = Array.from(
@@ -2773,18 +2230,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Logic for searching Defendants
   onSearchDefendantInput(defendantText: string) {
     const lowerCaseTerm = defendantText.toLowerCase();
-    this.filteredDefendants = this.excelData
+
+    this.filteredDefendants = this.defendantArrays
       .filter(
         (item) =>
-          item.data.legalEntities?.defendant &&
-          item.data.legalEntities.defendant
-            .toLowerCase()
+          item.toLowerCase()
             .includes(lowerCaseTerm)
-      )
-      .map((item) => ({
-        defendant: item.data.legalEntities.defendant,
-        caseNumber: item.data.caseDetails?.caseNumber || 'N/A',
-      }));
+      );
 
     // Remove duplicates based on defendant and caseNumber combination
     // this.filteredDefendants = Array.from(
@@ -2836,28 +2288,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Clear the search input
   clearTechnologyKeywordsSearch() {
     this.technologyKeywordInputValue = '';
-
-    // Reset the filtered list with unique values
-    const allKeywords = this.technologyKeywordsArrays
-      .map(
-        (keywords) =>
-          keywords.split(',').map((keyword) => keyword.trim().toLowerCase()) // Normalize case and trim
-      )
-      .flat();
-
-    this.filteredTechnologyKeywords = Array.from(new Set(allKeywords)); // Remove duplicates
-
-    console.log(
-      'Reset Filtered Unique Keywords:',
-      this.filteredTechnologyKeywords
-    );
+    delete this.payload.tech_keyword;
+    this.fetchData()
   }
 
   // Logic for searching Court Names
   onSearchCourtNamesInput(courtNameText: string) {
     const lowerCaseTerm = courtNameText.toLowerCase();
-    this.filteredCourtName = this.excelData
-      .map((item) => item.data.caseDetails.courtNames)
+    this.filteredCourtName = this.courtNameArrays
       .filter((courtName) => courtName?.toLowerCase().includes(lowerCaseTerm));
 
     this.filteredCourtName = Array.from(new Set(this.filteredCourtName));
@@ -2865,30 +2303,30 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Logic for selecting a court name
 
 
-  onCourtNameSelected(courtName: string) {
+  onCourtNameSelected(event: any) {
+    let courtName=event.value
     this.courtNameInputValue = courtName; // Update the input field with the selected court name
-
+    this.payload.court_name=this.selectedCourtNames
+    this.fetchData()
     // Optional: You can update your data source based on the selected court name if needed
-    const selectedData = this.excelData.filter(
-      (item) => item.data.caseDetails.courtNames === courtName
-    );
-    this.dataSource.data = selectedData; // Update the data source or handle it as required
+    // const selectedData = this.excelData.filter(
+    //   (item) => item.data.caseDetails.courtNames === courtName
+    // );
+    // this.dataSource.data = selectedData; // Update the data source or handle it as required
   }
 
   // Clear the search box for court names
   clearCourtNamesSearch() {
     this.courtNameInputValue = ''; // Reset the input value
     this.filteredCourtName = []; // Clear the suggestions
-
-    // Optionally reset the data source to show all data again
-    this.dataSource.data = this.excelData; // Show all data if that's the desired behavior
+    delete this.payload.court_name;
+    this.fetchData()
   }
 
   // Logic for searching Patent Number
   onSearchPatentNoInput(patentNoText: string) {
     const lowerCaseTerm = patentNoText.toLowerCase();
-    this.filteredPatentNos = this.excelData
-      .map((item) => item.data.patentNo) // Get all patent numbers
+    this.filteredPatentNos = this.patentNoArrays
       .filter(
         (patentNo) => patentNo?.toLowerCase().includes(lowerCaseTerm) // Use optional chaining
       );
@@ -2898,23 +2336,24 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Select patent number
-  onPatentNoSelected(patentNo: string) {
-    this.patentNoInputValue = patentNo; // Update the input field with the selected patent number
-    this.payload.patent_no = patentNo;
-    this.fetchData()
-    // console.log("patennnnnnnnttttt",patentNo)
-    // Optional: Update your data source based on the selected patent number if needed
-    const selectedData = this.excelData.filter(
-      (item) => item.data.patentNo === patentNo
-    );
-    this.dataSource.data = selectedData; // Update the data source or handle it as required
+  // onPatentNoSelected(patentNo: string) {
+  //   this.patentNoInputValue = patentNo; // Update the input field with the selected patent number
+
+  //   this.payload.patent_no = patentNo;
+  //   this.fetchData()
+   
+  // }
+  removePatentNo(patentNo: string) {
+    this.selectedpatentNo.delete(patentNo);
+    this.payload.patent_no = Array.from(this.selectedpatentNo);
+    this.fetchData();
   }
 
   // Clear the search box for patent numbers
   clearPatentNoSearch() {
     this.patentNoInputValue = ''; // Reset the input value
-    this.payload.patent_no = '';
-    this.fetchData();
+    // this.payload.patent_no = '';
+    // this.fetchData();
     this.filteredPatentNos = []; // Clear the suggestions
 
     // Optionally reset the data source to show all data again
@@ -2924,8 +2363,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Logic for searching Cause of Action
   onSearchCauseOfActionInput(causeText: string) {
     const lowerCaseTerm = causeText.toLowerCase();
-    this.filteredCauseOfActions = this.excelData
-      .map((item) => item.data.causeOfAction) // Get all causes of action
+    this.filteredCauseOfActions = this.causeOfActionArrays
       .filter(
         (cause) => cause?.toLowerCase().includes(lowerCaseTerm) // Use optional chaining
       );
@@ -2939,21 +2377,17 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Select cause of action
   onCauseOfActionSelected(cause: string) {
     this.causeOfActionInputValue = cause; // Update the input field with the selected cause of action
-
-    // Optional: Update your data source based on the selected cause of action if needed
-    const selectedData = this.excelData.filter(
-      (item) => item.data.causeOfAction === cause
-    );
-    this.dataSource.data = selectedData; // Update the data source or handle it as required
+    this.payload.causeOfaction=cause
+    this.fetchData()
   }
 
   // Clear the search box for cause of action
   clearCauseOfActionSearch() {
     this.causeOfActionInputValue = ''; // Reset the input value
     this.filteredCauseOfActions = []; // Clear the suggestions
-
+    this.payload.causeOfaction=''
+    this.fetchData()
     // Optionally reset the data source to show all data again
-    this.dataSource.data = this.excelData; // Show all data if that's the desired behavior
   }
 
   // Logic for searching Standard Essential Patent

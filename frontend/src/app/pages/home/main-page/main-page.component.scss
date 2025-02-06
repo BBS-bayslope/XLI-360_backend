@@ -3,6 +3,70 @@
 //   height: 160%;
 // }
 
+
+.drawer-container {
+  // display: flex;
+  height: auto;
+  width: 100%;
+}
+
+mat-sidenav {
+  width: 30%;
+}
+
+.sidebar {
+  width: 350px; /* Adjust width as needed */
+  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  top: 250px;
+  // bottom: 0;
+  overflow-y: auto;
+  background: white;
+  border-right: 1px solid #ccc;
+}
+
+.content {
+  margin-left: 350px; /* Must match sidebar width */
+  flex-grow: 1;
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.example-section{
+  max-height: 200px; /* Adjust height as needed */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Additional styles */
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+
+
 .toogle-cross {
   right: 0px;
   top: 0px;

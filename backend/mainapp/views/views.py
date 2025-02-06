@@ -14,14 +14,37 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.db import transaction
 from django.db.models import Q
 from ..serializers import CaseSerializer
+from django.db.models.functions import Upper, Lower
+
+def MainPage(request):
+    return render(request,'index.html') 
 
 class FileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def process_chunk(self, rows):
         records = []
+        required_columns = [
+            'Case Number', 'Case Name', 'Case Status', 'Court Names',
+            'Litigation Venues & Judicial Authorities', 'Related/Originating Cases',
+            'Cause of Action', 'Accused Product', 'Judge', 'Number of Infringed Claims',
+            '3rd Party Funding Involved', 'Case Strength Level', 'Recent Action',
+            'Winning Amount', 'Winning Party', 'Other Possible Infringer', 'List of Prior Art',
+            'Patent No', 'Type of Patent', 'Title', 'Original Assignee',
+            'Current Assignee', 'Single Patent or Family Involved?',
+            'Standard Essential Patent', 'Semiconductor Patent', 'Tech Centre',
+            'Art Unit', 'Acquired Patent or Organic patent?', 'Assignee Timeline',
+            'Industry', 'Technology Keywords', 'Tech Category', 'Reason of Allowance',
+            'Plaintiff/Petitioner', 'Plaintiff Type & Size', 'Defendant',
+            'Defendant Type & Size', 'Stage'
+        ]
+
         for row in rows:
             try:
+                missing_columns = [col for col in required_columns if col not in row]
+                if missing_columns:
+                    raise KeyError(f"Missing columns: {', '.join(missing_columns)}")
+
                 complaint_date = pd.to_datetime(row.get('Case Complaint Date'), errors='coerce')
                 case_closed_date = pd.to_datetime(row.get('Case Closed Date'), errors='coerce')
                 issue_date = pd.to_datetime(row.get('Patent Issued Date'), errors='coerce')
@@ -36,17 +59,17 @@ class FileUploadView(APIView):
                     case_no=row.get('Case Number'),
                     complaint_date=complaint_date,
                     case_name=row['Case Name'],
-                    case_status=row['Status'],
+                    case_status=row['Case Status'],
                     court_name=row['Court Names'],
                     litigation_venues=row['Litigation Venues & Judicial Authorities'],
                     related_cases=row.get('Related/Originating Cases', ''),
                     case_closed_date=case_closed_date,
                     cause_of_action=row['Cause of Action'],
                     accused_product=row['Accused Product'],
-                    assigned_judge=row.get('Assigned Judge', None),
+                    assigned_judge=row.get('Judge', None),
                     number_of_infringed_claims=row.get('Number of Infringed Claims', 0) or 0,
                     third_party_funding_involved=row['3rd Party Funding Involved'],
-                    type_of_infringement=row['Type of Infringement'],
+                    # type_of_infringement=row['Type of Infringement'],
                     case_strength_level=row['Case Strength Level'],
                     recent_action=row.get('Recent Action', None),
                     winning_amount=row.get('Winning Amount', None),
@@ -55,7 +78,7 @@ class FileUploadView(APIView):
                     list_of_prior_art=row.get('List of Prior Art', None),
                     patent_no=row.get('Patent No', None),
                     patent_type=row.get('Type of Patent', None),
-                    patent_title=row.get('Patent Title', None),
+                    patent_title=row.get('Title', None),
                     original_assignee=row['Original Assignee'],
                     current_assignee=row.get('Current Assignee', None),
                     issue_date=issue_date,
@@ -73,21 +96,25 @@ class FileUploadView(APIView):
                     reason_of_allowance=row['Reason of Allowance'],
                     plaintiff=row.get('Plaintiff/Petitioner', None),
                     plaintiff_type_and_size=row['Plaintiff Type & Size'],
-                    plaintiff_law_firm=row.get('Plaintiff Law Firm Name', None),
-                    plaintiff_attorney_name=row.get('PA Name 1', None),
-                    plaintiff_contact=row.get('PA Phone 1', None),
-                    plaintiff_email=row.get('PA Email 1', None),
+                    # plaintiff_law_firm=row.get('Plaintiff Law Firm Name', None),
+                    # plaintiff_attorney_name=row.get('PA Name 1', None),
+                    # plaintiff_contact=row.get('PA Phone 1', None),
+                    # plaintiff_email=row.get('PA Email 1', None),
                     defendant=row.get('Defendant', None),
                     defendent_type_and_size=row['Defendant Type & Size'],
-                    defendant_law_firm=row.get('Defendant Law Firm Name', None),
-                    defendant_attorney_name=row.get('DA Name 1', None),
-                    defendant_phone=row.get('DA Phone 1', None),
-                    defendant_email=row.get('DA Email 1', None),
+                    # defendant_law_firm=row.get('Defendant Law Firm Name', None),
+                    # defendant_attorney_name=row.get('DA Name 1', None),
+                    # defendant_phone=row.get('DA Phone 1', None),
+                    # defendant_email=row.get('DA Email 1', None),
                     stage=row['Stage']
                 )
                 records.append(raw_data_instance)
+            except KeyError as e:
+                print(f"KeyError: {str(e)}")  # Log missing columns
+                return e  # Returning KeyError causes an issue in the `post` method
             except Exception as e:
-                continue
+                print(f"Unexpected Error: {str(e)}")
+                return e
         return records
 
     def post(self, request):
@@ -106,7 +133,7 @@ class FileUploadView(APIView):
                     for future in as_completed(futures):
                         cnt=cnt+1
                         records_to_create.extend(future.result())
-                        print("see ",cnt)
+                        # print("see ",cnt)
 
                 with transaction.atomic():
                     RawData.objects.bulk_create(records_to_create, batch_size=500)
@@ -190,6 +217,10 @@ def prepare_caseDetails_objects(raw_data_batch):
                         winning_party=raw_data.winning_party,
                         other_possible_infringer=raw_data.other_possible_infringer,
                         list_of_prior_art=raw_data.list_of_prior_art,
+                        plaintiff = raw_data.plaintiff,
+                        defendant = raw_data.defendant,
+                        plaintiff_type_and_size = raw_data.plaintiff_type_and_size,
+                        defendent_type_and_size = raw_data.defendent_type_and_size
                     )
                 )
                 
@@ -207,41 +238,37 @@ def prepare_patent_objects(raw_data_batch):
             # Split the patent_no field by comma and strip whitespace from each entry
             # print("its herrrr")
             if raw_data.patent_no:
-                patent_numbers = [patent.strip() for patent in raw_data.patent_no.split(",")]
+                patent_no=raw_data.patent_no
                 # print(" look here too")
-                for patent_no in patent_numbers:
-                    # check is patent is already saved in previous batch
-                    if(patent_no=='0' or patent_no=='00:00:00'):
-                        continue
-                    if Patent.objects.filter(patent_no=patent_no).exists():
-                        continue
-                    # Check if this patent_no is already processed
-                    # print("yha aagya")
-                    if patent_no not in unique_patent_nos:
-                        unique_patent_nos.add(patent_no)
-                        # print(" look")
-                        patent_objects.append(
-                            Patent(
-                                patent_no=patent_no,
-                                patent_type=raw_data.patent_type,
-                                patent_title=raw_data.patent_title,
-                                original_assignee=raw_data.original_assignee,
-                                current_assignee=raw_data.current_assignee,
-                                issue_date = raw_data.issue_date,
-                                expiry_date = raw_data.expiry_date,
-                                single_or_multiple = raw_data.single_or_multiple,
-                                standard_patent = raw_data.standard_patent,
-                                semiconductor_patent = raw_data.semiconductor_patent,
-                                tech_center = raw_data.tech_center,
-                                art_unit = raw_data.art_unit,
-                                acquisition_type = raw_data.acquisition_type,
-                                assignee_timeline = raw_data.assignee_timeline,
-                                industry = raw_data.industry,
-                                technology_keywords = raw_data.technology_keywords,
-                                tech_category = raw_data.tech_category,
-                                reason_of_allowance = raw_data.reason_of_allowance
-                            )
-                        )
+                if(patent_no=='0' or patent_no=='00:00:00' or patent_no=='REDACTED'):
+                    continue
+                # if Patent.objects.filter(patent_no=patent_no).exists():
+                #     continue
+                # Check if this patent_no is already processed
+                # print("yha aagya")
+                
+                patent_objects.append(
+                    Patent(
+                        patent_no=patent_no,
+                        patent_type=raw_data.patent_type,
+                        patent_title=raw_data.patent_title,
+                        original_assignee=raw_data.original_assignee,
+                        current_assignee=raw_data.current_assignee,
+                        issue_date = raw_data.issue_date,
+                        expiry_date = raw_data.expiry_date,
+                        single_or_multiple = raw_data.single_or_multiple,
+                        standard_patent = raw_data.standard_patent,
+                        semiconductor_patent = raw_data.semiconductor_patent,
+                        tech_center = raw_data.tech_center,
+                        art_unit = raw_data.art_unit,
+                        acquisition_type = raw_data.acquisition_type,
+                        assignee_timeline = raw_data.assignee_timeline,
+                        industry = raw_data.industry,
+                        technology_keywords = raw_data.technology_keywords,
+                        tech_category = raw_data.tech_category,
+                        reason_of_allowance = raw_data.reason_of_allowance
+                    )
+                )
 
         return patent_objects
     except Exception as e:
@@ -258,27 +285,25 @@ def prepare_case_patent_objects(raw_data_batch):
                 case_instance = Case.objects.get(case_no=raw_data.case_no)
 
                 # Handle multiple patent numbers (comma-separated)
-                patent_list = [patent.strip() for patent in raw_data.patent_no.split(",")]
+                try:
+                    patent_no=raw_data.patent_no.upper()
+                    #validation check 
+                    if(patent_no=='0' or patent_no=='00:00:00' or patent_no=='REDACTED'):
+                        continue
+                    # Get the patent instance
+                    patent_instance = Patent.objects.get(patent_no=patent_no)
 
-                for patent_no in patent_list:
-                    try:
-                        #validation check 
-                        if(patent_no=='0' or patent_no=='00:00:00'):
-                            continue
-                        # Get the patent instance
-                        patent_instance = Patent.objects.get(patent_no=patent_no)
-
-                        # Check if CasePatent entry already exists
-                        if not CasePatent.objects.filter(case=case_instance, patent=patent_instance).exists():
-                            # Create CasePatent object
-                            case_patent_objects.append(
-                                CasePatent(
-                                    case=case_instance,
-                                    patent=patent_instance
-                                )
+                    # Check if CasePatent entry already exists
+                    if not CasePatent.objects.filter(case=case_instance, patent=patent_instance).exists():
+                        # Create CasePatent object
+                        case_patent_objects.append(
+                            CasePatent(
+                                case=case_instance,
+                                patent=patent_instance
                             )
-                    except Patent.DoesNotExist:
-                        print(f"Patent with patent_no {patent_no} does not exist. Skipping.")
+                        )
+                except Patent.DoesNotExist:
+                    print(f"Patent with patent_no {patent_no} does not exist. Skipping.")
             except Case.DoesNotExist:
                 print(f"Case with case_no {raw_data.case_no} does not exist. Skipping.")
         return case_patent_objects
@@ -301,10 +326,10 @@ def process_batch_bulk(raw_data_batch):
         # case_objects = prepare_case_objects(raw_data_batch)
         # Case.objects.bulk_create(case_objects, ignore_conflicts=True)
         
-        # case_objects = prepare_caseDetails_objects(raw_data_batch)
-        # CaseDetails.objects.bulk_create(case_objects, ignore_conflicts=True)
+        case_objects = prepare_caseDetails_objects(raw_data_batch)
+        CaseDetails.objects.bulk_create(case_objects, ignore_conflicts=True)
     
-        update_case_details(raw_data_batch)
+        # update_case_details(raw_data_batch)
     
         # Fetch the created cases for mapping
         # case_mapping = {case.case_no: case for case in Case.objects.filter(case_no__in=[raw.case_no for raw in raw_data_batch])}
@@ -354,15 +379,17 @@ def update_case_details(data_chunk):
 def split_and_process_bulk_with_threads():
     # Fetch all RawData entries
     try:
+        # RawData.objects.all().update(patent_no=Upper('patent_no'))
         raw_data_entries = RawData.objects.filter(is_valid=True)
-        distinct_entries= raw_data_entries.distinct('case_no')
-        
+        distinct_entries=raw_data_entries.distinct('case_no')
+        # distinct_entries= raw_data_entries.distinct('patent_no')
+        # distinct_entries = raw_data_entries.annotate(upper_patent_no=Upper('patent_no')).distinct('upper_patent_no')
         # Define batch size
         batch_size = 1000  # Larger batch size for bulk_create
         raw_data_batches = [distinct_entries[i:i + batch_size] for i in range(0, len(distinct_entries), batch_size)]
         
         # Use ThreadPoolExecutor for multithreading
-        with ThreadPoolExecutor(max_workers=5) as executor:  
+        with ThreadPoolExecutor(max_workers=4) as executor:  
             executor.map(process_batch_bulk, raw_data_batches)
         
         # Close database connection for each thread
@@ -470,21 +497,30 @@ class CaseListView(APIView):
             params_limit = int(request.data.get("limit", 10))
             filed_date_list=request.data.get("filed_date_list",[])
             case_closed_data_list=request.data.get("case_closed_data_list",[])
-            patent_no=request.data.get("patent_no",'')
+            patent_no=request.data.get("patent_no",[])
             court_name=request.data.get("court_name",[])
             acquisition_type=request.data.get("acquisition_type","")
             patent_type=request.data.get("patent_type","")
-            case_no=request.data.get("case_no","")
-            defendants=request.data.get("defendants",'')
-            plaintiff=request.data.get("plaintiff","")    
+            case_no=request.data.get("case_no",[])
+            defendants=request.data.get("defendants",[])
+            plaintiff=request.data.get("plaintiff",[])    
             tech_category=request.data.get("tech_category",[])
             tech_keyword=request.data.get("tech_keyword",[])
-            
+            causeofaction=request.data.get("causeOfaction",[])
+            standard_patent=request.data.get("standard_patent","")
+            semiconductor_patent=request.data.get("semiconductor_patent","")
             queryset = Case.objects.all()
             
             # Apply filters if provided
+            if litigation_venues_filter:
+                queryset = queryset.filter(litigation_venues__in=litigation_venues_filter)
+            
+            if case_no:
+                queryset = queryset.filter(case_no__in=case_no)
+            
             if case_status_filter:
-                queryset = queryset.filter(case_no=case_no)
+                queryset = queryset.annotate(lower_case_status=Lower('case_status')).filter(lower_case_status=case_status_filter.lower())
+
             
             if filed_date_list:
                 queryset=queryset.filter(
@@ -498,19 +534,25 @@ class CaseListView(APIView):
             
             if plaintiff:
                 queryset = queryset.filter(
-                    Q(casedetails__plaintiff=plaintiff[0])
+                    Q(casedetails__plaintiff__in=plaintiff)
                 )
             
             if defendants:
                 queryset = queryset.filter(
-                    Q(casedetails__defendant=defendants[0])
+                    Q(casedetails__defendant__in=defendants)
                 )
             
+            if causeofaction:
+                query = Q()
+                for action in causeofaction: 
+                    query |= Q(casedetails__cause_of_action__icontains=action) 
+                
+                queryset = queryset.filter(query)
             if case_status_filter:
                 queryset = queryset.filter(case_status=case_status_filter)
             
             if patent_no:
-                queryset = queryset.filter(patents__patent_no=patent_no)
+                queryset = queryset.filter(patents__patent_no__in=patent_no)
                 
             if patent_type:
                 queryset = queryset.filter(patents__patent_type=patent_type)
@@ -518,6 +560,11 @@ class CaseListView(APIView):
             if acquisition_type:
                 queryset = queryset.filter(patents__acquisition_type=acquisition_type)
             
+            if standard_patent:
+                queryset = queryset.filter(patents__standard_patent=standard_patent)
+            
+            if semiconductor_patent:
+                queryset = queryset.filter(patents__semiconductor_patent=semiconductor_patent)
             
             if industry_filter:
                 queryset = queryset.filter(patents__industry__in=industry_filter).distinct()  # Many-to-many filter
@@ -525,9 +572,6 @@ class CaseListView(APIView):
             if court_name:
                 queryset = queryset.filter(court_name__in=court_name)
                 
-            if litigation_venues_filter:
-                queryset = queryset.filter(litigation_venues__in=litigation_venues_filter)
-            
             query = Q()
 
             if tech_category:
@@ -592,12 +636,14 @@ class FilterDataView(APIView):
             cause_of_action = CaseDetails.objects.filter(cause_of_action__isnull=False).values_list('cause_of_action', flat=True).distinct()       
             unique_patentno=Patent.objects.values_list("patent_no",flat=True).distinct()
             unique_caseNo=Case.objects.values_list("case_no",flat=True)
-            unique_plaintiffs=CaseDetails.objects.values_list('plaintiff').distinct()
-            unique_defendents=CaseDetails.objects.values_list('defendant').distinct()
+            unique_plaintiffs=CaseDetails.objects.values_list('plaintiff',flat=True).distinct()
+            unique_defendents=CaseDetails.objects.values_list('defendant',flat=True).distinct()
             # Fetch all unique industries from the Patent table
             industries = Patent.objects.values_list("industry", flat=True).distinct()
             tech_categories = Patent.objects.values_list("tech_category", flat=True).distinct()
             tech_keywords = Patent.objects.values_list("technology_keywords", flat=True).distinct()
+            standard_patent = Patent.objects.values_list("standard_patent", flat=True).distinct()
+            semiconductor_patent = Patent.objects.values_list("semiconductor_patent", flat=True).distinct()
 
             # Remove any null or blank entries and split multiple values if needed
             unique_categories = set()
@@ -616,7 +662,8 @@ class FilterDataView(APIView):
                              "patentType":unique_patent_types,"acquisition_type":unique_acquisition_types,
                              "cause_of_action":cause_of_action, "plaintiff":unique_plaintiffs,
                              'defendants':unique_defendents,"tech_categories":unique_categories,
-                             "tech_keywords":unique_keywords}, status=status.HTTP_200_OK)
+                             "tech_keywords":unique_keywords, "standard_patent":standard_patent,
+                             "semiconductor_patent":semiconductor_patent}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 {"error": f"Error fetching case statuses: {str(e)}"},

@@ -38,6 +38,7 @@ import {Router} from '@angular/router';
 })
 export class ApiService {
   private baseUrl = 'http://18.216.104.19'; // Base API URL
+  // private baseUrl ="http://127.0.0.1:8000"
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
   selectedCaseDocId: any;
@@ -62,6 +63,10 @@ export class ApiService {
   getDetails(payload: object): Observable<any> {
     const endpoint = `${this.baseUrl}/api/case-details/`;
     return this.http.post<any>(endpoint,payload);
+  }
+  getCaseStats(): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/case-stats/`;
+    return this.http.get<any>(endpoint);
   }
 
 

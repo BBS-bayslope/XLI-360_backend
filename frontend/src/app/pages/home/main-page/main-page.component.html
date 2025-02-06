@@ -101,8 +101,8 @@
     </button> -->
   </div>
 </div>
-<mat-drawer-container class="example-container">
-  <mat-drawer #drawer opened="true" mode="side">
+<mat-sidenav-container class="drawer-container">
+  <mat-sidenav #drawer mode="side" opened>
     <mat-accordion style="height: 100vh">
       <span style="
           display: flex;
@@ -176,20 +176,24 @@
         <mat-expansion-panel-header>
           <mat-panel-title> Case Number </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="caseNumberInputValue"
-            [matAutocomplete]="autoSearchCaseNumber" (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
-          <button mat-icon-button matSuffix (click)="clearSearchCaseNumber()" *ngIf="caseNumberInputValue">
-            <mat-icon>clear</mat-icon>
-          </button>
-          <mat-autocomplete #autoSearchCaseNumber="matAutocomplete"
-            (optionSelected)="selectCaseNumber($event.option.value)">
-            <mat-option *ngFor="let caseNumber of filteredCaseNumbers" (click)="onCaseNumberSelected(caseNumber)"
-              [value]="caseNumber">
-              {{ caseNumber }}
-            </mat-option>
-          </mat-autocomplete>
+          <mat-chip *ngFor="let no of selectedCaseNumbers" (removed)="removeCaseNo(no)">
+            {{ no }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        <input [disabled]="!tabledata.length" matInput [(ngModel)]="caseNumberInputValue"
+          [matAutocomplete]="autoSearchCaseNumber" (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
+        <!-- <button mat-icon-button matSuffix (click)="clearSearchCaseNumber()" *ngIf="caseNumberInputValue">
+          <mat-icon>clear</mat-icon>
+        </button> -->
+        <mat-autocomplete #autoSearchCaseNumber="matAutocomplete"
+          (optionSelected)="selectCaseNumber($event.option.value)">
+          <mat-option *ngFor="let caseNumber of filteredCaseNumbers"
+            [value]="caseNumber">
+            {{ caseNumber }}
+          </mat-option>
+        </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
 
@@ -198,10 +202,10 @@
         <mat-expansion-panel-header>
           <mat-panel-title> Case History </mat-panel-title>
         </mat-expansion-panel-header>
-        <label class="example-value-label" style="color: gray">In last {{ slider.value }} years</label>
+        <label class="example-value-label" style="color: rgb(10, 9, 9)">In last {{ slider.value }} years</label>
 
         <mat-slider [max]="max" [disabled]="!max" [min]="min" [step]="step" [discrete]="thumbLabel"
-          [showTickMarks]="showTicks" style="width: 80%">
+          [showTickMarks]="showTicks" style="width: 100%">
           <input matSliderThumb [(ngModel)]="valueSlider" #slider (input)="onYearSliderChange(valueSlider)" />
         </mat-slider>
       </mat-expansion-panel>
@@ -248,16 +252,20 @@
           <mat-panel-title> Plaintiff </mat-panel-title>
         </mat-expansion-panel-header>
         <!-- Search for Plaintiff -->
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search Plaintiff</mat-label>
+          <mat-chip *ngFor="let plaintiff of selectedPlaintiff" (removed)="removePlaintiff(plaintiff)">
+            {{ plaintiff }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
           <input [disabled]="!tabledata.length" matInput [(ngModel)]="plaintiffInputValue"
             [matAutocomplete]="autoSearchPlaintiff" (input)="onSearchPlaintiffInput(plaintiffInputValue)" />
-          <button mat-icon-button matSuffix (click)="clearPlaintiffSearch()" *ngIf="plaintiffInputValue">
+          <!-- <button mat-icon-button matSuffix (click)="clearPlaintiffSearch()" *ngIf="plaintiffInputValue">
             <mat-icon>clear</mat-icon>
-          </button>
+          </button> -->
           <mat-autocomplete #autoSearchPlaintiff="matAutocomplete"
             (optionSelected)="selectPlaintiff($event.option.value)">
-            <mat-option *ngFor="let plaintiff of filteredPlaintiff" (click)="onPlaintiffSelected(plaintiff)"
+            <mat-option *ngFor="let plaintiff of filteredPlaintiff"
               [value]="plaintiff">
               {{ plaintiff}}
             </mat-option>
@@ -271,16 +279,20 @@
           <mat-panel-title> Defendant </mat-panel-title>
         </mat-expansion-panel-header>
 
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search Defendant</mat-label>
+          <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeDefandant(defendant)">
+            {{ defendant }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
           <input [disabled]="!tabledata.length" matInput [(ngModel)]="defendantInputValue"
             [matAutocomplete]="autoSearchDefendant" (input)="onSearchDefendantInput(defendantInputValue)" />
-          <button mat-icon-button matSuffix (click)="clearDefendantSearch()" *ngIf="defendantInputValue">
+          <!-- <button mat-icon-button matSuffix (click)="clearDefendantSearch()" *ngIf="defendantInputValue">
             <mat-icon>clear</mat-icon>
-          </button>
+          </button> -->
           <mat-autocomplete #autoSearchDefendant="matAutocomplete"
             (optionSelected)="selectDefendant($event.option.value)">
-            <mat-option *ngFor="let defendant of filteredDefendants" (click)="onDefendantSelected(defendant)"
+            <mat-option *ngFor="let defendant of filteredDefendants"
               [value]="defendant">
               {{ defendant }}
             </mat-option>
@@ -294,9 +306,14 @@
           <mat-panel-title> Industry </mat-panel-title>
         </mat-expansion-panel-header>
 
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Search</mat-label>
-          <input type="search" [(ngModel)]="industryInputValue" (input)="filterIndustry()" matNativeControl />
+          <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeIndustry(industry)">
+            {{ industry }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <input type="search" [(ngModel)]="industryInputValue" (input)="filterIndustry()" matNativeControl
+            style="width: 100%;" />
         </mat-form-field>
 
         <section class="example-section" *ngIf="filteredIndustry.length > 0">
@@ -312,9 +329,16 @@
         <mat-expansion-panel-header>
           <mat-panel-title> Tech Category </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Search</mat-label>
-          <input type="search" [(ngModel)]="techCategoryInputValue" (input)="filterTechCategory()" matNativeControl />
+          <!-- <mat-chip-list #chipList aria-label="Selected Categories"> -->
+          <mat-chip *ngFor="let category of selectedTechCategory" (removed)="removeCategory(category)">
+            {{ category }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <!-- </mat-chip-list> -->
+          <input type="text" [(ngModel)]="techCategoryInputValue" (input)="filterTechCategory()" matNativeControl
+            style="width: 100%;" />
         </mat-form-field>
         <section class="example-section" *ngIf="filteredTechCategory.length > 0">
           <mat-checkbox [checked]="selectedTechCategory.has(techCategory)" (change)="
@@ -332,19 +356,23 @@
         </mat-expansion-panel-header>
 
         <!-- Search Field -->
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
-          <input [disabled]="!excelData.length" matInput [(ngModel)]="technologyKeywordInputValue"
+          <mat-chip *ngFor="let keyword of selectedTechnologyKeywords" (removed)="removeKeyword(keyword)">
+            {{ keyword }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <input [disabled]="!tabledata.length" matInput [(ngModel)]="technologyKeywordInputValue"
             (focus)="filterTechnologyKeywords()" (input)="filterTechnologyKeywords()"
-            placeholder="Search Technology Keywords" />
-          <button mat-icon-button matSuffix (click)="clearTechnologyKeywordsSearch()"
+            placeholder="Search Technology Keywords" style="width: 100%;" />
+          <!-- <button mat-icon-button matSuffix (click)="clearTechnologyKeywordsSearch()"
             *ngIf="technologyKeywordInputValue">
             <mat-icon>clear</mat-icon>
-          </button>
+          </button> -->
         </mat-form-field>
 
         <!-- Technology Keywords Checkboxes -->
-        <div>
+        <div class="example-section" *ngIf="filteredTechnologyKeywords.length > 0">
           <mat-checkbox *ngFor="let keyword of filteredTechnologyKeywords"
             [checked]="selectedTechnologyKeywords.has(keyword)"
             (change)="onTechnologyKeywordChanged(keyword, $event.checked)">
@@ -360,20 +388,26 @@
         </mat-expansion-panel-header>
 
         <!-- Search for Court Names -->
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
+          <mat-chip *ngFor="let court of selectedCourtName" (removed)="removeKeyword(court)">
+            {{ court }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
           <input [disabled]="!tabledata.length" matInput [(ngModel)]="courtNameInputValue"
             (focus)="onSearchCourtNamesInput(courtNameInputValue)"
-            (input)="onSearchCourtNamesInput(courtNameInputValue)" />
-          <button mat-icon-button matSuffix (click)="clearCourtNamesSearch()" *ngIf="courtNameInputValue">
+            (input)="onSearchCourtNamesInput(courtNameInputValue)" placeholder="Search Court Name" />
+          <!-- <button mat-icon-button matSuffix (click)="clearCourtNamesSearch()" *ngIf="courtNameInputValue">
             <mat-icon>clear</mat-icon>
-          </button>
-          <mat-autocomplete #autoSearchCourtNames="matAutocomplete">
-            <mat-option *ngFor="let courtName of filteredCourtName" (click)="onCourtNameSelected(courtName)"
-              [value]="courtName">
-              {{ courtName }}
-            </mat-option>
-          </mat-autocomplete>
+          </button> -->
+          <!-- <section class="example-section" *ngIf="filteredCourtName.length > 0">
+            <mat-autocomplete #autoSearchCourtNames="matAutocomplete">
+              <mat-option *ngFor="let courtName of filteredCourtName" (click)="onCourtNameSelected(courtName)"
+                [value]="courtName">
+                {{ courtName }}
+              </mat-option>
+            </mat-autocomplete>
+          </section> -->
         </mat-form-field>
 
         <section class="example-section" *ngIf="filteredCourtName.length > 0">
@@ -417,17 +451,21 @@
         </mat-expansion-panel-header>
 
         <!-- Search for Patent Number -->
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="patentNoInputValue"
-            [matAutocomplete]="autoSearchPatentNo" (input)="onSearchPatentNoInput(patentNoInputValue)" />
-          <button mat-icon-button matSuffix (click)="clearPatentNoSearch()" *ngIf="patentNoInputValue">
+          <mat-chip *ngFor="let patentNo of selectedpatentNo" (removed)="removePatentNo(patentNo)">
+            {{ patentNo }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <input type="text" [disabled]="!tabledata.length" matInput [(ngModel)]="patentNoInputValue"
+            [matAutocomplete]="autoSearchPatentNo" (input)="onSearchPatentNoInput(patentNoInputValue)"
+            placeholder="eg. 1104721, etc." />
+          <!-- <button mat-icon-button matSuffix (click)="clearPatentNoSearch()" *ngIf="patentNoInputValue">
             <mat-icon>clear</mat-icon>
-          </button>
+          </button> -->
           <mat-autocomplete #autoSearchPatentNo="matAutocomplete"
             (optionSelected)="selectPatentNo($event.option.value)">
-            <mat-option *ngFor="let patentNo of filteredPatentNos" (click)="onPatentNoSelected(patentNo)"
-              [value]="patentNo">
+            <mat-option *ngFor="let patentNo of filteredPatentNos" [value]="patentNo">
               {{ patentNo }}
             </mat-option>
           </mat-autocomplete>
@@ -441,17 +479,20 @@
         </mat-expansion-panel-header>
 
         <!-- Search for Cause of Action -->
-        <mat-form-field appearance="outline" style="width: 70%">
+        <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
+          <mat-chip *ngFor="let action of selectedCauseOfAction" (removed)="removeactions(action)">
+            {{ action }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
           <input [disabled]="!tabledata.length" matInput [(ngModel)]="causeOfActionInputValue"
             [matAutocomplete]="autoSearchCauseOfAction" (input)="onSearchCauseOfActionInput(causeOfActionInputValue)" />
-          <button mat-icon-button matSuffix (click)="clearCauseOfActionSearch()" *ngIf="causeOfActionInputValue">
+          <!-- <button mat-icon-button matSuffix (click)="clearCauseOfActionSearch()" *ngIf="causeOfActionInputValue">
             <mat-icon>clear</mat-icon>
-          </button>
+          </button> -->
           <mat-autocomplete #autoSearchCauseOfAction="matAutocomplete"
             (optionSelected)="selectCauseOfAction($event.option.value)">
-            <mat-option *ngFor="let causeOfAction of filteredCauseOfActions"
-              (click)="onCauseOfActionSelected(causeOfAction)" [value]="causeOfAction">
+            <mat-option *ngFor="let causeOfAction of filteredCauseOfActions" [value]="causeOfAction">
               {{ causeOfAction }}
             </mat-option>
           </mat-autocomplete>
@@ -463,31 +504,12 @@
         <mat-expansion-panel-header>
           <mat-panel-title>Standard Essential Patent</mat-panel-title>
         </mat-expansion-panel-header>
-
-        <mat-form-field appearance="outline" style="width: 70%">
-          <mat-label>Search Standard Essential Patent</mat-label>
-          <input [disabled]="!excelData.length" matInput [(ngModel)]="standardEssentialPatentInputValue"
-            [matAutocomplete]="autoSearchStandardEssentialPatent" (input)="
-              onSearchStandardEssentialPatentInput(
-                standardEssentialPatentInputValue
-              )
-            " />
-          <button mat-icon-button matSuffix (click)="clearStandardEssentialPatentSearch()"
-            *ngIf="standardEssentialPatentInputValue">
-            <mat-icon>clear</mat-icon>
-          </button>
-          <mat-autocomplete #autoSearchStandardEssentialPatent="matAutocomplete" (optionSelected)="
-              selectStandardEssentialPatent($event.option.value)
-            ">
-            <mat-option *ngFor="
-                let standardEssentialPatent of filteredStandardEssentialPatents
-              " (click)="
-                onStandardEssentialPatentSelected(standardEssentialPatent)
-              " [value]="standardEssentialPatent">
-              {{ standardEssentialPatent }}
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+        <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedStandardPatent" (change)="onStandardPatentChange()">
+          <mat-radio-button value="All">All</mat-radio-button>
+          <ng-container *ngFor="let item of standardEssentialPatentArrays">
+            <mat-radio-button [value]="item">{{ item }}</mat-radio-button>
+          </ng-container>
+        </mat-radio-group>
       </mat-expansion-panel>
 
       <!-- //Semiconductor Patent -->
@@ -497,29 +519,17 @@
         </mat-expansion-panel-header>
 
         <!-- Search for Semiconductor Patent -->
-        <mat-form-field appearance="outline" style="width: 70%">
-          <mat-label>Search Semiconductor Patent</mat-label>
-          <input [disabled]="!excelData.length" matInput [(ngModel)]="semiconductorPatentInputValue"
-            [matAutocomplete]="autoSearchSemiconductorPatent" (input)="
-              onSearchSemiconductorPatentInput(semiconductorPatentInputValue)
-            " />
-          <button mat-icon-button matSuffix (click)="clearSemiconductorPatentSearch()"
-            *ngIf="semiconductorPatentInputValue">
-            <mat-icon>clear</mat-icon>
-          </button>
-          <mat-autocomplete #autoSearchSemiconductorPatent="matAutocomplete"
-            (optionSelected)="selectSemiconductorPatent($event.option.value)">
-            <mat-option *ngFor="let semiconductorPatent of filteredSemiconductorPatents"
-              (click)="onSemiconductorPatentSelected(semiconductorPatent)" [value]="semiconductorPatent">
-              {{ semiconductorPatent }}
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+        <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedSemiconductorpatent" (change)="onSemiconductorPatentChange()">
+          <mat-radio-button value="All">All</mat-radio-button>
+          <ng-container *ngFor="let item of semiconductorPatentArrays">
+            <mat-radio-button [value]="item">{{ item }}</mat-radio-button>
+          </ng-container>
+        </mat-radio-group>
       </mat-expansion-panel>
     </mat-accordion>
-  </mat-drawer>
+  </mat-sidenav>
 
-  <mat-drawer-content style="height: auto; background-color: white">
+  <mat-sidenav-content style="height: auto; background-color: white">
     <!-- All Chips -->
 
     <div style="
@@ -675,7 +685,7 @@
           <!-- causeOfAction Chip -->
           <mat-chip *ngFor="let causeOfAction of selectedCauseOfAction"
             (removed)="removeFilter('causeOfAction', causeOfAction)">
-            cCause Of Action: {{ causeOfAction }}
+            Cause Of Action: {{ causeOfAction }}
             <button matChipRemove [attr.aria-label]="'remove causeOfAction'">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -728,7 +738,7 @@
         style="width: 100%; height: auto">
         <mat-tab label="CaseList">
           <!-- <div class="case-list-table"> -->
-          <div *ngIf="this.dataSource.data.length === 0 && isLoading" style="
+          <div *ngIf="loader" style="
               display: flex;
               flex-direction: column;
               align-items: flex-start;
@@ -737,7 +747,7 @@
             ">
             loading litigation cases..
           </div>
-          <div *ngIf="isFilteredLoading" style="
+          <!-- <div *ngIf="isFilteredLoading" style="
               display: flex;
               flex-direction: column;
               align-items: flex-start;
@@ -754,9 +764,9 @@
               height: 40vh;
             ">
             fetching more litigation cases..
-          </div>
+          </div> -->
 
-          <table mat-table *ngIf="tabledata.length !== 0 && !isLoading" [dataSource]="tabledata"
+          <table mat-table *ngIf="!loader" [dataSource]="tabledata"
             class="mat-elevation-z8" style="height: auto">
             <!-- <table mat-table class="mat-elevation-z8"> -->
             <!-- Sr. No. Column -->
@@ -784,8 +794,7 @@
               <th mat-header-cell *matHeaderCellDef>Case Number</th>
               <td mat-cell *matCellDef="let element">
                 <a (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
-                style="cursor: pointer;color:blue"
-                  >
+                  style="cursor: pointer;color:blue">
                   {{ element.case_no || 'NA' }}
                 </a>
               </td>
@@ -800,7 +809,7 @@
               </td>
             </ng-container>
 
-            
+
             <!-- Status Column -->
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef>Status</th>
@@ -808,7 +817,7 @@
                 {{ element.case_status || "NA" }}
               </td>
             </ng-container>
-            
+
             <!-- court Column -->
             <ng-container matColumnDef="court_name">
               <th mat-header-cell *matHeaderCellDef>Court Name</th>
@@ -827,16 +836,16 @@
             <!-- Prior Reports Column -->
             <!-- Prior Reports Column -->
             <!-- <ng-container matColumnDef="quickSearchReport"> -->
-              <!-- <th mat-header-cell *matHeaderCellDef style="white-space: nowrap">
+            <!-- <th mat-header-cell *matHeaderCellDef style="white-space: nowrap">
                 Prior Reports
               </th> -->
-              <!-- <td mat-cell *matCellDef="let element" style="display: flex; gap: 10px"> -->
-                <!-- <ng-container *ngIf="
+            <!-- <td mat-cell *matCellDef="let element" style="display: flex; gap: 10px"> -->
+            <!-- <ng-container *ngIf="
                     element.data.quickSearchReport?.length > 0;
                     else noFiles
                   "> -->
-                  <!-- File Links -->
-                  <!-- <ng-container *ngFor="let fileType of fileTypes">
+            <!-- File Links -->
+            <!-- <ng-container *ngFor="let fileType of fileTypes">
                     <ng-container *ngIf="
                         getFileDetails(
                           element.data.quickSearchReport,
@@ -850,9 +859,9 @@
                       </a>
                     </ng-container>
                   </ng-container> -->
-                <!-- </ng-container> -->
-                <!-- <ng-template #noFiles> NA </ng-template> -->
-              <!-- </td> -->
+            <!-- </ng-container> -->
+            <!-- <ng-template #noFiles> NA </ng-template> -->
+            <!-- </td> -->
             <!-- </ng-container> -->
 
             <!-- Table Header and Row Definitions -->
@@ -875,7 +884,7 @@
             Fetching data...
           </div> -->
 
-          <div *ngIf="dataSource.data.length === 0 && !isLoading" style="
+          <div *ngIf="loader" style="
               height: 60vh;
               width: 100%;
               margin-bottom: 600px;
@@ -911,7 +920,7 @@
         </mat-tab>
       </mat-tab-group>
     </div>
-  </mat-drawer-content>
-</mat-drawer-container>
+  </mat-sidenav-content>
+</mat-sidenav-container>
 
 <!-- <app-case-list [caseNumberPass]="selectedDataToPass"></app-case-list>  -->

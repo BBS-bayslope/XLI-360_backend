@@ -61,7 +61,8 @@ class RawData(models.Model):
     defendant_email = models.TextField(blank=True, null=True)
     stage=models.CharField(max_length=20,blank=True,null=True)
     is_valid=models.BooleanField(default=True,blank=True,null=True)
-    
+    is_processed=models.BooleanField(default=False,blank=True,null=True)
+
     def __str__(self):
         return self.case_no
     
@@ -133,3 +134,28 @@ class CasePatent(models.Model):
 
     def __str__(self):
         return f"Case {self.case.case_no} - Patent {self.patent.patent_no}"
+
+class PlaintiffDetails(models.Model):
+    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    plaintiff = models.TextField(blank=True, null=True)
+    plaintiff_law_firm = models.TextField(blank=True, null=True)
+    plaintiff_attorney_name =models.TextField(blank=True, null=True)
+    plaintiff_contact = models.TextField(blank=True, null=True)
+    plaintiff_email = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Case {self.case.case_no}: {self.plaintiff_law_firm}"
+
+class DefendantDetails(models.Model):
+    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    defendant = models.TextField(blank=True, null=True)
+    defendant_law_firm = models.TextField(blank=True, null=True)
+    defendant_attorney_name = models.TextField(blank=True, null=True)
+    defendant_phone = models.TextField(blank=True, null=True)
+    defendant_email = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"Case {self.case.case_no}: {self.defendant_law_firm}"
+
+   
+    
