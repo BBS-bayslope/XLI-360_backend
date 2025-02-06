@@ -76,6 +76,7 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  # Your Angular frontend
     "http://127.0.0.1:4200",
+    "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com"
 ]
 
 
