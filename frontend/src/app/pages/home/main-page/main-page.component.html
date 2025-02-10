@@ -899,7 +899,7 @@
           <mat-paginator [pageSize]="20" showFirstLastButtons [length]="totalCount"></mat-paginator>
         </mat-tab>
         <mat-tab label="Analytics">
-          <div *ngIf="filterDataForAnalytics && excelData2">
+          <div>
             <app-analytics [filterDataForAnalytics]="filterDataForAnalytics" [excelData]="excelData2"></app-analytics>
           </div>
 

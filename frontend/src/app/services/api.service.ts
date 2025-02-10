@@ -68,6 +68,14 @@ export class ApiService {
     const endpoint = `${this.baseUrl}/api/case-stats/`;
     return this.http.get<any>(endpoint);
   }
+  getPlaintiffTypeStats(): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/plaintiff-type-stats/`;
+    return this.http.get<any>(endpoint);
+  }
+  getIndustryStats(): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/industry-stats/`;
+    return this.http.get<any>(endpoint);
+  }
 
 
 

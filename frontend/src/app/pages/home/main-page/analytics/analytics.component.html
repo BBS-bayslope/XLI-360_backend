@@ -1,7 +1,7 @@
 <div
   class="chart-container"
-  *ngIf="excelData && filterDataForAnalytics; else loading"
->
+  >
+  <!-- *ngIf="!loader; else loading" -->
   <!-- Total Litigation Cases & Status -->
   <div class="chart-item">
     <strong>Total Litigation Cases & Status</strong>
@@ -12,6 +12,9 @@
       [options]="doughnutChartOptionsTotalCases"
     >
     </canvas>
+    <!-- <div *ngIf="chartOptions">
+      <canvasjs-chart [options]="chartOptions" [styles]="{width: '100%', height:'360px'}"></canvasjs-chart>
+    </div>    -->
   </div>
   <!-- Total Litigation Cases Filed by Plaintiff according to Plaintiff type. -->
   <div class="chart-item">
@@ -77,7 +80,14 @@
   <!-- Top Plaintiff -->
   <div class="chart-item">
     <strong>Top Plaintiff</strong>
-    <mat-form-field appearance="outline">
+    <canvas
+      baseChart
+      [data]="barChartDataTopPlaintiffs"
+      [type]="barChartTypeTopPlaintiffs"
+      [options]="barChartOptionsTopPlaintiffs"
+    >
+    </canvas>
+    <!-- <mat-form-field appearance="outline">
       <mat-label>Select Number of Items</mat-label>
       <mat-select
         [(value)]="itemsToShowInTopPlaintiff"
@@ -89,9 +99,9 @@
         <mat-option value="6">6</mat-option>
         <mat-option value="all">All</mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
     <!-- Displaying the List -->
-    <div class="scrollable-list">
+    <!-- <div class="scrollable-list">
       <mat-list role="list">
         <mat-list-item *ngFor="let plaintiff of filteredTopPlaintiffs">
           <span style="text-wrap: wrap"
@@ -99,13 +109,20 @@
           >
         </mat-list-item>
       </mat-list>
-    </div>
+    </div> -->
   </div>
 
   <!-- Top Defendants -->
   <div class="chart-item">
     <strong>Top Defendants</strong>
-    <mat-form-field appearance="outline">
+    <canvas
+      baseChart
+      [data]="barChartDataTopDefandants"
+      [type]="barChartTypeTopDefandants"
+      [options]="barChartOptionsTopDefandants"
+    >
+    </canvas>
+    <!-- <mat-form-field appearance="outline">
       <mat-label>Select Number of Items</mat-label>
       <mat-select
         [(value)]="itemsToShowInTopDefendant"
@@ -117,9 +134,9 @@
         <mat-option value="6">6</mat-option>
         <mat-option value="all">All</mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
     <!-- Displaying the List -->
-    <div class="scrollable-list">
+    <!-- <div class="scrollable-list">
       <mat-list role="list">
         <mat-list-item *ngFor="let defendant of filteredTopDefendant">
           <span style="text-wrap: wrap">
@@ -127,7 +144,31 @@
           >
         </mat-list-item>
       </mat-list>
-    </div>
+    </div> -->
+  </div>
+<!-- Most Sued Tech Areas -->
+  <div class="chart-item">
+    <strong>Most Sued Tech Areas</strong>
+    <canvas
+      baseChart
+      [data]="barChartData" 
+      [options]="barChartOptions" 
+      [type]="barChartTypeMostSuedTechAreas"
+      (chartHover)="chartHovered($event)"
+      (chartClick)="chartClicked($event)"
+    >
+    </canvas>
+  </div>
+
+  <div class="chart-item">
+    <strong>Most Sued Companies</strong>
+    <canvas
+      baseChart
+      [data]="mostSuedCompaniesChartData"
+      [type]="mostSuedCompaniesChartType"
+      [options]="mostSuedCompaniesChartOptions"
+    >
+    </canvas>
   </div>
 
   <!-- All Plaintiff -->
@@ -192,35 +233,18 @@
     >
     </canvas>
   </div>
-  <!-- Most Sued Tech Areas -->
-  <div class="chart-item">
-    <strong>Most Sued Tech Areas</strong>
-    <canvas
-      baseChart
-      [data]="barChartDataMostSuedTechAreas"
-      [type]="barChartTypeMostSuedTechAreas"
-      [options]="barChartOptionsMostSuedTechAreas"
-      (chartHover)="chartHovered($event)"
-      (chartClick)="chartClicked($event)"
-    >
-    </canvas>
-  </div>
-
-  <div class="chart-item">
-    <strong>Most Sued Companies</strong>
-    <canvas
-      baseChart
-      [data]="mostSuedCompaniesChartData"
-      [type]="mostSuedCompaniesChartType"
-      [options]="mostSuedCompaniesChartOptions"
-    >
-    </canvas>
-  </div>
-
+  
   <!-- Top Plaintiff Law Firm -->
   <div class="chart-item">
     <strong>Top Plaintiff Law Firm</strong>
-    <mat-form-field appearance="outline">
+    <canvas
+      baseChart
+      [data]="barChartDataTopPlaintiffFirm"
+      [type]="barChartTypeTopPlaintiffFirm"
+      [options]="barChartOptionsTopPlaintiffFirm"
+    >
+  </canvas>
+    <!-- <mat-form-field appearance="outline">
       <mat-label>Select Number of Items</mat-label>
       <mat-select
         [(value)]="itemsToShowInTopPlaintiffLawFirm"
@@ -232,9 +256,9 @@
         <mat-option value="6">6</mat-option>
         <mat-option value="all">All</mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
     <!-- Displaying the List -->
-    <div class="scrollable-list">
+    <!-- <div class="scrollable-list">
       <mat-list role="list">
         <mat-list-item
           *ngFor="let topPlaintiffLawFirm of filteredTopPlaintiffLawFirm"
@@ -242,12 +266,19 @@
           {{ topPlaintiffLawFirm.name }}
         </mat-list-item>
       </mat-list>
-    </div>
+    </div> -->
   </div>
   <!-- Top Defendant Law Firm -->
   <div class="chart-item">
     <strong>Top Defendant Law Firm</strong>
-    <mat-form-field appearance="outline">
+    <canvas
+      baseChart
+      [data]="barChartDataTopDefandantFirm"
+      [type]="barChartTypeTopDefandantFirm"
+      [options]="barChartOptionsTopDefandantFirm"
+    >
+  </canvas>
+    <!-- <mat-form-field appearance="outline">
       <mat-label>Select Number of Items</mat-label>
       <mat-select
         [(value)]="itemsToShowInTopDefendentLawFirm"
@@ -259,9 +290,9 @@
         <mat-option value="6">6</mat-option>
         <mat-option value="all">All</mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
     <!-- Displaying the List -->
-    <div class="scrollable-list">
+    <!-- <div class="scrollable-list">
       <mat-list role="list">
         <p
           *ngFor="let topDefendantLawFirm of filteredTopDefendentLawFirm"
@@ -269,11 +300,8 @@
         >
           {{ topDefendantLawFirm.name }}
         </p>
-        <!-- <mat-list-item *ngFor="let topDefendantLawFirm of filteredTopDefendentLawFirm"  class="full-text">
-                  {{ topDefendantLawFirm.name }}
-                </mat-list-item> -->
       </mat-list>
-    </div>
+    </div> -->
   </div>
   <!-- Overlapping Law Firm -->
   <div class="chart-item">

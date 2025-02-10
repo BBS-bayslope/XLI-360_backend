@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -58,4 +58,285 @@
     </script>
 
 </body>
+</html> {% endcomment %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Admin Panel</h2>
+
+        <h3>Upload an Excel File</h3>
+        <input type="file" id="fileInput" accept=".xlsx, .xls">
+        <button onclick="uploadFile()">Upload</button>
+        <p id="message"></p>
+
+        <hr>
+
+        <h3>Download Case Entity List</h3>
+        <button onclick="downloadExcel()">Download Excel</button>
+    </div>
+
+    <script>
+        function uploadFile() {
+            let fileInput = document.getElementById('fileInput');
+            let file = fileInput.files[0];
+            let messageElem = document.getElementById("message");
+
+            if (!file) {
+                alert("Please select an Excel file to upload.");
+                return;
+            }
+
+            messageElem.textContent = "Uploading...";
+            messageElem.style.color = "blue";
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            fetch("/api/uploadNew/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                messageElem.textContent = "Excel file uploaded successfully!";
+                messageElem.style.color = "green";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                messageElem.textContent = "Upload failed!";
+                messageElem.style.color = "red";
+            });
+        }
+
+        function downloadExcel() {
+            fetch("api/case-entity-list/", {
+                method: "GET"
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                let url = window.URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "case_entity_list.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to download Excel file.");
+            });
+        }
+    </script>
+
+</body>
+</html> {% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #message, #downloadMessage {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .loader {
+            display: none;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Admin Panel</h2>
+
+        <h3>Upload an Excel File</h3>
+        <input type="file" id="fileInput" accept=".xlsx, .xls">
+        <button onclick="uploadFile()">Upload</button>
+        <p id="message"></p>
+
+        <hr>
+
+        <h3>Download Case Entity List</h3>
+        <button onclick="downloadExcel()">Download Excel</button>
+        <div class="loader" id="downloadLoader"></div>
+        <p id="downloadMessage"></p>
+    </div>
+
+    <script>
+        function uploadFile() {
+            let fileInput = document.getElementById('fileInput');
+            let file = fileInput.files[0];
+            let messageElem = document.getElementById("message");
+
+            if (!file) {
+                alert("Please select an Excel file to upload.");
+                return;
+            }
+
+            messageElem.textContent = "Uploading...";
+            messageElem.style.color = "blue";
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            fetch("/api/uploadNew/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                messageElem.textContent = "Excel file uploaded successfully!";
+                messageElem.style.color = "green";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                messageElem.textContent = "Upload failed!";
+                messageElem.style.color = "red";
+            });
+        }
+
+        function downloadExcel() {
+            let loader = document.getElementById("downloadLoader");
+            let messageElem = document.getElementById("downloadMessage");
+
+            loader.style.display = "block";
+            messageElem.textContent = "Generating file...";
+            messageElem.style.color = "blue";
+
+            fetch("/api/case-entity-list/", { method: "GET" })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                let url = window.URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "case_entity_list.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                messageElem.textContent = "Download complete!";
+                messageElem.style.color = "green";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                messageElem.textContent = "Download failed!";
+                messageElem.style.color = "red";
+            })
+            .finally(() => {
+                loader.style.display = "none";
+            });
+        }
+    </script>
+
+</body>
 </html>
+

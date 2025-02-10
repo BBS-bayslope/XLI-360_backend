@@ -11,11 +11,14 @@ mat-grid-tile {
 }
 
 .chart-container {
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr; /* Two columns per row */
+  gap: 20px; /* Optional: Adjust space between grid items */
   margin: 10px;
   padding: 20px;
 }
+
 
 .chart-item {
   padding: 20px;
