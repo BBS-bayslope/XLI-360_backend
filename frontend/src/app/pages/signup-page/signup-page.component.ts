@@ -54,7 +54,7 @@ export class SignupPageComponent implements OnInit {
 
   register(): void {
     if (this.password === this.confirmPassword) {
-      this.authService.register(this.email, this.password).subscribe({
+      this.authService.register({"email":this.email, "password":this.password}).subscribe({
         next: (user) => {
           console.log('Registered as:', user?.email);
           this.router.navigate(['/']);

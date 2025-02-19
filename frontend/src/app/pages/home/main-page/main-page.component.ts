@@ -796,7 +796,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.paginator.page.subscribe((event) => {
       this.payload.offset = event.pageIndex;
       this.payload.limit = event.pageSize
+      console.log(event.pageIndex,"dd")
       this.fetchData();
+      this.cdr.detectChanges();
     });
 
     //
@@ -2080,12 +2082,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   formatDate(date: Date | null): string {
     if (!date) return '';
+    
+    const day = date.getDate(); // No need to pad single-digit days
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensure two digits
-    const day = String(date.getDate()).padStart(2, '0');       // Ensure two digits
-    return `${year}/${month}/${day}`;
+  
+    return `${day} ${month}, ${year}`;
   }
-
 
   toggleIcon() {
     this.menuIcon = !this.menuIcon;

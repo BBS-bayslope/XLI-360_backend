@@ -2,6 +2,8 @@ from django.urls import path
 from .views.views import FileUploadView,ValidateRawDataAPIView, CaseListView,FilterDataView, CaseDetailsView
 from .views.uploadview import FileUploadView, FileUploadViewNew
 from .views.analytics import CaseStatisticsView, PlaintiffTypeCountView, IndustryStats, CaseEntityListing
+from .views.userView import RegisterView, LoginView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('upload/', FileUploadView.as_view(), name='api-upload-file'),
@@ -14,4 +16,7 @@ urlpatterns = [
     path('plaintiff-type-stats/', PlaintiffTypeCountView.as_view(), name='pt-stats'),
     path('industry-stats/', IndustryStats.as_view(), name='industry-stats'),
     path('case-entity-list/', CaseEntityListing.as_view(), name='case-entity-list'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

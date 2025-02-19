@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ExcelData } from '../pages/admin/excelDataTpes-interface';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpErrorResponse  } from '@angular/common/http';
 import {
   BehaviorSubject,
   catchError,
@@ -16,6 +16,8 @@ import {
   Subject,
   switchMap,
   toArray,
+  tap,
+  throwError
 } from 'rxjs';
 import {
   addDoc,
@@ -37,8 +39,9 @@ import {Router} from '@angular/router';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://18.216.104.19'; // Base API URL
-  // private baseUrl ="http://127.0.0.1:8000"
+  // private baseUrl = 'http://18.220.232.127'; // Base API URL
+  private baseUrl ="http://127.0.0.1:8000"
+  private tokenKey: string = "access"; // Key to store token in localStorage
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
   selectedCaseDocId: any;
@@ -52,6 +55,81 @@ export class ApiService {
     public router: Router,
   ) {}
   
+  // Remove token on logout
+  logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('refresh');
+    // localStorage.removeItem(this.tokenExpirationKey);
+    // this.authStatusSubject.next(false);
+    this.router.navigate(['/login']);
+  }
+
+  // Handle token expiration
+  private handleUnauthorized(): void {
+    this.logout(); // Clear token
+    this.router.navigate(['/login']);
+  }
+
+  refreshToken(): Observable<string> {
+    const endpoint = `${this.baseUrl}/api/token/refresh/`;
+    const refreshToken = localStorage.getItem('refresh');
+  
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+  
+    return this.http.post<any>(endpoint, { refresh: refreshToken }).pipe(
+      switchMap(response => {
+        if (response && response.access) {
+          localStorage.setItem('access', response.access);
+          localStorage.setItem('refresh', response.refresh);
+          return of(response.access);
+        } else {
+          this.logout();
+          return throwError(() => new Error('Invalid refresh response'));
+        }
+      }),
+      catchError(err => {
+        this.logout();
+        return throwError(() => err);
+      })
+    );
+  }
+  
+  // Login function
+  login(payload:object): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/login/`;
+    return this.http.post<any>(endpoint, payload).pipe(
+      tap(response => {
+        if (response && response.access) {
+          localStorage.setItem(this.tokenKey, response.access);
+          localStorage.setItem("refresh", response.refresh);
+          console.log(response.access)
+        } else {
+          console.error('Invalid login response', response);
+        }
+        
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Login failed', error);
+        return of(null);
+      })
+    );
+  }
+
+  // Register function
+  register(payload:object): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/register/`;
+    return this.http.post<any>(endpoint, payload).pipe(
+      tap(() => this.router.navigate(['/login'])),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Registration failed', error);
+        return of(null);
+      })
+    );
+  }
+
   getTableData(payload: object): Observable<any> {
     const endpoint = `${this.baseUrl}/api/case-list/`;
     return this.http.post<any>(endpoint,  payload );

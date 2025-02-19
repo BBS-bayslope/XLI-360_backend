@@ -1,12 +1,39 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
-# Create your models here.
-# class User(models.Model):
-#     email = models.EmailField(unique=True, max_length=255)
-#     password = models.CharField(max_length=128)
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-#     def __str__(self):
-#         return self.email
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_admin', True)
+
+        return self.create_user(email, password, **extra_fields)
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True)
+    is_admin = models.BooleanField(default=False)  # To check if the user is an admin
+    is_active = models.BooleanField(default=True)  # Required for authentication
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    def __str__(self):
+        return self.email
+
+    @property
+    def is_staff(self):
+        """Allows admin users to access Django admin panel."""
+        return self.is_admin
 
 class RawData(models.Model):
     case_no = models.CharField(max_length=100,blank=True, null=True) 
@@ -42,24 +69,29 @@ class RawData(models.Model):
     tech_center = models.TextField(blank=True, null=True)
     art_unit = models.TextField(blank=True, null=True)
     acquisition_type = models.TextField(blank=True, null=True)
-    assignee_timeline = models.TextField(blank=True, null=True)
+    assignee_timeline = models.JSONField(blank=True, null=True)
     industry = models.TextField(blank=True, null=True)
     technology_keywords = models.TextField(blank=True,null=True)
     tech_category = models.TextField(blank=True, null=True)
     reason_of_allowance = models.TextField(blank=True,null=True)
     plaintiff = models.TextField(blank=True, null=True)
-    plaintiff_type_and_size = models.TextField(blank=True, null=True)
+    plaintiff_type = models.TextField(blank=True, null=True)
+    plaintiff_size = models.TextField(blank=True, null=True)
+    plaintiff_count = models.TextField(blank=True, null=True)
     plaintiff_law_firm = models.TextField(blank=True, null=True)
     plaintiff_attorney_name =models.TextField(blank=True, null=True)
     plaintiff_contact = models.TextField(blank=True, null=True)
     plaintiff_email = models.TextField(blank=True, null=True)
     defendant = models.TextField(blank=True, null=True)
-    defendent_type_and_size = models.TextField(blank=True, null=True)
+    defendent_type = models.TextField(blank=True, null=True)
+    defendent_size = models.TextField(blank=True, null=True)
+    defendent_count = models.TextField(blank=True, null=True)
     defendant_law_firm = models.TextField(blank=True, null=True)
     defendant_attorney_name = models.TextField(blank=True, null=True)
     defendant_phone = models.TextField(blank=True, null=True)
     defendant_email = models.TextField(blank=True, null=True)
     stage=models.CharField(max_length=20,blank=True,null=True)
+    chances_of_winning=models.TextField(blank=True,null=True)
     is_valid=models.BooleanField(default=True,blank=True,null=True)
     is_processed=models.BooleanField(default=False,blank=True,null=True)
 
@@ -79,7 +111,7 @@ class Case(models.Model):
         return f"Case {self.case_no}: {self.case_name}"
 
 class CaseDetails(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, unique=True)
     related_cases = models.TextField(blank=True, null=True)
     case_closed_date = models.TextField(blank=True, null=True)
     cause_of_action = models.TextField(blank=True,null=True)
@@ -95,13 +127,18 @@ class CaseDetails(models.Model):
     other_possible_infringer = models.TextField(blank=True, null=True)
     list_of_prior_art = models.TextField(blank=True, null=True)
     plaintiff = models.TextField(blank=True, null=True)
-    plaintiff_type_and_size = models.TextField(blank=True, null=True)
+    plaintiff_type = models.TextField(blank=True, null=True)
+    plaintiff_size = models.TextField(blank=True, null=True)
+    plaintiff_count = models.TextField(blank=True, null=True)
     defendant = models.TextField(blank=True, null=True)
-    defendent_type_and_size = models.TextField(blank=True, null=True)
+    defendent_type = models.TextField(blank=True, null=True)
+    defendent_size = models.TextField(blank=True, null=True)
+    defendent_count = models.TextField(blank=True, null=True)
     stage=models.CharField(max_length=20,blank=True,null=True)
     other_defendents=models.TextField(blank=True, null=True)
     no_of_defendents=models.TextField(blank=True, null=True)
     activity_timeline=models.TextField(blank=True, null=True)
+    chances_of_winning=models.TextField(blank=True, null=True)
     
 class Patent(models.Model):
     patent_no = models.CharField(max_length=100, unique=True)  
@@ -117,7 +154,7 @@ class Patent(models.Model):
     tech_center = models.TextField(blank=True, null=True)
     art_unit = models.TextField(blank=True, null=True)
     acquisition_type = models.TextField(blank=True, null=True)
-    assignee_timeline = models.TextField(blank=True, null=True)
+    assignee_timeline = models.JSONField(blank=True, null=True)
     industry = models.TextField(blank=True, null=True)
     technology_keywords = models.TextField(blank=True,null=True)
     tech_category = models.TextField(blank=True, null=True)
@@ -131,7 +168,9 @@ class CasePatent(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     patent = models.ForeignKey(Patent, on_delete=models.CASCADE)
     date_added = models.DateField(auto_now_add=True)
-
+    
+    class Meta:
+        unique_together = ('case', 'patent')  # Prevents duplicates
     def __str__(self):
         return f"Case {self.case.case_no} - Patent {self.patent.patent_no}"
 

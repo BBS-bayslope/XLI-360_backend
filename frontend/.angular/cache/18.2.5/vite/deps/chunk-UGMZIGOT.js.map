@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../../../node_modules/rxjs/dist/esm5/internal/observable/of.js"],
-  "sourcesContent": ["import { popScheduler } from '../util/args';\nimport { from } from './from';\nexport function of() {\n  var args = [];\n  for (var _i = 0; _i < arguments.length; _i++) {\n    args[_i] = arguments[_i];\n  }\n  var scheduler = popScheduler(args);\n  return from(args, scheduler);\n}\n"],
-  "mappings": ";;;;;;AAEO,SAAS,KAAK;AACnB,MAAI,OAAO,CAAC;AACZ,WAAS,KAAK,GAAG,KAAK,UAAU,QAAQ,MAAM;AAC5C,SAAK,EAAE,IAAI,UAAU,EAAE;AAAA,EACzB;AACA,MAAI,YAAY,aAAa,IAAI;AACjC,SAAO,KAAK,MAAM,SAAS;AAC7B;",
-  "names": []
-}

@@ -12,8 +12,8 @@ import {
   toFont,
   toPadding,
   valueOrDefault
-} from "./chunk-RGLJYQZA.js";
-import "./chunk-K4KU7J5H.js";
+} from "./chunk-CYVX5E7M.js";
+import "./chunk-T6SYERLG.js";
 
 // node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.esm.js
 var devicePixelRatio = function() {

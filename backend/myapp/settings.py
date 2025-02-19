@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +29,11 @@ DEBUG = True
 ALLOWED_HOSTS = ['18.216.104.19', 'localhost', '127.0.0.1']
 
 
+AUTH_USER_MODEL = 'mainapp.CustomUser'  # Correct (Capital 'C')
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,7 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'mainapp'
+    'mainapp',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 MIDDLEWARE = [
@@ -79,8 +88,24 @@ CORS_ALLOWED_ORIGINS = [
     "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com"
 ]
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_BLACKLIST_ENABLED': True, 
 
+}
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -100,10 +125,10 @@ CORS_ALLOWED_ORIGINS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'BayslopeDb',
+        'NAME': 'LitigationDb',
         'USER': 'Sarita',
         'PASSWORD':'Bayslope_23',
-        'HOST': 'database-1.cd842y2iqcq8.us-east-2.rds.amazonaws.com',
+        'HOST': 'database-3.cd842y2iqcq8.us-east-2.rds.amazonaws.com',
         'PORT': 5432,
         
     }

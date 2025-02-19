@@ -17,7 +17,9 @@ from django.db.models import Q
 from ..serializers import CaseSerializer
 from django.db.models.functions import Upper, Lower
 from django.db import connection
-
+from rest_framework.permissions import AllowAny, IsAuthenticated
+import json
+from django.db.models.functions import Upper, Lower
 
 class FileUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -92,19 +94,23 @@ class FileUploadView(APIView):
                     tech_center=row['Tech Centre'],
                     art_unit=row['Art Unit'],
                     acquisition_type=row['Acquired Patent or Organic patent?'],
-                    assignee_timeline=row.get('Assignee Timeline', None),
+                    # assignee_timeline=row.get('Assignee Timeline', None),
                     industry=row['Industry'],
                     technology_keywords=row['Technology Keywords'],
                     tech_category=row['Tech Category'],
                     reason_of_allowance=row['Reason of Allowance'],
                     plaintiff=row.get('Plaintiff/Petitioner', None),
-                    plaintiff_type_and_size=row['Plaintiff Type & Size'],
+                    plaintiff_type=row['Plaintiff Type'],
+                    plaintiff_size=row['Plaintiff Size'],
+                    plaintiff_count=row['Number of Plaintiff/petitioners'],
                     # plaintiff_law_firm=row.get('Plaintiff Law Firm Name', None),
                     # plaintiff_attorney_name=row.get('PA Name 1', None),
                     # plaintiff_contact=row.get('PA Phone 1', None),
                     # plaintiff_email=row.get('PA Email 1', None),
                     defendant=row.get('Defendant', None),
-                    defendent_type_and_size=row['Defendant Type & Size'],
+                    defendent_type=row['Defendant Type'],
+                    defendent_size=row['Defendant Size'],
+                    defendent_count=row['Number of Defendants'],
                     # defendant_law_firm=row.get('Defendant Law Firm Name', None),
                     # defendant_attorney_name=row.get('DA Name 1', None),
                     # defendant_phone=row.get('DA Phone 1', None),
@@ -186,17 +192,18 @@ def create_stored_procedure():
             case_id, related_cases, case_closed_date, cause_of_action, accused_product,
             judge, number_of_infringed_claims, third_party_funding_involved,
             case_strength_level, recent_action, winning_amount, winning_party, other_possible_infringer,
-            list_of_prior_art, plaintiff, defendant, plaintiff_type_and_size, defendent_type_and_size
+            list_of_prior_art, plaintiff, defendant, plaintiff_type, plaintiff_size, plaintiff_count, defendent_type, defendent_size, defendent_count, chances_of_winning
         )
-        SELECT DISTINCT c.id, rd.related_cases, rd.case_closed_date, rd.cause_of_action, rd.accused_product,
-            rd.assigned_judge, rd.third_party_funding_involved,
-            rd.type_of_infringement, rd.case_strength_level, rd.recent_action, rd.winning_amount,
-            rd.winning_party, rd.other_possible_infringer, rd.list_of_prior_art, rd.plaintiff,
-            rd.defendant, rd.plaintiff_type_and_size, rd.defendent_type_and_size
+        SELECT DISTINCT ON (c.id)  -- Ensures one record per case_id
+            c.id, rd.related_cases, rd.case_closed_date, rd.cause_of_action, rd.accused_product,
+            rd.assigned_judge, rd.number_of_infringed_claims, rd.third_party_funding_involved,
+            rd.case_strength_level, rd.recent_action, rd.winning_amount,
+            rd.winning_party, rd.other_possible_infringer, rd.list_of_prior_art, rd.plaintiff, rd.defendant, rd.plaintiff_type, rd.plaintiff_size,
+            rd.plaintiff_count, rd.defendent_type, rd.defendent_size, rd.defendent_count, rd.chances_of_winning
         FROM mainapp_rawdata rd
         JOIN mainapp_case c ON rd.case_no = c.case_no
         WHERE rd.is_processed = FALSE AND rd.is_valid = TRUE
-        ON CONFLICT (id) DO UPDATE SET
+        ON CONFLICT (case_id) DO UPDATE SET
             related_cases = EXCLUDED.related_cases,
             case_closed_date = EXCLUDED.case_closed_date,
             cause_of_action = EXCLUDED.cause_of_action,
@@ -204,7 +211,6 @@ def create_stored_procedure():
             judge = EXCLUDED.judge,
             number_of_infringed_claims = EXCLUDED.number_of_infringed_claims,
             third_party_funding_involved = EXCLUDED.third_party_funding_involved,
-            type_of_infringement = EXCLUDED.type_of_infringement,
             case_strength_level = EXCLUDED.case_strength_level,
             recent_action = EXCLUDED.recent_action,
             winning_amount = EXCLUDED.winning_amount,
@@ -213,9 +219,14 @@ def create_stored_procedure():
             list_of_prior_art = EXCLUDED.list_of_prior_art,
             plaintiff = EXCLUDED.plaintiff,
             defendant = EXCLUDED.defendant,
-            plaintiff_type_and_size = EXCLUDED.plaintiff_type_and_size,
-            defendent_type_and_size = EXCLUDED.defendent_type_and_size;
-
+            plaintiff_type = EXCLUDED.plaintiff_type,
+            plaintiff_size = EXCLUDED.plaintiff_size,
+            plaintiff_count = EXCLUDED.plaintiff_count,
+            defendent_type = EXCLUDED.defendent_type,
+            defendent_size = EXCLUDED.defendent_size,
+            defendent_count = EXCLUDED.defendent_count,
+            chances_of_winning = EXCLUDED.chances_of_winning;
+            
         -- Insert new patents (ignoring duplicates)
         INSERT INTO mainapp_patent (
             patent_no, patent_type, patent_title, original_assignee, current_assignee, issue_date, expiry_date,
@@ -261,7 +272,7 @@ def create_stored_procedure():
 
 class FileUploadViewNew(APIView):
     parser_classes = (MultiPartParser, FormParser)
-
+    permission_classes = [AllowAny]
     def process_chunk(self, rows):
         records = []
         required_columns = [
@@ -275,8 +286,8 @@ class FileUploadViewNew(APIView):
             'Standard Essential Patent', 'Semiconductor Patent', 'Tech Centre',
             'Art Unit', 'Acquired Patent or Organic patent?', 'Assignee Timeline',
             'Industry', 'Technology Keywords', 'Tech Category', 'Reason of Allowance',
-            'Plaintiff/Petitioner', 'Plaintiff Type & Size', 'Defendant',
-            'Defendant Type & Size', 'Stage'
+            'Plaintiff/Petitioner', 'Number of Plaintiff/petitioners', 'Plaintiff Type', 'Plaintiff Size', 'Defendant',
+            'Defendant Type', 'Defendant Size', 'Number of Defendants', 'Stage', 'Chances of Winning'
         ]
 
         for row in rows:
@@ -298,7 +309,7 @@ class FileUploadViewNew(APIView):
                 expiry_date = expiry_date.strftime('%Y-%m-%d') if pd.notnull(expiry_date) else None
 
                 raw_data_instance = RawData(
-                    case_no=row.get('Case Number'),
+                    case_no=row.get('Case Number','').upper(),
                     complaint_date=complaint_date,
                     case_name=row['Case Name'],
                     case_status=row['Case Status'],
@@ -311,13 +322,14 @@ class FileUploadViewNew(APIView):
                     assigned_judge=row.get('Judge', None),
                     number_of_infringed_claims=row.get('Number of Infringed Claims', 0) or 0,
                     third_party_funding_involved=row['3rd Party Funding Involved'],
+                    # type_of_infringement=row['Type of Infringement'],
                     case_strength_level=row['Case Strength Level'],
                     recent_action=row.get('Recent Action', None),
                     winning_amount=row.get('Winning Amount', None),
                     winning_party=row.get('Winning Party', None),
                     other_possible_infringer=row.get('Other Possible Infringer', None),
                     list_of_prior_art=row.get('List of Prior Art', None),
-                    patent_no=row.get('Patent No', None),
+                    patent_no=row.get('Patent No', '').upper(),
                     patent_type=row.get('Type of Patent', None),
                     patent_title=row.get('Title', None),
                     original_assignee=row['Original Assignee'],
@@ -330,16 +342,29 @@ class FileUploadViewNew(APIView):
                     tech_center=row['Tech Centre'],
                     art_unit=row['Art Unit'],
                     acquisition_type=row['Acquired Patent or Organic patent?'],
-                    assignee_timeline=row.get('Assignee Timeline', None),
+                    # assignee_timeline=row.get('Assignee Timeline', None),
                     industry=row['Industry'],
                     technology_keywords=row['Technology Keywords'],
                     tech_category=row['Tech Category'],
                     reason_of_allowance=row['Reason of Allowance'],
                     plaintiff=row.get('Plaintiff/Petitioner', None),
-                    plaintiff_type_and_size=row['Plaintiff Type & Size'],
+                    plaintiff_type=row['Plaintiff Type'],
+                    plaintiff_size=row['Plaintiff Size'],
+                    plaintiff_count=row['Number of Plaintiff/petitioners'],
+                    # plaintiff_law_firm=row.get('Plaintiff Law Firm Name', None),
+                    # plaintiff_attorney_name=row.get('PA Name 1', None),
+                    # plaintiff_contact=row.get('PA Phone 1', None),
+                    # plaintiff_email=row.get('PA Email 1', None),
                     defendant=row.get('Defendant', None),
-                    defendent_type_and_size=row['Defendant Type & Size'],
+                    defendent_type=row['Defendant Type'],
+                    defendent_size=row['Defendant Size'],
+                    defendent_count=row['Number of Defendants'],
+                    # defendant_law_firm=row.get('Defendant Law Firm Name', None),
+                    # defendant_attorney_name=row.get('DA Name 1', None),
+                    # defendant_phone=row.get('DA Phone 1', None),
+                    # defendant_email=row.get('DA Email 1', None),
                     stage=row['Stage'],
+                    chances_of_winning=row['Chances of Winning'],
                     is_valid=is_valid
                 )
                 records.append(raw_data_instance)
@@ -355,7 +380,7 @@ class FileUploadViewNew(APIView):
         for row in plaintiffs_rows:
             try:
                 if(row.get('Case Number')):
-                    case_instance = Case.objects.get(case_no=row.get('Case Number'))
+                    case_instance = Case.objects.get(case_no=row.get('Case Number').upper())
                 else:
                     return Response({'error': 'Case Number is missing!'}, status=status.HTTP_400_BAD_REQUEST)
                 plaintiffs.append(
@@ -368,7 +393,7 @@ class FileUploadViewNew(APIView):
                         plaintiff_email=clean_value(row.get('PA Email 1'))
                     ) )
             except Case.DoesNotExist:
-                print(f"Case with case_no {row.get('Case Number')} does not exist. Skipping.")
+                print(f"Case with case_no {row.get('Case Number')} in plaintiff does not exist. Skipping.")
         return plaintiffs
 
     def process_defendants(self, defendants_rows):
@@ -380,7 +405,7 @@ class FileUploadViewNew(APIView):
         for row in defendants_rows:
             try:
                 if(row.get('Case Number')):
-                    case_instance = Case.objects.get(case_no=row.get('Case Number'))
+                    case_instance = Case.objects.get(case_no=row.get('Case Number').upper())
                 else:
                     return Response({'error': 'Case Number is missing!'}, status=status.HTTP_400_BAD_REQUEST)
                 defendants.append(
@@ -393,8 +418,52 @@ class FileUploadViewNew(APIView):
                     defendant_email=clean_value(row.get('DA Email 1'))
                 )) 
             except Case.DoesNotExist:
-                print(f"Case with case_no {row.get('Case Number')} does not exist. Skipping.")
+                print(f"Case with case_no {row.get('Case Number')} in defendant does not exist. Skipping.")
         return defendants
+
+    def process_AssigneeChunk(self,chunk):
+        """
+        Processes a chunk of data and prepares it for bulk update.
+        """
+        patents_to_update = []
+
+        for row in chunk:
+            patent_no = str(row['Patent_No']).upper().strip()
+            total_assignments = row.get('Total_assignments', 0)   # handling empty row having no assignements detials assigning them zero
+            if pd.isna(total_assignments) or total_assignments == '':
+                total_assignments = 0
+            else:
+                total_assignments = int(total_assignments)  # Convert safely
+
+            assignments = []
+            for i in range(1, total_assignments + 1):  
+                execution_date = row.get(f'Execution_Date_{i}', None)
+                assignor = row.get(f'Assignors_{i}', None)
+                assignee = row.get(f'Assignee_{i}', None)
+
+                if pd.notna(execution_date) and pd.notna(assignor) and pd.notna(assignee):
+                    assignments.append({
+                        "execution_date": str(execution_date).strip(),
+                        "assignor": str(assignor).strip(),
+                        "assignee": str(assignee).strip()
+                    })
+
+            assignee_timeline_json = json.dumps({"assignments": assignments})
+
+            try:
+                patent = Patent.objects.get(patent_no=patent_no)
+                patent.assignee_timeline = assignee_timeline_json
+                patents_to_update.append(patent)
+            except Patent.DoesNotExist:
+                print(patent_no, "patent missing")
+                pass  # Skip if patent not found
+
+        # Bulk update to optimize database write
+        # if patents_to_update:
+        #     Patent.objects.bulk_update(patents_to_update, ['assignee_timeline'])
+
+        return patents_to_update # Return count of updated records
+
 
     def get(self,request):
         create_stored_procedure()
@@ -417,12 +486,14 @@ class FileUploadViewNew(APIView):
                 raw_data_df = excel_data.parse(sheet_name=0, dtype=str)
                 plaintiffs_df = excel_data.parse(sheet_name=1, dtype=str)
                 defendants_df = excel_data.parse(sheet_name=2, dtype=str)
+                assigneeTimeline_df=excel_data.parse(sheet_name=3, dtype=str)
 
                 raw_data_rows = raw_data_df.to_dict('records')
                 plaintiffs_rows = plaintiffs_df.to_dict('records')
                 defendants_rows = defendants_df.to_dict('records')
+                assignee_rows=assigneeTimeline_df.to_dict('records')
 
-                chunk_size = 180
+                chunk_size = 500
                 raw_data_chunks = [raw_data_rows[i:i + chunk_size] for i in range(0, len(raw_data_rows), chunk_size)]
 
                 with ThreadPoolExecutor(max_workers=4) as executor:
@@ -443,14 +514,12 @@ class FileUploadViewNew(APIView):
                 # Step 3: Process Plaintiffs & Defendants with the mapped Case records
                 plaintiffs_chunks = [plaintiffs_rows[i:i + chunk_size] for i in range(0, len(plaintiffs_rows), chunk_size)]
                 defendants_chunks = [defendants_rows[i:i + chunk_size] for i in range(0, len(defendants_rows), chunk_size)]
-
                 with ThreadPoolExecutor(max_workers=4) as executor:
                     plaintiffs_futures = [executor.submit(self.process_plaintiffs, chunk) for chunk in plaintiffs_chunks]
                     defendants_futures = [executor.submit(self.process_defendants, chunk) for chunk in defendants_chunks]
 
                     plaintiffs_to_create = []
                     defendants_to_create = []
-
                     for future in as_completed(plaintiffs_futures):
                         plaintiffs_to_create.extend(future.result())
 
@@ -459,9 +528,22 @@ class FileUploadViewNew(APIView):
 
                 # Step 4: Insert Plaintiffs & Defendants into DB
                 with transaction.atomic():
-                    Plaintiffs.objects.bulk_create(plaintiffs_to_create, batch_size=500)
-                    Defendants.objects.bulk_create(defendants_to_create, batch_size=500)
-
+                    PlaintiffDetails.objects.bulk_create(plaintiffs_to_create, batch_size=500)
+                    DefendantDetails.objects.bulk_create(defendants_to_create, batch_size=500)
+                     
+                # print("2nd step completed")
+                timeline_chunks = [assignee_rows[i:i + chunk_size] for i in range(0, len(assignee_rows), chunk_size)]
+                with ThreadPoolExecutor(max_workers=4) as executor:
+                    assignee_futures = [executor.submit(self.process_AssigneeChunk, chunk) for chunk in timeline_chunks]
+                    
+                    assignee_to_update = []
+                    for future in as_completed(assignee_futures):
+                        assignee_to_update.extend(future.result())
+                        
+                with transaction.atomic():
+                    Patent.objects.bulk_update(assignee_to_update, ['assignee_timeline']) 
+                    
+                
                 return Response({'message': 'File processed and data inserted successfully!'}, status=status.HTTP_200_OK)
 
             except Exception as e:

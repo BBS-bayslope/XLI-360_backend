@@ -32,8 +32,30 @@ import {
   orderBy,
   onSnapshot,
 } from '@angular/fire/firestore';
-import { BehaviorSubject, concat, from, merge, Observable, of } from 'rxjs';
-import { catchError, finalize, map, mergeMap, switchMap } from 'rxjs/operators';
+import { HttpClient, HttpHeaders, HttpErrorResponse  } from '@angular/common/http';
+import {
+  BehaviorSubject,
+  catchError,
+  concatMap,
+  filter,
+  first,
+  forkJoin,
+  from,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  Subject,
+  switchMap,
+  toArray,
+  tap,
+  throwError,
+  merge,
+  concat,
+  finalize
+} from 'rxjs';
+import {Router} from '@angular/router';
+// import { catchError, finalize, map, mergeMap, switchMap } from 'rxjs/operators';
 import {
   ExcelData,
   UploadedFile,
@@ -67,6 +89,8 @@ export class AuthService {
     new BehaviorSubject<User | null>(null);
 
   constructor(
+    private http: HttpClient,
+    public router: Router,
     private auth: Auth,
     private firestore: Firestore,
     private storage: Storage
@@ -76,6 +100,7 @@ export class AuthService {
     });
   }
 
+  private baseUrl ="http://127.0.0.1:8000"
   // Get the current user as an Observable
   getUserState(): Observable<User | null> {
     return this.userSubject.asObservable();
@@ -270,22 +295,22 @@ export class AuthService {
   }
 
   // Register new user
-  register(email: string, password: string): Observable<User | null> {
-    return from(
-      createUserWithEmailAndPassword(this.auth, email, password)
-    ).pipe(
-      map((userCredential) => userCredential.user),
+  // register(email: string, password: string): Observable<User | null> {
+  //   return from(
+  //     createUserWithEmailAndPassword(this.auth, email, password)
+  //   ).pipe(
+  //     map((userCredential) => userCredential.user),
 
-      switchMap((user) => this.saveUserData(user))
-    );
-  }
+  //     switchMap((user) => this.saveUserData(user))
+  //   );
+  // }
 
   // Login existing user
-  login(email: string, password: string): Observable<User | null> {
-    return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(
-      map((userCredential) => userCredential.user)
-    );
-  }
+  // login(email: string, password: string): Observable<User | null> {
+  //   return from(signInWithEmailAndPassword(this.auth, email, password)).pipe(
+  //     map((userCredential) => userCredential.user)
+  //   );
+  // }
 
   // Google sign-in
   googleLogin(): Observable<User | null> {
@@ -638,6 +663,40 @@ export class AuthService {
   //     })
   //   );
   // }
+
+  // Login function
+    login(payload:object): Observable<any> {
+      const endpoint = `${this.baseUrl}/api/login/`;
+      return this.http.post<any>(endpoint, payload).pipe(
+        tap(response => {
+          if (response && response.access) {
+            localStorage.setItem("access", response.access);
+            localStorage.setItem("refresh", response.refresh);
+            console.log(response.access)
+          } else {
+            console.error('Invalid login response', response);
+          }
+          
+        }),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Login failed', error);
+          return of(null);
+        })
+      );
+    }
+  
+    // Register function
+    register(payload:object): Observable<any> {
+      const endpoint = `${this.baseUrl}/api/register/`;
+      return this.http.post<any>(endpoint, payload).pipe(
+        tap(() => this.router.navigate(['/login'])),
+        catchError((error: HttpErrorResponse) => {
+          console.error('Registration failed', error);
+          return of(null);
+        })
+      );
+    }
+  
 
   getPaginatedData(
     collectionName: string,

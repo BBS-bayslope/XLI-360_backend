@@ -23,9 +23,13 @@ from django.db.models import Count, F
 from ..models import Case, Patent, PlaintiffDetails, DefendantDetails
 from rest_framework.decorators import api_view
 from collections import defaultdict
+from rest_framework.permissions import AllowAny, IsAuthenticated
+# from ..utils import normalize_name, are_names_similar
 
 class CaseStatisticsView(APIView):
-    def get(self, request):  # This method will handle GET requests
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
         try:
             # Use Django ORM aggregation to get case status counts efficiently
             case_status_counts = (
@@ -38,15 +42,90 @@ class CaseStatisticsView(APIView):
                 (item["case_status"].lower().strip() if item["case_status"] else "unknown"): item["count"]
                 for item in case_status_counts
             }
-            tech_areas = Patent.objects.values('tech_category').annotate(case_count=Count('cases')).order_by('-case_count')
-            
-            plaintiffs = CaseDetails.objects.values('plaintiff').annotate(case_count=Count('case')).order_by('-case_count')[:25]
-            plaw_firms = PlaintiffDetails.objects.values('plaintiff_law_firm').annotate(case_count=Count('case')).order_by('-case_count')[:25]
-            
-            defendants = CaseDetails.objects.values('defendant').annotate(case_count=Count('case')).order_by('-case_count')[:25]
-            dlaw_firms = DefendantDetails.objects.values('defendant_law_firm').annotate(case_count=Count('case')).order_by('-case_count')[:25]
-    
-            
+
+            # Fetch top tech areas
+            tech_areas = (
+                Patent.objects.values("tech_category")
+                .annotate(case_count=Count("cases"))
+                .order_by("-case_count")
+            )
+
+            # Fetch top plaintiffs and their law firms
+            plaintiffs = (
+                CaseDetails.objects.values("plaintiff")
+                .annotate(case_count=Count("case"))
+                .order_by("-case_count")[:25]
+            )
+            plaw_firms = (
+                PlaintiffDetails.objects.exclude(plaintiff_law_firm="nan")
+                .values("plaintiff_law_firm")
+                .annotate(case_count=Count("case"))
+                .order_by("-case_count")[:25]
+            )
+
+            # Fetch top defendants and their law firms
+            defendants = (
+                CaseDetails.objects.values("defendant")
+                .annotate(case_count=Count("case"))
+                .order_by("-case_count")[:25]
+            )
+            dlaw_firms = (
+                DefendantDetails.objects.exclude(defendant_law_firm="nan")
+                .values("defendant_law_firm")
+                .annotate(case_count=Count("case"))
+                .order_by("-case_count")[:25]
+            )
+
+            # --- Overlapping Law Firms ---
+            plaintiff_firms = (
+                PlaintiffDetails.objects.exclude(plaintiff_law_firm="nan")
+                .values("plaintiff_law_firm")
+                .annotate(plaintiff_case_count=Count("case"))
+            )
+            defendant_firms = (
+                DefendantDetails.objects.exclude(defendant_law_firm="nan")
+                .values("defendant_law_firm")
+                .annotate(defendant_case_count=Count("case"))
+            )
+
+            plaintiff_firm_dict = {firm["plaintiff_law_firm"]: firm["plaintiff_case_count"] for firm in plaintiff_firms}
+            defendant_firm_dict = {firm["defendant_law_firm"]: firm["defendant_case_count"] for firm in defendant_firms}
+
+            overlapping_law_firms = [
+                {
+                    "entity": firm,
+                    "plaintiff_case_count": plaintiff_firm_dict[firm],
+                    "defendant_case_count": defendant_firm_dict[firm],
+                    "total_cases": plaintiff_firm_dict[firm] + defendant_firm_dict[firm],
+                }
+                for firm in plaintiff_firm_dict.keys() & defendant_firm_dict.keys()
+            ]
+            overlapping_law_firms.sort(key=lambda x: x["total_cases"], reverse=True)
+
+            # --- Overlapping Plaintiffs and Defendants ---
+            plaintiff_entities = (
+                CaseDetails.objects.values("plaintiff")
+                .annotate(plaintiff_case_count=Count("case"))
+            )
+            defendant_entities = (
+                CaseDetails.objects.values("defendant")
+                .annotate(defendant_case_count=Count("case"))
+            )
+
+            plaintiff_dict = {p["plaintiff"]: p["plaintiff_case_count"] for p in plaintiff_entities}
+            defendant_dict = {d["defendant"]: d["defendant_case_count"] for d in defendant_entities}
+
+            overlapping_parties = [
+                {
+                    "entity": entity,
+                    "plaintiff_case_count": plaintiff_dict[entity],
+                    "defendant_case_count": defendant_dict[entity],
+                    "total_cases": plaintiff_dict[entity] + defendant_dict[entity],
+                }
+                for entity in plaintiff_dict.keys() & defendant_dict.keys()
+            ]
+            overlapping_parties.sort(key=lambda x: x["total_cases"], reverse=True)
+
             response_data = {
                 "total_cases": Case.objects.count(),
                 "case_status_counts": status_counts,
@@ -54,34 +133,48 @@ class CaseStatisticsView(APIView):
                 "top_defendant_law_firms": dlaw_firms,
                 "top_plaintiffs": plaintiffs,
                 "top_plaintiff_law_firms": plaw_firms,
-                "tech_area":tech_areas
-                
+                "tech_area": tech_areas,
+                "overlapping_law_firms": overlapping_law_firms,
+                "overlapping_parties": overlapping_parties,  # Added this new data
             }
 
             return Response({"data": response_data}, status=status.HTTP_200_OK)
-        
+
         except Exception as e:
             return Response(
                 {"error": f"Error processing request: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-
 class PlaintiffTypeCountView(APIView):
+    permission_classes=[IsAuthenticated]
+    
+    def process_patent(self,patent):
+        """
+        Process a single patent to check if it was transferred and return associated cases.
+        """
+        original_names = normalize_name(patent.original_assignee)
+        current_names = normalize_name(patent.current_assignee)
+
+        # If names are not similar, consider it a transfer
+        if not are_names_similar(original_names, current_names):
+            # Fetch case numbers linked to this patent
+            return list(CasePatent.objects.filter(patent=patent).values_list('case__case_no', flat=True))
+        return []
     def get(self, request):
         try:
             # Aggregate count of unique plaintiff_type_and_size values from CaseDetails
             plaintiff_counts = (
-                CaseDetails.objects.values("plaintiff_type_and_size")
-                .annotate(count=Count("plaintiff_type_and_size"))
+                CaseDetails.objects.values("plaintiff_type")
+                .annotate(count=Count("plaintiff_type"))
             )
 
             # Normalize plaintiff types
             plaintiff_type_counts = {
-                (item["plaintiff_type_and_size"].strip().lower() if item["plaintiff_type_and_size"] else "unknown"): item["count"]
+                (item["plaintiff_type"].strip().lower() if item["plaintiff_type"] else "unknown"): item["count"]
                 for item in plaintiff_counts
             }
 
-            defendant_counts = CaseDetails.objects.values_list("defendent_type_and_size", flat=True)
+            defendant_counts = CaseDetails.objects.values_list("defendent_type", flat=True)
 
             # Dictionary to store aggregated counts
             defendant_type_counts = defaultdict(int)
@@ -92,9 +185,24 @@ class PlaintiffTypeCountView(APIView):
                     for t in types:
                         defendant_type_counts[t] += 1  # Count each type separately
 
+            # print("step2 started")
+            # transferred_cases = set()
+
+            # # Fetch all patents in bulk
+            # patents = list(Patent.objects.all())
+
+            # # Use ThreadPoolExecutor for parallel processing
+            # with ThreadPoolExecutor(max_workers=5) as executor:  # Adjust the worker count as needed
+            #     results = executor.map(self.process_patent, patents)
+
+            # # Collect results from all threads
+            # for case_list in results:
+            #     transferred_cases.update(case_list)
+
             response_data = {
                 "plaintiff_type_counts": plaintiff_type_counts,
-                "defendant_type_counts": dict(defendant_type_counts)
+                "defendant_type_counts": dict(defendant_type_counts),
+                # "transferredCases":len(list(transferred_cases))
             }
 
             return Response({"data": response_data}, status=status.HTTP_200_OK)
@@ -106,6 +214,7 @@ class PlaintiffTypeCountView(APIView):
             )
 
 class IndustryStats(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self,request):
         try:
         # Fetch unique cases per industry
@@ -193,6 +302,7 @@ class IndustryStats(APIView):
             
 
 class CaseEntityListing(APIView):
+    permission_classes=[AllowAny]
     def get(self, request):
         try:
             wb = openpyxl.Workbook()

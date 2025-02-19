@@ -10,6 +10,11 @@ mat-grid-tile {
   height: auto;
 }
 
+.chart-select{
+  width: 100%;
+  margin: 10px;
+  align-items: center;
+}
 .chart-container {
   width: 100%;
   display: grid;
@@ -26,6 +31,19 @@ mat-grid-tile {
   height: 450px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+.chart-item1 {
+  width: 100%;
+  padding: 20px;
+  margin: 10px;
+  height: 450px;
+  // display: flex;
+  // flex-direction: column;
   align-items: center;
   border-left: 1px solid #ccc;
   border-bottom: 1px solid #ccc;

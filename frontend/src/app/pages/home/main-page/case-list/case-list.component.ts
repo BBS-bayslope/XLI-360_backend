@@ -16,6 +16,7 @@ import {
   ChartData,
   ChartDataset,
   ChartEvent,
+  ChartOptions 
 } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -28,10 +29,16 @@ import { AuthService } from '../../../../services/auth.service';
 import { ReportPaymentComponent } from '../../../../dialogs/report-payment/report-payment.component';
 import { MatButtonModule } from '@angular/material/button';
 import { ActivatedRoute } from '@angular/router';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TimelineComponent } from '../../../timeline/timeline.component';
 interface Point {
   x: number; // This will represent the year
   y: number; // This will represent the month
+}
+
+interface TimelineEvent {
+  date: Date;
+  label: string;
 }
 
 @Component({
@@ -44,6 +51,8 @@ interface Point {
     CommonModule,
     BaseChartDirective,
     MatButtonModule,
+    MatProgressSpinnerModule,
+    TimelineComponent
   ],
   templateUrl: './case-list.component.html',
   styleUrls: ['./case-list.component.scss'],
@@ -58,9 +67,44 @@ export class CaseListComponent implements OnInit, OnChanges {
 
   caseData?: any;
   objectKeys = Object.keys;
-
-
+  loader:any = false;
+  assigneeTimelineData1:ChartData<'line'> = { labels: [], datasets: [] };
+  chartOptions1: ChartOptions = {
+    responsive: true,
+    scales: {
+      x: { title: { display: true, text: 'Execution Date' } },
+      y: { title: { display: true, text: 'Assignees' } }
+    }
+  };
   case:any={};
+  timelineEvents: TimelineEvent[] = [];
+  data: any=
+      {
+        "patent_no": 9026836,
+        "assignments": [
+          {
+            "execution_date": "2012-05-18",
+            "assignor": "Brunson, Gordon R.",
+            "assignee": "Avaya Inc."
+          },
+          {
+            "execution_date": "2012-12-21",
+            "assignor": "Avaya, Inc.",
+            "assignee": "The Bank Of New York Mellon Trust Company, N.A."
+          },
+          {
+            "execution_date": "2013-03-07",
+            "assignor": "Avaya, Inc.",
+            "assignee": "Bank Of New York Mellon Trust Company, N.A., The"
+          },
+          {
+            "execution_date": "2017-01-24",
+            "assignor": "Avaya Inc.",
+            "assignee": "Citibank, N.A., As Administrative Agent"
+          },
+        ]
+      }
+    
 
   public scatterChartLabels: string[] = [
     'January',
@@ -196,13 +240,17 @@ export class CaseListComponent implements OnInit, OnChanges {
   private router = inject(Router);
   ngOnInit() {
     //YE MERA CODE HAI
+    // this.processTimelineData(this.data.timeline_data)
     this.route.queryParams.subscribe(params => {
       let caseno = params['caseno'];
       let payload:any={};
       payload.case_no=caseno;
       this.fetchData(payload);
     });
-
+    this.timelineEvents = this.data.assignments.map((assignment:any) => ({
+      date: new Date(assignment.execution_date),
+      label: `${assignment.assignor} → ${assignment.assignee}`
+    }));
     //
 
     this.api.selectedCase$.subscribe((caseDetails) => {
@@ -217,22 +265,88 @@ export class CaseListComponent implements OnInit, OnChanges {
   }
 
 
-  fetchData(payload:object): void {
-    // this.isLoading=true
+  processTimelineData(timelineData: any) {
+    const labelsSet = new Set<string>();  // To store unique dates
+    const datasets: any[] = [];
+  
+    timelineData.forEach((patent: any) => {
+      const dataPoints: any[] = [];
+  
+      patent.assignments.forEach((assignment: any) => {
+        labelsSet.add(assignment.execution_date);
+        dataPoints.push({
+          x: assignment.execution_date,
+          y: assignment.assignee
+        });
+      });
+  
+      datasets.push({
+        label: `Patent ${patent.patent_no}`,
+        data: dataPoints,
+        borderColor: this.getRandomColor(), // Function to get random colors
+        fill: false,
+        showLine: true,
+        pointRadius: 5,
+      });
+    });
+  
+    this.assigneeTimelineData1 = {
+      labels: Array.from(labelsSet).sort(),
+      datasets
+    };
+  }
+  
+  // Function to generate random colors for better visualization
+  getRandomColor() {
+    return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
+  }
+  
+
+
+  fetchData(payload: object): void {
+    this.loader = true;
     this.api.getDetails(payload)
       .subscribe(
         (response: any) => {
-          this.case=response
-      
-          // this.isLoading=false
+          this.case = response;
+          if (this.case?.patents.length > 0) {
+            this.case?.patents.forEach((ele: any) => {
+              if (ele.assignee_timeline && ele.assignee_timeline.assignments.length > 0) {
+                ele.assignee_timeline.assignments = ele.assignee_timeline.assignments.map((assignment: any) => {
+                  // Ensure execution_date is properly converted to a Date object
+                  const executionDate = assignment.execution_date ? new Date(assignment.execution_date) : null;
+  
+                  return {
+                    date: executionDate ? this.formatDate(executionDate) : '',  // Format only if valid
+                    label: `${assignment.assignor} → ${assignment.assignee}`
+                  };
+                });
+              } else {
+                ele.assignee_timeline = { "assignments": [] };
+              }
+            });
+            // console.log(this.case?.patents, "sssss");
+          }
+          this.loader = false;
         },
         (error) => {
-          // this.isLoading=false
+          this.loader = false;
           console.error('Error fetching data', error);
         }
       );
   }
-
+  
+  // Corrected formatDate function
+  formatDate(date: Date | null): string {
+    if (!(date instanceof Date) || isNaN(date.getTime())) return '';  // Ensure valid date
+  
+    const day = String(date.getDate()).padStart(2, '0'); // Ensures two-digit day
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Ensures two-digit month
+    const year = String(date.getFullYear()); // Gets last two digits of year
+  
+    return `${day}/${month}/${year}`;
+  }
+  
 
   isValidDate(date: any): boolean {
     return !isNaN(new Date(date).getTime());

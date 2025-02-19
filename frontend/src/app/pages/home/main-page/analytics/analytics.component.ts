@@ -1,4 +1,5 @@
 import {
+  AfterViewChecked,
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -9,6 +10,7 @@ import {
   OnInit,
   SimpleChanges,
   ViewChild,
+  ElementRef
 } from '@angular/core';
 import {
   ChartConfiguration,
@@ -32,9 +34,20 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../../services/auth.service';
 import { ApiService } from '../../../../services/api.service';
 import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
-
+import { Pie } from '@antv/g2plot';
+import { Bar } from '@antv/g2plot';
+import { PieChartComponent } from '../../../pie-chart/pie-chart.component';
+import { StackedBarChartComponent } from '../../../charts/stackedBarChart.component';
+import { DoughnutChartComponent } from '../../../charts/doughtnutChart.component';
+// import * as CanvasJS from 'canvasjs';
 // Ensure the plugin is registered
 Chart.register(ChartDataLabels, ...registerables);
+
+interface ChartData1 {
+  region: string;
+  qty: number;
+}
+
 
 @Component({
   selector: 'app-analytics',
@@ -48,20 +61,25 @@ Chart.register(ChartDataLabels, ...registerables);
     MatFormFieldModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    CanvasJSAngularChartsModule
+    CanvasJSAngularChartsModule,
+    PieChartComponent,
+    StackedBarChartComponent,
+    DoughnutChartComponent
   ],
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.scss'],
 })
-export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
+export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
   @Input() filterDataForAnalytics: any[] = [];
   @Input() excelData: any[] = [];
   @ViewChild(BaseChartDirective) chart!: BaseChartDirective; // Access the chart instance
+  // @ViewChild('BarContainer', { static: false }) barContainer?: ElementRef;
 
   private cdRef = inject(ChangeDetectorRef);
   private router = inject(Router);
   private authService = inject(AuthService);
   private api = inject(ApiService);
+  private el = inject(ElementRef);
 
   doughnutChartDataTotalCases: ChartData<'doughnut'> = { labels: [], datasets: [{ data: [] }] };
   doughnutChartTypeTotalCases: 'doughnut' = 'doughnut';
@@ -93,6 +111,7 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
     },
   };
   barChartData: ChartData<'bar'> = { labels: [], datasets: [] };
+  barChartDataSuedCompanies: ChartData<'bar'> = { labels: [], datasets: [] };
   barChartOptions: ChartOptions<'bar'> = {
     responsive: true,
     indexAxis: 'y', // 
@@ -106,15 +125,53 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
       y: { ticks: { font: { size: 12 } } }
     }
   };
-  // public chartOptions: any = null;
+  public chartOptions: any = null;
+  public charT: any= null; // Chart instance
+  public Statusdata: any[] = []; // DataPoints Array
+  public plaintiffTypeData: any[] = []; // DataPoints Array
+  public defendantTypeData: any[] = []; // DataPoints Array
+  public suedTechArea: any[] = []; // DataPoints Array
+  public suedCompanies: any[] = []; // DataPoints Array
+  public industryData: any[] = []; // DataPoints Array
+  public casesByOc: any[] = []; // DataPoints Array
+  public overlappingLawFirms : any[]=[];
+  public overlappingParties : any[]=[];
+  public transferredCases : any[]=[];
   loaderr: boolean = false;
+  availableCharts = [
+    { key: 'totalLitigation', label: 'Total Litigation Cases & Status' },
+    { key: 'plaintiffType', label: 'Total Cases Filed by Plaintiff (by Type)' },
+    { key: 'defendantType', label: 'Total Cases Filed by Defendant (by Type)' },
+    { key: 'casesByOc', label: 'Total Cases by OC' },
+    // { key: 'transferred', label: 'Total Cases transferred from OC to NPE' },
+    { key: 'industry', label: 'Industry' },
+    { key: 'techCategory', label: 'Tech Category' },
+    { key: 'mostSuedTechAreas', label: 'Most Sued Tech Areas' },
+    { key: 'mostSuedCompanies', label: 'Most Sued Companies' },
+    { key: 'topPlaintiffs', label: 'Top Plaintiff' },
+    { key: 'topDefendants', label: 'Top Defendants' },
+    { key: 'topDefendantsFirm', label: 'Top Defendant Law Firm' },
+    { key: 'topPlaintiffFirm', label: 'Top Plaintiff Law Firm' },
+    { key: 'overlappingfirm', label: 'Overlapping Law Firms' },
+    { key: 'overlappingparty', label: 'Overlapping Parties' },
+  ];
+
+  // Selected charts (default selection)
+  selectedCharts: string[] = [];
   constructor() {
     Chart.register(this.drawTextPlugin); // Register the custom plugin
   }
 
   ngOnInit(): void {
     // console.log(this.filterDataForAnalytics, this.excelData);
-
+    const savedCharts = localStorage.getItem('selectedCharts');
+    if (savedCharts) {
+      this.selectedCharts = JSON.parse(savedCharts);
+    } else {
+      // Default selection
+      this.selectedCharts = ['totalLitigation', 'plaintiffType', 'defendantType'];
+      this.saveSelectedCharts();
+    }
     // console.dir(this.excelData);
     this.fetchCaseStats()
     this.fetchPlaintiffTypeStats()
@@ -143,58 +200,108 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
     // this.getOverlappingLawFirm();
     // this.getCasesTransferredFromOCToNPE();
     // this.updateMostSuedCompaniesChart();
+    // let chart = new CanvasJS.Chart("BarContainer", {
+    //   title: { text: "Bar Chart Example" },
+    //   data: [{ type: "column", dataPoints: [{ label: "A", y: 10 }, { label: "B", y: 20 }] }]
+    // });
+    // chart.render();
+    // this.cdRef.detectChanges();
     this.cdRef.detectChanges();
   }
 
   excelDataAnalytics: any[] = [];
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(this.filterDataForAnalytics, this.excelData);
-    if (
-      changes['filterDataForAnalytics'] &&
-      changes['filterDataForAnalytics'].currentValue
-    ) {
-      console.dir(this.excelData);
+  piePlot!: Pie; // Store chart instance
 
-      // this.getAllPlaintiff();
-      // this.getAllDefendent();
-      // // this.totalCasesDataArrays= [];
-      // this.calculateTotalCasesByStatus(); // Call the method to count Total case number .
-      // this.storeUniquePlaintiffTypeAndSize(); // Call the method to count unique plaintiffTypeSize.
-      // this.storeUniqueDefendantTypeAndSize(); // Call the method to count unique  defendantTypeSize.
-      // this.countCaseByOc(); // Call the method to count unique  case of Oc.
-      // this.storeUniqueTechCategories(); // Call the method to count unique  tech category.
-      // this.storeUniqueIndustry(); // Call the method to count unique  industry.
-      // this.storeUniqueMostSuedTechAreas();
-      // this.storeUniqueTotalCaseOfPlaintiff();
-      // this.storeUniqueTotalCaseOfDefendent();
-      // Trigger change detection
-      // this.onItemsToShowChangeInTopPlaitiff();
-      // this.onItemsToShowChangeInAllDefendent();
-      // this.getAllOriginalAndCurrentAssigne();
-      // console.log(this.originalAssignee);
-      // console.log(this.currentAssignee);
-      // this.onItemsToShowChangeInTopPlaitiff();
-      // this.getTopPlaintiffLawFirm();
-      // this.getTopDefendantLawFirm();
-      // this.getOverlappingLawFirm();
-      // this.getCasesTransferredFromOCToNPE();
-      // this.updateMostSuedCompaniesChart();
-      // this.cdRef.detectChanges();
+  ngOnChanges() {
+    // console.log(this.Statusdata,"dsfds")
+    // if (this.Statusdata.length > 0) {
+    //   this.renderChart();
+    //   this.cdRef.detectChanges();
+    // }
+  }
+  stackedBarPlot!: Bar
+  renderStackedBarChart() {
+    if (!this.stackedBarPlot) {
+      console.log(this.overlappingLawFirms);
+  
+      // Transform API data into a format suitable for the stacked bar chart
+      const transformedData = this.overlappingLawFirms.flatMap(firm => [
+        { law_firm: firm.law_firm, type: 'Plaintiff Cases', value: firm.plaintiff_case_count },
+        { law_firm: firm.law_firm, type: 'Defendant Cases', value: firm.defendant_case_count }
+      ]);
+  
+      this.stackedBarPlot = new Bar(this.el.nativeElement.querySelector('#stacked-bar-chart-container'), {
+        data: transformedData,
+        isStack: true,  // Enable stacking
+        xField: 'value',  // X-axis is the number of cases
+        yField: 'law_firm',  // Y-axis is the law firm names
+        seriesField: 'type',  // Stack by Plaintiff & Defendant cases
+        legend: { layout: 'horizontal', position: 'bottom' },
+        label: {
+          position: 'middle',
+          layout: [
+            { type: 'interval-adjust-position' }, // Adjusts label position
+            { type: 'interval-hide-overlap' },   // Hides overlapping labels
+            { type: 'adjust-color' }             // Adjusts label color
+          ],
+        },
+        interactions: [{ type: 'element-active' }],
+      });
+    } else {
+      // Update chart data dynamically
+      const updatedData = this.overlappingLawFirms.flatMap(firm => [
+        { law_firm: firm.law_firm, type: 'Plaintiff Cases', value: firm.plaintiff_case_count },
+        { law_firm: firm.law_firm, type: 'Defendant Cases', value: firm.defendant_case_count }
+      ]);
+  
+      this.stackedBarPlot.changeData(updatedData);
     }
-
-    if (changes['excelData'] && changes['excelData'].currentValue) {
-      this.getCasesTransferredFromOCToNPE();
-      this.updateMostSuedCompaniesChart();
-      this.cdRef.detectChanges();
-    }
+  
+    this.stackedBarPlot.render();
   }
 
-  ngAfterViewInit(): void {
-    // this.countCaseByOc(); // Ensure charts are updated after view initialization
+  showChart = false;
+
+  ngAfterViewInit() {
+    // const data: ChartData1[] = this.Statusdata;
+    // console.log(data,"see",this.Statusdata)
+    // const piePlot = new Pie(this.el.nativeElement.querySelector('#pie-chart-container'), {
+    //   appendPadding: 10,
+    //   data,
+    //   angleField: 'qty',
+    //   colorField: 'region',
+    //   radius: 0.7,
+    //   label: {
+    //     type: 'spider', 
+    //     labelHeight: 20,
+    //     content: (data) => `${(data as ChartData1).region}: ${(data as ChartData1).qty}`,
+    //   },
+    //   interactions: [{ type: 'element-active' }],
+    //   legend: {
+    //     layout: 'horizontal',
+    //     position: 'bottom',
+    //   },
+    // });
+
+    // piePlot.render();
   }
+
+  ngAfterViewChecked(): void {
+    // let chart = new CanvasJS.Chart("BarContainer", {
+    //   title: { text: "Bar Chart Example" },
+    //   data: [{ type: "column", dataPoints: [{ label: "A", y: 10 }, { label: "B", y: 20 }] }]
+    // });
+    // chart.render();
+    // this.cdRef.detectChanges();
+  }
+
 
   //MY CODE
 
+  saveSelectedCharts() {
+    localStorage.setItem('selectedCharts', JSON.stringify(this.selectedCharts));
+    // this.renderStackedBarChart()
+  }
   generateUniqueColors(count: number): string[] {
     const colors = [];
     for (let i = 0; i < count; i++) {
@@ -209,17 +316,17 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
   fetchCaseStats(): void {
     this.loaderr = true;
     this.api.getCaseStats().subscribe((response: any) => {
-      if (response && response.data) {
+      if (response && response?.data) {
         const caseStatusCounts = response.data?.case_status_counts;
-
+        this.overlappingLawFirms=response.data?.overlapping_law_firms.slice(0,25);
+        this.overlappingParties=response.data?.overlapping_parties.slice(0,10)
+        // this.renderStackedBarChart()
         // Extract labels and data
-        this.doughnutChartDataTotalCases = {
-          labels: Object.keys(caseStatusCounts),
-          datasets: [{
-            data: Object.values(caseStatusCounts),
-            backgroundColor: this.generateUniqueColors(Object.keys(caseStatusCounts).length),
-          }]
-        };
+        this.Statusdata = Object.entries(caseStatusCounts).map(([region, qty]) => ({
+          region,
+          qty
+        }));
+
         let total_tech_areas=response.data?.tech_area.slice(0,10)
         const categories = total_tech_areas.map((item: any) => item.tech_category);
         const caseCounts = total_tech_areas.map((item: any) => item.case_count);
@@ -232,25 +339,36 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
               // label: 'Number of Cases',
               data: caseCounts,
               backgroundColor: [
-                'rgba(255, 99, 71, 0.8)', // Adjust colors as needed
+                'rgba(13, 113, 199, 0.8)', // Adjust colors as needed
               ],
               borderColor: '#000',
               borderWidth: 2,
             }
           ]
         };
-        this.mostSuedCompaniesChartData.labels = response.data?.top_defendants.slice(0,10).map((item: any) => item.defendant);
-        this.mostSuedCompaniesChartData.datasets[0].data = response.data?.top_defendants.slice(0,10).map((item: any) => item.case_count);
-        this.mostSuedCompaniesChartData.datasets[0].backgroundColor= this.generateUniqueColors(10);
-
+        this.barChartDataSuedCompanies={
+          labels: response.data?.top_defendants.slice(0,10).map((item: any) => item.defendant),
+          datasets: [
+            {
+              // label: 'Number of Cases',
+              data: response.data?.top_defendants.slice(0,10).map((item: any) => item.case_count),
+              backgroundColor: [
+                'rgba(13, 105, 19, 0.8)', // Adjust colors as needed
+              ],
+              borderColor: '#000',
+              borderWidth: 2,
+            }
+          ]
+        };
+        
         const defendants_n = response.data?.top_defendants.map((item: any) => item.defendant);
         const defendants_cnt = response.data?.top_defendants.map((item: any) => item.case_count);
         const plaintiff_n = response.data?.top_plaintiffs.map((item: any) => item.plaintiff);
         const plaintiff_cnt = response.data?.top_plaintiffs.map((item: any) => item.case_count);
 
-        const defendants_fn = response.data?.top_defendant_law_firms.map((item: any) => item.defendant);
+        const defendants_fn = response.data?.top_defendant_law_firms.map((item: any) => item.defendant_law_firm);
         const defendants_fcnt = response.data?.top_defendant_law_firms.map((item: any) => item.case_count);
-        const plaintiff_fn = response.data?.top_plaintiff_law_firms.map((item: any) => item.plaintiff);
+        const plaintiff_fn = response.data?.top_plaintiff_law_firms.map((item: any) => item.plaintiff_law_firm);
         const plaintiff_fcnt = response.data?.top_plaintiff_law_firms.map((item: any) => item.case_count);
 
         this.barChartDataTopDefandants.labels=defendants_n
@@ -277,17 +395,29 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
   fetchPlaintiffTypeStats(): void {
     this.api.getPlaintiffTypeStats().subscribe((response: any) => {
       if (response && response.data) {
+        // this.transferredCases=[{type:"OC-->NPE",value:response.data?.transferredCases}];
         this.plaintiffTypeAndSizeChartData.labels = Object.keys(response.data?.plaintiff_type_counts);
         this.plaintiffTypeAndSizeChartData.datasets[0].data = Object.values(response.data?.plaintiff_type_counts);
-
+        this.plaintiffTypeData=Object.entries(response.data?.plaintiff_type_counts).map(([region, qty]) => ({
+          region,
+          qty
+        }));
+        this.defendantTypeData=Object.entries(response.data?.defendant_type_counts).map(([region, qty]) => ({
+          region,
+          qty
+        }));
         this.defendantTypeAndSizeChartData.labels = Object.keys(response.data?.defendant_type_counts);
         this.defendantTypeAndSizeChartData.datasets[0].data =Object.values(response.data?.defendant_type_counts);
         this.defendantTypeAndSizeChartData.datasets[0].backgroundColor= this.generateUniqueColors(Object.keys(response.data?.defendant_type_counts).length);
         let defendant= response?.data?.defendant_type_counts["loc"];
         let plaintiff= response.data?.plaintiff_type_counts["operating company"];
         // console.log(defendant,plaintiff)
-        this.caseByOcChartData.labels = ['defendant','plaintiff'];
-        this.caseByOcChartData.datasets[0].data = [defendant,plaintiff];
+        this.casesByOc=[
+          {region:'defendant',qty:defendant},
+          {region:'plaintiff',qty:plaintiff},
+        ]
+        // this.caseByOcChartData.labels = ['defendant','plaintiff'];
+        // this.caseByOcChartData.datasets[0].data = [defendant,plaintiff];
         }
     },
     (error) => {
@@ -302,15 +432,11 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
       if (response && response.data) {
         this.industryChartData.labels = Object.keys(response?.data);
         this.industryChartData.datasets[0].data = Object.values(response?.data);
+        this.industryData=Object.entries(response?.data).map(([region, qty]) => ({
+          region,
+          qty
+        }));
         
-       
-        this.chartOptions.data[0].dataPoints=[
-          { name: "Overhead", y: 9.1 },
-          { name: "Problem Solving", y: 3.7 },
-          { name: "Debugging", y: 36.4 },
-          { name: "Writing Code", y: 30.7 },
-          { name: "Firefighting", y: 20.1 }
-        ]
     }
     },
     (error) => {
@@ -351,22 +477,6 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit {
     this.doughnutChartDataTotalCases.datasets[0].data = data;
 
     console.log('Chart Data by Status:', statusCounts);
-  }
-  public chartOptions = {
-    animationEnabled: true,
-    theme: "dark2",
-    exportEnabled: true,
-    title: {
-      text: "Developer Work Week"
-    },
-    subtitles: [{
-      text: "Median hours/week"
-    }],
-    data: [{
-      type: "pie", //change type to column, line, area, doughnut, etc
-      indexLabel: "{name}: {y}%",
-      dataPoints:  [] as { name: string; y: number }[]
-    }]
   }
   // for total case  Doughnut chart
   caseNumber: number = 0;

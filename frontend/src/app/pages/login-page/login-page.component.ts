@@ -10,7 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
-
+import { ApiService } from '../../services/api.service';
 @Component({
   selector: 'app-login-page',
   standalone: true,
@@ -36,11 +36,11 @@ export class LoginPageComponent {
   incorrectPassword: boolean = false;
   hide = signal(true);
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private apiService: ApiService, private router: Router) {}
 
   login(): void {
     this.incorrectPassword = false;
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login({"email":this.email, "password":this.password}).subscribe({
       next: (user) => {
         console.log('Logged in as:', user?.email);
         this.router.navigate(['/']);

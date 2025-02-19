@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
-from ..models import RawData, Case, Patent, CasePatent, CaseDetails
+from ..models import RawData, Case, Patent, CasePatent, CaseDetails, PlaintiffDetails, DefendantDetails
 from django.core.exceptions import ValidationError
 from django.utils.dateparse import parse_date
 from datetime import datetime
@@ -15,6 +15,8 @@ from django.db import transaction
 from django.db.models import Q
 from ..serializers import CaseSerializer
 from django.db.models.functions import Upper, Lower
+from rest_framework.permissions import AllowAny, IsAuthenticated
+import json
 
 def MainPage(request):
     return render(request,'index.html') 
@@ -399,6 +401,8 @@ def split_and_process_bulk_with_threads():
         return Response({'error': f'Error processing file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class CaseDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         try:
             # Retrieve case number from the payload
@@ -408,9 +412,9 @@ class CaseDetailsView(APIView):
 
             # Fetch the case object
             case = Case.objects.get(case_no=case_no)
-            if(case is None):
+            if case is None:
                 return Response({"error": "No data related to this case no"}, status=status.HTTP_400_BAD_REQUEST)
-            
+
             # Serialize the case data
             case_data = {
                 "case_no": case.case_no,
@@ -420,7 +424,6 @@ class CaseDetailsView(APIView):
                 "court_name": case.court_name,
                 "litigation_venues": case.litigation_venues,
             }
-
             # Fetch related case details
             case_details = CaseDetails.objects.filter(case=case).first()
             if case_details:
@@ -439,6 +442,14 @@ class CaseDetailsView(APIView):
                     "winning_party": case_details.winning_party,
                     "other_possible_infringer": case_details.other_possible_infringer,
                     "list_of_prior_art": case_details.list_of_prior_art,
+                    "plaintiff": case_details.plaintiff,
+                    "plaintiff_type": case_details.plaintiff_type,
+                    "plaintiff_size": case_details.plaintiff_size,
+                    "plaintiff_count": case_details.plaintiff_count,
+                    "defendant": case_details.plaintiff,
+                    "defendant_type": case_details.defendent_type,
+                    "defendant_size": case_details.defendent_size,
+                    "defendant_count": case_details.defendent_count,
                 }
             else:
                 case_details_data = {}
@@ -460,7 +471,7 @@ class CaseDetailsView(APIView):
                     "tech_center": patent.tech_center,
                     "art_unit": patent.art_unit,
                     "acquisition_type": patent.acquisition_type,
-                    "assignee_timeline": patent.assignee_timeline,
+                    "assignee_timeline": json.loads(patent.assignee_timeline) if patent.assignee_timeline else {},
                     "industry": patent.industry,
                     "technology_keywords": patent.technology_keywords,
                     "tech_category": patent.tech_category,
@@ -469,24 +480,52 @@ class CaseDetailsView(APIView):
                 for patent in patents
             ]
 
+            # Fetch plaintiff details (multiple entries possible)
+            plaintiffs = PlaintiffDetails.objects.filter(case=case)
+            plaintiffs_data = [
+                {
+                    "plaintiff": plaintiff.plaintiff,
+                    "plaintiff_law_firm": plaintiff.plaintiff_law_firm,
+                    "plaintiff_attorney_name": plaintiff.plaintiff_attorney_name,
+                    "plaintiff_contact": plaintiff.plaintiff_contact,
+                    "plaintiff_email": plaintiff.plaintiff_email,
+                }
+                for plaintiff in plaintiffs
+            ]
+
+            # Fetch defendant details (multiple entries possible)
+            defendants = DefendantDetails.objects.filter(case=case)
+            defendants_data = [
+                {
+                    "defendant": defendant.defendant,
+                    "defendant_law_firm": defendant.defendant_law_firm,
+                    "defendant_attorney_name": defendant.defendant_attorney_name,
+                    "defendant_phone": defendant.defendant_phone,
+                    "defendant_email": defendant.defendant_email,
+                }
+                for defendant in defendants
+            ]
+
             # Construct the response
             response_data = {
                 "case": case_data,
                 "case_details": case_details_data,
                 "patents": patents_data,
+                "plaintiffs": plaintiffs_data,
+                "defendants": defendants_data,
             }
 
             return Response(response_data, status=status.HTTP_200_OK)
 
+        except Case.DoesNotExist:
+            return Response({"error": "Case not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response(
-                {"error": f"An error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+            return Response({"error": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
 class CaseListView(APIView):
+    permission_classes=[IsAuthenticated]
     def post(self, request):
         try:
             # Extract filter parameters from the payload
@@ -606,6 +645,7 @@ class CaseListView(APIView):
        
 
 class FilterDataView(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request):
         try:
             # Retrieve distinct case_status values, excluding null or blank values
