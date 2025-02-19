@@ -26,7 +26,7 @@ SECRET_KEY = '=)6fvl-@-)f$%bwd@fsda(yp2p#&$-!_*o@q2_$na6_m$3(n#r'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['18.216.104.19', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['18.216.104.19', 'localhost', '127.0.0.1','18.220.232.127']
 
 
 AUTH_USER_MODEL = 'mainapp.CustomUser'  # Correct (Capital 'C')
@@ -85,7 +85,8 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",  # Your Angular frontend
     "http://127.0.0.1:4200",
-    "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com"
+    "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com",
+    "http://ec2-18-220-232-127.us-east-2.compute.amazonaws.com"
 ]
 
 SIMPLE_JWT = {
