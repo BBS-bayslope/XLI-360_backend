@@ -3,15 +3,21 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
 
-  constructor(private apiService: ApiService) {}
+  constructor(private apiService: ApiService,private authService: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+
+    if (req.headers.has('Skip-Auth-Interceptor')) {
+      const clonedReq = req.clone({ headers: req.headers.delete('Skip-Auth-Interceptor') });
+      return next.handle(clonedReq);
+    }
     let authReq = req;
     const token = localStorage.getItem('access');
 
@@ -40,7 +46,7 @@ export class AuthInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      return this.apiService.refreshToken().pipe(
+      return this.authService.refreshToken().pipe(
         switchMap((newToken: string) => {
           this.isRefreshing = false;
           this.refreshTokenSubject.next(newToken);

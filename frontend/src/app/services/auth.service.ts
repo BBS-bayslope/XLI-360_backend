@@ -664,10 +664,43 @@ export class AuthService {
   //   );
   // }
 
+
+  refreshToken(): Observable<string> {
+    const endpoint = `${this.baseUrl}/api/token/refresh/`;
+    const refreshToken = localStorage.getItem('refresh');
+  
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+  
+    return this.http.post<any>(endpoint, { refresh: refreshToken }, {
+      headers: { 'Skip-Auth-Interceptor': 'true' } // Custom header to signal interceptor to skip
+    }).pipe(
+      switchMap(response => {
+        if (response && response.access) {
+          localStorage.setItem('access', response.access);
+          localStorage.setItem('refresh', response.refresh);
+          return of(response.access);
+        } else {
+          this.logout();
+          return throwError(() => new Error('Invalid refresh response'));
+        }
+      }),
+      catchError(err => {
+        this.logout();
+        return throwError(() => err);
+      })
+    );
+  }
+  
+  
   // Login function
     login(payload:object): Observable<any> {
       const endpoint = `${this.baseUrl}/api/login/`;
-      return this.http.post<any>(endpoint, payload).pipe(
+      return this.http.post<any>(endpoint, payload, {
+        headers: { 'Skip-Auth-Interceptor': 'true' } // Custom header to signal interceptor to skip
+      }).pipe(
         tap(response => {
           if (response && response.access) {
             localStorage.setItem("access", response.access);
@@ -688,7 +721,9 @@ export class AuthService {
     // Register function
     register(payload:object): Observable<any> {
       const endpoint = `${this.baseUrl}/api/register/`;
-      return this.http.post<any>(endpoint, payload).pipe(
+      return this.http.post<any>(endpoint, payload, {
+        headers: { 'Skip-Auth-Interceptor': 'true' } // Custom header to signal interceptor to skip
+      }).pipe(
         tap(() => this.router.navigate(['/login'])),
         catchError((error: HttpErrorResponse) => {
           console.error('Registration failed', error);
