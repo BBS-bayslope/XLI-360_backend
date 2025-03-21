@@ -319,7 +319,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isFiltering = !!searchText;
     this.searchQuery = searchText;
     this.searchBy = searchBy || '';
-
+    this.payload.case_name=this.searchInputText
+    this.fetchData()
     if (!this.isFiltering) {
       this.filteredSearchInputData = []; // Clear suggestions
       return;
@@ -403,17 +404,17 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   searchOptions = [
     { label: 'Case Name', value: 'caseDetails.caseName' },
-    { label: 'Industry', value: 'industry' },
-    { label: 'Case Number', value: 'caseDetails.caseNumber' },
-    { label: 'Plaintiff', value: 'legalEntities.plaintiffOrPetitioner' },
-    { label: 'Defendant', value: 'legalEntities.defendant' },
-    { label: 'Patent Number', value: 'patentDetails.patentNo' },
-    { label: 'Technology Keywords', value: 'patentDetails.technologyKeywords' },
-    { label: 'Judge', value: 'administrativeDetails.judge' },
-    { label: 'Stage', value: 'administrativeDetails.stage' },
-    { label: 'Winning Party', value: 'caseOutcome.winningParty' },
-    { label: 'Accused Product', value: 'infringementDetails.accusedProduct' },
-    { label: 'Cause of Action', value: 'causeOfAction' },
+    // { label: 'Industry', value: 'industry' },
+    // { label: 'Case Number', value: 'caseDetails.caseNumber' },
+    // { label: 'Plaintiff', value: 'legalEntities.plaintiffOrPetitioner' },
+    // { label: 'Defendant', value: 'legalEntities.defendant' },
+    // { label: 'Patent Number', value: 'patentDetails.patentNo' },
+    // { label: 'Technology Keywords', value: 'patentDetails.technologyKeywords' },
+    // { label: 'Judge', value: 'administrativeDetails.judge' },
+    // { label: 'Stage', value: 'administrativeDetails.stage' },
+    // { label: 'Winning Party', value: 'caseOutcome.winningParty' },
+    // { label: 'Accused Product', value: 'infringementDetails.accusedProduct' },
+    // { label: 'Cause of Action', value: 'causeOfAction' },
   ];
 
   // Selected field for search
@@ -1320,6 +1321,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   clearSearchTextInput() {
     try {
       this.searchInputText = ''; // Reset search input text
+      this.payload.case_name=""
+      this.fetchData()
       this.filteredSearchInputData = []; // Clear any filtered data
       this.isFiltering = false; // Reset filtering flag
       this.isLoadingSuggestions = false; // Stop any loading indication

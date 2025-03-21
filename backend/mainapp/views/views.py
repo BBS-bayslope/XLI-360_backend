@@ -548,6 +548,7 @@ class CaseListView(APIView):
             causeofaction=request.data.get("causeOfaction",[])
             standard_patent=request.data.get("standard_patent","")
             semiconductor_patent=request.data.get("semiconductor_patent","")
+            case_name = request.data.get("case_name","")  # List of words to search in case names
             queryset = Case.objects.all()
             
             # Apply filters if provided
@@ -556,6 +557,14 @@ class CaseListView(APIView):
             
             if case_no:
                 queryset = queryset.filter(case_no__in=case_no)
+
+            # Apply case name filtering
+            if case_name:
+                query = Q()
+                query |= Q(case_name__icontains=case_name)  # Case-insensitive search
+                
+                queryset = queryset.filter(query)
+
             
             if case_status_filter:
                 queryset = queryset.annotate(lower_case_status=Lower('case_status')).filter(lower_case_status=case_status_filter.lower())

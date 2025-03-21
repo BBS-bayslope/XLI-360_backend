@@ -26,14 +26,21 @@
     <mat-form-field appearance="outline" style="width: 80%">
       <mat-label>Search by {{ getLabelForField(selectedSearchField) }}</mat-label>
 
-      <input matInput [(ngModel)]="searchInputText" (input)="onSearchInputText(searchInputText, selectedSearchField)"
+      <!-- (input)="onSearchInputText(searchInputText, selectedSearchField)"  -->
+      <input matInput [(ngModel)]="searchInputText" 
+      (keyup.enter)="onSearchInputText(searchInputText, selectedSearchField)" 
+      [placeholder]="'Enter ' + getLabelForField(selectedSearchField).toLowerCase()" />
+
+      <button mat-icon-button matSuffix (click)="clearSearchTextInput()" *ngIf="searchInputText">
+ <mat-icon>clear</mat-icon></button>
+      <!-- <input matInput [(ngModel)]="searchInputText" (input)="onSearchInputText(searchInputText, selectedSearchField)"
         [placeholder]="
-          'Enter ' + getLabelForField(selectedSearchField).toLowerCase()
-        " [matAutocomplete]="autoSearch" />
+          'Enter ' + getLabelForField(selectedSearchField).toLowerCase()" 
+          />
       <button mat-icon-button matSuffix (click)="clearSearchTextInput()" *ngIf="searchInputText">
         <mat-icon>clear</mat-icon>
-      </button>
-      <mat-autocomplete #autoSearch="matAutocomplete">
+      </button> -->
+      <!-- <mat-autocomplete #autoSearch="matAutocomplete">
         <mat-option *ngIf="isLoadingSuggestions" disabled>
           <mat-spinner color="primary" diameter="20"></mat-spinner>
           Loading suggestions...
@@ -42,7 +49,6 @@
           <mat-option *ngFor="let item of filteredSearchInputData"
             (click)="onSearchTextOptionSelected(item.docId, item)" [value]="getFieldValue(item, selectedSearchField)"
             [disabled]="getFieldValue(item, selectedSearchField) === 'NA'">
-            <!-- Show selected field value first -->
             {{
             getFieldValue(item, selectedSearchField) === "NA"
             ? "Search term seems invalid"
@@ -50,13 +56,12 @@
             }}
             &nbsp;
 
-            <!-- Always show Case Name as the second part -->
             <span *ngIf="selectedSearchField !== 'caseDetails.caseName'">{{
               getFieldValue(item, "caseDetails.caseName") || "NA"
               }}</span>
           </mat-option>
         </span>
-      </mat-autocomplete>
+      </mat-autocomplete> -->
     </mat-form-field>
 
     <!-- <mat-form-field appearance="outline" style="width: 80%">
@@ -182,7 +187,7 @@
             {{ no }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-        <input [disabled]="!tabledata.length" matInput [(ngModel)]="caseNumberInputValue"
+        <input matInput [(ngModel)]="caseNumberInputValue"
           [matAutocomplete]="autoSearchCaseNumber" (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
         <!-- <button mat-icon-button matSuffix (click)="clearSearchCaseNumber()" *ngIf="caseNumberInputValue">
           <mat-icon>clear</mat-icon>
@@ -258,7 +263,7 @@
             {{ plaintiff }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="plaintiffInputValue"
+          <input matInput [(ngModel)]="plaintiffInputValue"
             [matAutocomplete]="autoSearchPlaintiff" (input)="onSearchPlaintiffInput(plaintiffInputValue)" />
           <!-- <button mat-icon-button matSuffix (click)="clearPlaintiffSearch()" *ngIf="plaintiffInputValue">
             <mat-icon>clear</mat-icon>
@@ -285,7 +290,7 @@
             {{ defendant }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="defendantInputValue"
+          <input matInput [(ngModel)]="defendantInputValue"
             [matAutocomplete]="autoSearchDefendant" (input)="onSearchDefendantInput(defendantInputValue)" />
           <!-- <button mat-icon-button matSuffix (click)="clearDefendantSearch()" *ngIf="defendantInputValue">
             <mat-icon>clear</mat-icon>
@@ -362,7 +367,7 @@
             {{ keyword }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="technologyKeywordInputValue"
+          <input matInput [(ngModel)]="technologyKeywordInputValue"
             (focus)="filterTechnologyKeywords()" (input)="filterTechnologyKeywords()"
             placeholder="Search Technology Keywords" style="width: 100%;" />
           <!-- <button mat-icon-button matSuffix (click)="clearTechnologyKeywordsSearch()"
@@ -394,7 +399,7 @@
             {{ court }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="courtNameInputValue"
+          <input matInput [(ngModel)]="courtNameInputValue"
             (focus)="onSearchCourtNamesInput(courtNameInputValue)"
             (input)="onSearchCourtNamesInput(courtNameInputValue)" placeholder="Search Court Name" />
           <!-- <button mat-icon-button matSuffix (click)="clearCourtNamesSearch()" *ngIf="courtNameInputValue">
@@ -457,7 +462,7 @@
             {{ patentNo }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <input type="text" [disabled]="!tabledata.length" matInput [(ngModel)]="patentNoInputValue"
+          <input type="text" matInput [(ngModel)]="patentNoInputValue"
             [matAutocomplete]="autoSearchPatentNo" (input)="onSearchPatentNoInput(patentNoInputValue)"
             placeholder="eg. 1104721, etc." />
           <!-- <button mat-icon-button matSuffix (click)="clearPatentNoSearch()" *ngIf="patentNoInputValue">
@@ -485,7 +490,7 @@
             {{ action }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <input [disabled]="!tabledata.length" matInput [(ngModel)]="causeOfActionInputValue"
+          <input matInput [(ngModel)]="causeOfActionInputValue"
             [matAutocomplete]="autoSearchCauseOfAction" (input)="onSearchCauseOfActionInput(causeOfActionInputValue)" />
           <!-- <button mat-icon-button matSuffix (click)="clearCauseOfActionSearch()" *ngIf="causeOfActionInputValue">
             <mat-icon>clear</mat-icon>
@@ -529,7 +534,7 @@
     </mat-accordion>
   </mat-sidenav>
 
-  <mat-sidenav-content style="height: auto; background-color: white">
+  <mat-sidenav-content style="height: 100vh; background-color: white">
     <!-- All Chips -->
 
     <div style="
@@ -884,7 +889,7 @@
             Fetching data...
           </div> -->
 
-          <div *ngIf="loader" style="
+          <div *ngIf="!loader && !tabledata" style="
               height: 60vh;
               width: 100%;
               margin-bottom: 600px;
