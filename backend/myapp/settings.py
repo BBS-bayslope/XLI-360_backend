@@ -27,7 +27,8 @@ SECRET_KEY = '=)6fvl-@-)f$%bwd@fsda(yp2p#&$-!_*o@q2_$na6_m$3(n#r'
 DEBUG = True
 
 ALLOWED_HOSTS = ['18.216.104.19', 'localhost', '127.0.0.1','18.220.232.127']
-
+GOOGLE_CLIENT_ID="511014243371-d0q42ehfg2l40rc722t0n6oep2hl08pd.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET_ID="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"
 
 AUTH_USER_MODEL = 'mainapp.CustomUser'  # Correct (Capital 'C')
 

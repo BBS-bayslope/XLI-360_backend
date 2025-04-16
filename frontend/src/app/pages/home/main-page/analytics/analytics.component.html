@@ -1,12 +1,27 @@
-<div class="chart-select">
-  <mat-form-field appearance="outline" style="width: 100%">
+<div class="d-flex justify-content-end">
+  <button mat-icon-button class="no-border-icon" [matMenuTriggerFor]="chartMenu" aria-label="Select charts to display">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #chartMenu="matMenu">
+    <div (click)="$event.stopPropagation()">
+      <mat-checkbox
+        *ngFor="let chart of availableCharts"
+        [checked]="selectedCharts.includes(chart.key)"
+        (change)="toggleChartSelection(chart.key)"
+        style="display: block; padding: 8px 16px;"
+      >
+        {{ chart.label }}
+      </mat-checkbox>
+    </div>
+  </mat-menu>
+  <!-- <mat-form-field appearance="outline" style="width: 100%">
     <mat-label>Select Charts to Display</mat-label>
     <mat-select multiple [(value)]="selectedCharts" (selectionChange)="saveSelectedCharts()">
       <mat-option *ngFor="let chart of availableCharts" [value]="chart.key">
         {{ chart.label }}
       </mat-option>
     </mat-select>
-  </mat-form-field>
+  </mat-form-field> -->
 </div>
 <div class="chart-item1" *ngIf="selectedCharts.includes('totalLitigation')">
   <strong>Total Litigation Cases & Status</strong>

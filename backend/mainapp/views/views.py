@@ -561,7 +561,8 @@ class CaseListView(APIView):
             # Apply case name filtering
             if case_name:
                 query = Q()
-                query |= Q(case_name__icontains=case_name)  # Case-insensitive search
+                query |= Q(case_name__icontains=case_name) | Q(casedetails__plaintiff__icontains=case_name) | Q(casedetails__defendant__icontains=case_name) | Q(patents__industry__icontains=case_name) | Q(patents__tech_category__icontains=case_name) | Q(patents__technology_keywords__icontains=case_name)
+                 # Case-insensitive search
                 
                 queryset = queryset.filter(query)
 

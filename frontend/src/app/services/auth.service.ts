@@ -32,6 +32,7 @@ import {
   orderBy,
   onSnapshot,
 } from '@angular/fire/firestore';
+import { getAuth } from 'firebase/auth';
 import { HttpClient, HttpHeaders, HttpErrorResponse  } from '@angular/common/http';
 import {
   BehaviorSubject,
@@ -313,14 +314,46 @@ export class AuthService {
   // }
 
   // Google sign-in
-  googleLogin(): Observable<User | null> {
+  // googleLogin(): Observable<User | null> {
+  //   const provider = new GoogleAuthProvider();
+  //   provider.setCustomParameters({
+  //     prompt: 'select_account',
+  //   });
+  //   return from(signInWithPopup(this.auth, provider)).pipe(
+  //     map((userCredential) => userCredential.user),
+  //     switchMap((user) => this.saveUserData(user))
+  //   );
+  // }
+
+  googleLogin(): Observable<any> {
+    const auth = getAuth();
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account',
-    });
-    return from(signInWithPopup(this.auth, provider)).pipe(
-      map((userCredential) => userCredential.user),
-      switchMap((user) => this.saveUserData(user))
+
+    return from(signInWithPopup(auth, provider)).pipe(
+      switchMap((result) => {
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const idToken = credential?.idToken;
+
+        if (!idToken) {
+          throw new Error('No ID token found');
+        }
+
+        // Send the Google ID token to your backend to exchange for a custom JWT
+        return this.http.post(`${this.baseUrl}/api/google-login/`, { idToken }).pipe(
+          map((response: any) => {
+            // Assuming the backend returns a JWT token and user data
+            localStorage.setItem('access', response.token); // Store the JWT token
+            localStorage.setItem("refresh", response.refresh);
+            console.log(response.token)
+             // Store the JWT token
+            return {
+              email: result.user.email,
+              uid: result.user.uid,
+              token: response.token,
+            };
+          })
+        );
+      })
     );
   }
 

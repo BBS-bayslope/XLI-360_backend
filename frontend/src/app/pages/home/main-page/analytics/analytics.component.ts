@@ -12,6 +12,7 @@ import {
   ViewChild,
   ElementRef
 } from '@angular/core';
+import { MatIcon } from '@angular/material/icon';
 import {
   ChartConfiguration,
   ChartData,
@@ -39,6 +40,8 @@ import { Bar } from '@antv/g2plot';
 import { PieChartComponent } from '../../../pie-chart/pie-chart.component';
 import { StackedBarChartComponent } from '../../../charts/stackedBarChart.component';
 import { DoughnutChartComponent } from '../../../charts/doughtnutChart.component';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule } from '@angular/material/menu';
 // import * as CanvasJS from 'canvasjs';
 // Ensure the plugin is registered
 Chart.register(ChartDataLabels, ...registerables);
@@ -64,7 +67,10 @@ interface ChartData1 {
     CanvasJSAngularChartsModule,
     PieChartComponent,
     StackedBarChartComponent,
-    DoughnutChartComponent
+    DoughnutChartComponent,
+    MatIcon,
+    MatCheckboxModule,
+    MatMenuModule
   ],
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.scss'],
@@ -297,6 +303,16 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
 
 
   //MY CODE
+
+  toggleChartSelection(chartKey: string) {
+    const index = this.selectedCharts.indexOf(chartKey);
+    if (index >= 0) {
+      this.selectedCharts.splice(index, 1);
+    } else {
+      this.selectedCharts.push(chartKey);
+    }
+    this.saveSelectedCharts(); // Keep your existing save logic
+  }
 
   saveSelectedCharts() {
     localStorage.setItem('selectedCharts', JSON.stringify(this.selectedCharts));

@@ -2,7 +2,7 @@ from django.urls import path
 from .views.views import FileUploadView,ValidateRawDataAPIView, CaseListView,FilterDataView, CaseDetailsView
 from .views.uploadview import FileUploadView, FileUploadViewNew
 from .views.analytics import CaseStatisticsView, PlaintiffTypeCountView, IndustryStats, CaseEntityListing
-from .views.userView import RegisterView, LoginView
+from .views.userView import RegisterView, LoginView, GoogleLoginView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -19,4 +19,5 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('google-login/', GoogleLoginView.as_view(), name='google-login'),
 ]
