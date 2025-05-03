@@ -65,6 +65,7 @@ export class CaseListComponent implements OnInit, OnChanges {
 
   // @ViewChild(BaseChartDirective) chart!: BaseChartDirective; // Access the chart instance
 
+  activity_timeline: any=[]
   caseData?: any;
   objectKeys = Object.keys;
   loader:any = false;
@@ -309,8 +310,27 @@ export class CaseListComponent implements OnInit, OnChanges {
       .subscribe(
         (response: any) => {
           this.case = response;
+          this.activity_timeline.push({
+            date: this.case?.case.complaint_date ? new Date(this.case?.case.complaint_date): null,
+            label: `${this.case?.case.case_no} → Case Filed Date`
+          })
+          if(this.case?.case_details.case_closed_date){
+
+            this.activity_timeline.push({
+              date: this.case?.case_details.case_closed_date ? new Date(this.case?.case_details.case_closed_date): null,
+              label: `${this.case?.case.case_no} → Case Closed Date`
+            })
+          }
           if (this.case?.patents.length > 0) {
             this.case?.patents.forEach((ele: any) => {
+              this.activity_timeline.push({
+                date: ele.issue_date ? new Date(ele.issue_date): null,
+                label: `${ele.patent_no} → issue date`
+              })
+              this.activity_timeline.push({
+                date: ele.expiry_date ? new Date(ele.expiry_date): null,
+                label: `${ele.patent_no} → expiry date`
+              })
               if (ele.assignee_timeline && ele.assignee_timeline.assignments.length > 0) {
                 ele.assignee_timeline.assignments = ele.assignee_timeline.assignments.map((assignment: any) => {
                   // Ensure execution_date is properly converted to a Date object
@@ -328,6 +348,21 @@ export class CaseListComponent implements OnInit, OnChanges {
             // console.log(this.case?.patents, "sssss");
           }
           this.loader = false;
+          this.activity_timeline.sort(function(a: any, b: any) {
+            if (!a.date && !b.date) return 0;          // Both dates are null
+            if (!a.date) return 1;                     // a.date is null, put it after b
+            if (!b.date) return -1;                    // b.date is null, put it after a
+        
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+        });
+        this.activity_timeline=this.activity_timeline.map((ele:any)=>{
+          return{
+            date:ele.date ? this.formatDate(ele.date) : '',
+            label: ele.label
+          }
+        })
+        // console.log(this.activity_timeline,"see this")
+          
         },
         (error) => {
           this.loader = false;
@@ -417,10 +452,10 @@ export class CaseListComponent implements OnInit, OnChanges {
     );
     this.caseComplaintDateYear = this.getYear(this.caseData?.caseComplaintDate);
 
-    console.log(this.patentIssuedDateMonth);
-    console.log(this.patentIssuedDateYear);
-    console.log(this.caseComplaintDatemonth);
-    console.log(this.caseComplaintDateYear);
+    // console.log(this.patentIssuedDateMonth);
+    // console.log(this.patentIssuedDateYear);
+    // console.log(this.caseComplaintDatemonth);
+    // console.log(this.caseComplaintDateYear);
 
     // Update scatter data
     this.scatterData = [

@@ -563,7 +563,15 @@
 
   <mat-sidenav-content style="height: 100vh; background-color: white">
     <!-- All Chips -->
-
+    <div class="row d-flex g-1 justify-content-start align-items-center">
+      <div class="col-2 year-filter-buttons m" *ngFor="let year of years">
+        <button
+          [ngClass]="{ 'active': selectedYear === year }"
+          (click)="selectYear(year)">
+          {{ year === '' ? 'All' : year }}
+        </button>
+      </div>
+    </div>
     <div style="
         display: flex;
         flex-direction: row;
@@ -862,7 +870,22 @@
                 {{ element.litigation_venues || "NA" }}
               </td>
             </ng-container>
-
+            <ng-container matColumnDef="winningPrediction">
+              <th mat-header-cell *matHeaderCellDef>Win Prediction</th>
+              <td mat-cell *matCellDef="let element">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <mat-progress-bar mode="determinate" [value]="winningPercentage || 0"
+                                    style="width: 100px;"></mat-progress-bar>
+                  <span>{{ (winningPercentage || 0) | number:'1.0-0' }}%</span>
+                </div>
+              </td>
+            </ng-container>
+            <ng-container matColumnDef="relatedCases">
+              <th mat-header-cell *matHeaderCellDef>Related Cases</th>
+              <td mat-cell *matCellDef="let element">
+                {{ "NA" }}
+              </td>
+            </ng-container>
             <!-- Prior Reports Column -->
             <!-- Prior Reports Column -->
             <!-- <ng-container matColumnDef="quickSearchReport"> -->

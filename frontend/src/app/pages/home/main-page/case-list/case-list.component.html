@@ -667,6 +667,19 @@
   
 
   <div class="details">
+    <h5>Activity Timeline</h5>
+      <div class="row d-flex justify-content-center w-100">
+      <div class="col-12 d-flex align-items-center">
+      <ng-container *ngIf="activity_timeline.length > 0; else noData">
+        <app-timeline [data]="activity_timeline"></app-timeline>
+      </ng-container>
+      <ng-template #noData>
+        <p>No data available!</p>
+      </ng-template>
+    </div>
+  </div>
+  </div>
+  <div class="details">
     <h5>Assignee Timeline</h5>
     <div *ngFor="let element of case?.patents">
       <div class="row d-flex justify-content-center gap-2">

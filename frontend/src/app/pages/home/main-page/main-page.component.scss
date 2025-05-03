@@ -4,6 +4,26 @@
 // }
 
 
+.year-filter-buttons {
+  // margin-bottom: 15px;
+}
+
+.year-filter-buttons button {
+  padding: 10px 20px;
+  // margin-right: 5px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.year-filter-buttons button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
 .drawer-container {
   // display: flex;
   height: auto;

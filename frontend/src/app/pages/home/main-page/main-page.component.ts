@@ -35,6 +35,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatChipsModule } from '@angular/material/chips';
 import { ApiService } from '../../../services/api.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import {
   ProgressSpinnerMode,
   MatProgressSpinnerModule,
@@ -66,6 +67,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
   selector: 'app-main-page',
   standalone: true,
   imports: [
+    MatProgressBarModule,
     MatListModule,
     MatTableModule,
     MatIcon,
@@ -108,7 +110,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
   tabIndex: number = 0; // Default to the first tab
-
+  years = ['', '2023', '2024', '2025']; // '' = All
+  selectedYear = '';
   displayedColumns: string[] = [
     'srNo',
     'caseComplaintDate',
@@ -117,6 +120,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     'court_name',
     'status',
     'venue',
+    'winningPrediction',
+    'relatedCases'
   ];
 
   private router = inject(Router);
@@ -162,6 +167,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   totalCount: number = 0;
   currentPage: number = 1;
   loader: boolean = false;
+  winningPercentage:any=50;
   constructor(private cdr: ChangeDetectorRef, private firestore: Firestore) { }
 
   ngOnInit() {
@@ -245,6 +251,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error('Error fetching data', error);
       }
     )
+  }
+  selectYear(year: string): void {
+    this.selectedYear = year;
+    if (this.selectedYear) {
+      this.payload.year = this.selectedYear;
+    }
+    this.fetchData();
   }
   //ye mera code hai
   fetchData(): void {

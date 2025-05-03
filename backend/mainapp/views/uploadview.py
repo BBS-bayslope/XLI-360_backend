@@ -37,8 +37,8 @@ class FileUploadView(APIView):
             'Standard Essential Patent', 'Semiconductor Patent', 'Tech Centre',
             'Art Unit', 'Acquired Patent or Organic patent?', 'Assignee Timeline',
             'Industry', 'Technology Keywords', 'Tech Category', 'Reason of Allowance',
-            'Plaintiff/Petitioner', 'Plaintiff Type & Size', 'Defendant',
-            'Defendant Type & Size', 'Stage'
+            'Plaintiff/Petitioner', 'Number of Plaintiff/petitioners', 'Plaintiff Type', 'Plaintiff Size', 'Defendant',
+            'Defendant Type', 'Defendant Size', 'Number of Defendants', 'Stage', 'Chances of Winning'
         ]
 
         for row in rows:
@@ -143,15 +143,17 @@ class FileUploadView(APIView):
         file = request.FILES.get('file')
         if file:
             try:
-                df = pd.read_excel(file, dtype=str)  # Read all as strings for easier handling
+                excel_data = pd.ExcelFile(file)
+                df = excel_data.parse(sheet_name=0, dtype=str)
+                # df = pd.read_excel(file, dtype=str)  # Read all as strings for easier handling
                 rows = df.to_dict('records')
                 print(f"Rows shape: ({len(rows)}, {len(df.columns)})")
-                chunk_size = 180
+                chunk_size = 5000
                 chunks = [rows[i:i + chunk_size] for i in range(0, len(rows), chunk_size)]
                 print("chunks created")
                 records_to_create = []
                 cnt=0
-                with ThreadPoolExecutor(max_workers=4) as executor:
+                with ThreadPoolExecutor(max_workers=5) as executor:
                     futures = [executor.submit(self.process_chunk, chunk) for chunk in chunks]
                     for future in as_completed(futures):
                         cnt=cnt+1
@@ -159,7 +161,7 @@ class FileUploadView(APIView):
                         # print("see ",cnt)
 
                 with transaction.atomic():
-                    RawData.objects.bulk_create(records_to_create, batch_size=500)
+                    RawData.objects.bulk_create(records_to_create, batch_size=5000)
 
                 
                 # Call the stored procedure to process data

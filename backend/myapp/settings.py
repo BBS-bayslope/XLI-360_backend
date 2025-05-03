@@ -130,7 +130,7 @@ DATABASES = {
         'NAME': 'LitigationDb',
         'USER': 'Sarita',
         'PASSWORD':'Bayslope_23',
-        'HOST': 'database-3.cd842y2iqcq8.us-east-2.rds.amazonaws.com',
+        'HOST': 'xlidbinstance.cd842y2iqcq8.us-east-2.rds.amazonaws.com',
         'PORT': 5432,
         
     }

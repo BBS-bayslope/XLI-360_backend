@@ -549,8 +549,12 @@ class CaseListView(APIView):
             standard_patent=request.data.get("standard_patent","")
             semiconductor_patent=request.data.get("semiconductor_patent","")
             case_name = request.data.get("case_name","")  # List of words to search in case names
+            year_filter = request.data.get("year", "")
             queryset = Case.objects.all()
             
+            if year_filter:
+                queryset = queryset.filter(complaint_date__startswith=year_filter)
+
             # Apply filters if provided
             if litigation_venues_filter:
                 queryset = queryset.filter(litigation_venues__in=litigation_venues_filter)
