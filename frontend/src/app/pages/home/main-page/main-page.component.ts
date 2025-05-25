@@ -177,7 +177,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.getTotalCount(); // Fetch the total item count for paginator
     // this.loadPage(0, this.pageSize);
     // this.getAllLitigationVenues(); // Fetch unique litigation venues
-    // this.getAllCaseStatus();
+    // this.getAllCaseStatus(); 
 
 
     // this.getAllTechCategory();
