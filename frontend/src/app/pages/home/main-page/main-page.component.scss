@@ -26,6 +26,8 @@
 
 .drawer-container {
   // display: flex;
+  margin: 0 !important;
+  padding: 0 !important;
   height: auto;
   width: 100%;
 }
@@ -37,6 +39,9 @@ mat-option {
 mat-sidenav {
   width: 30%;
   height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-right: none;
 }
 
 .sidebar {
@@ -56,17 +61,19 @@ mat-sidenav {
   flex-grow: 1;
   padding: 20px;
   overflow-x: auto;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.example-section{
-  max-height: 200px; /* Adjust height as needed */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
+// .example-section{
+//   max-height: 200px; /* Adjust height as needed */
+//   overflow-y: auto;
+//   display: flex;
+//   flex-direction: column;
+//   padding: 10px;
+//   border: 1px solid #ddd;
+//   border-radius: 5px;
+// }
 
 /* Additional styles */
 .filter-header {
@@ -123,7 +130,11 @@ mat-sidenav {
 //   // opacity: 0px;
 // }
 
-// :host ::ng-deep .mat-drawer-inner-container {
+:host ::ng-deep .mat-drawer-inner-container {
+  width: 80%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
 //   // overflow: auto;
 //   // overflow-y: hidden;
 //   // overscroll-behavior:  ;
@@ -156,11 +167,11 @@ mat-sidenav {
 ///main main table
 /// second parrt
 
-// .example-sidenav-content {
-//   display: flex;
-//   height: auto;
-//   justify-content: center;
-// }
+.example-sidenav-content {
+  display: flex;
+  height: auto;
+  justify-content: center;
+}
 .toogle {
   margin-top: 20px;
   margin-right: 0px;
@@ -217,28 +228,187 @@ img {
 }
 
 .scrollable-radio-group {
-  max-height: 200px; /* Limit the height */
+  max-height: 200px;
   width: 250px;
-  overflow-y: auto; /* Enable vertical scrolling */
-  padding-right: 4px; /* Adjust for scrollbar */
-  scrollbar-width: thin; /* Thin scrollbar for better appearance */
-  scrollbar-color: #2074f3 transparent; /* Custom scrollbar color */
+  overflow-y: auto;
+  padding-right: 4px;
 
-  /* Styling for the scrollbar */
+  /* Show thin scrollbar in Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #2074f3 transparent;
+
+  /* For Chrome, Safari, Edge */
   &::-webkit-scrollbar {
-    width: 6px; /* Width of the vertical scrollbar */
+    width: 6px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: #888; /* Scrollbar thumb color */
-    border-radius: 4px; /* Rounded scrollbar thumb */
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background-color: #555; /* Darker on hover */
+    background-color: #2074f3;
+    border-radius: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: transparent; /* Scrollbar track color */
+    background: transparent;
   }
+}
+
+
+/* Hide scrollbar in Chrome, Safari, and Edge */
+.scrollable-radio-group::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+
+
+
+// ---------scss
+// .bold-tab-label .mat-tab-label-content {
+//   font-weight: bold;
+// }
+
+
+
+.custom-tab-label {
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bff;
+  transition: color 0.3s, transform 0.2s;
+}
+
+.custom-tab-label:hover {
+  color: #3f51b5; /* Or any primary/brand color */
+  transform: scale(1.05);
+  // text-decoration: underline;
+}
+
+.mat-row:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mat-cell, .mat-header-cell {
+  font-weight: 500;
+}
+
+
+/* Hover effect for all rows */
+.mat-row:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Specific style for Case Date column */
+.mat-column-caseComplaintDate {
+  font-weight: 500;
+  color: #2a2a2a;
+}
+
+/* Optional: highlight Case Date on hover */
+.mat-cell:hover .casedate-hover {
+  color: #1976d2;
+  font-weight: bold;
+}
+
+
+.no-wrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adds ... if text overflows */
+  width: 10%; /* Adjust width as needed */
+}
+
+.wrap-text {
+  width: 500px; /* Set your desired fixed width  */
+  white-space: normal; /* Allow text to wrap */
+  word-break: break-word; /* Break long words to fit within the width */
+  overflow-wrap: break-word; /* Ensure wrapping for modern browsers */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mat-drawer-inner-container {
+  width: 71%;
+}
+
+
+
+
+// ------------------------------------
+// Ensure the table has a block display for scrolling
+mat-table {
+  display: block;
+  height: 500px;
+  overflow-y: auto;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  width: 100%;
+}
+
+// Ensure the header row is sticky
+mat-header-row {
+  position: sticky;
+  top: 0;
+  z-index: 10; // Increased z-index to ensure it stays above rows
+  background-color: white;
+}
+
+// Style the header cells
+mat-header-cell {
+  font-weight: bolder;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10; // Ensure header cells are above content
+  padding: 8px 16px; // Add some padding for readability
+  border-bottom: 1px solid #ddd; // Add a border to separate header from rows
+}
+
+// Ensure table rows and cells behave correctly
+mat-row {
+  display: table-row;
+}
+
+mat-cell {
+  display: table-cell;
+  font-weight: 500;
+  padding: 8px 16px; // Consistent padding with header cells
+}
+
+// Hover effect for all rows
+.mat-row:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+// Specific style for Case Date column
+.mat-column-caseComplaintDate {
+  font-weight: 500;
+  color: #2a2a2a;
+}
+
+// Optional: highlight Case Date on hover
+.mat-cell:hover .casedate-hover {
+  color: #1976d2;
+  font-weight: bold;
+}
+
+// .no-wrap {
+//   white-space: nowrap;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+// }
+
+.sticky-filter-row {
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Make sure it stays above scrollable content */
+  background: white; /* Match background to avoid transparency */
+  padding: 8px 0;
+  border-bottom: 1px solid #ccc; /* Optional */
 }
