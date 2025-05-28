@@ -643,15 +643,67 @@ class CaseListView(APIView):
             offset = params_offset * params_limit
             limited_queryset = queryset[offset:offset + params_limit]
             
-            # Serialize the filtered and paginated queryset
-            serializer = CaseSerializer(limited_queryset, many=True)
-            
-            # Return the response
+            # --- Add similar cases ---
+            response_data = []
+            for case in limited_queryset:
+                current_data = CaseSerializer(case).data
+
+                try:
+                    case_details = CaseDetails.objects.get(case=case)
+                except CaseDetails.DoesNotExist:
+                    # If no CaseDetails found, no similar cases
+                    current_data["similar_cases"] = []
+                    response_data.append(current_data)
+                    continue
+
+                # Get patents and tech categories of the case
+                case_patents = case.patents.exclude(
+                    Q(patent_no__isnull=True) |
+                    Q(patent_no__exact='') |
+                    Q(patent_no__iexact='not found')
+                )
+
+                case_tech_categories = case_patents.exclude(
+                    Q(tech_category__isnull=True) |
+                    Q(tech_category__exact='') |
+                    Q(tech_category__iexact='not found')
+                ).values_list('tech_category', flat=True)
+
+                # Clean plaintiff and defendant
+                plaintiff = case_details.plaintiff
+                defendant = case_details.defendant
+
+                similar_q = Case.objects.none()
+
+                query = Q()
+
+                if plaintiff and plaintiff.strip().lower() != "not found":
+                    query |= Q(casedetails__plaintiff=plaintiff.strip())
+
+                if defendant and defendant.strip().lower() != "not found":
+                    query |= Q(casedetails__defendant=defendant.strip())
+
+                if case_patents.exists():
+                    query |= Q(patents__in=case_patents)
+
+                if case_tech_categories:
+                    query |= Q(patents__tech_category__in=case_tech_categories)
+
+                if query:
+                    similar_q = Case.objects.filter(query).exclude(id=case.id).distinct()[:5]
+
+                current_data["similar_cases"] = list(similar_q.values_list("case_no", flat=True))
+                response_data.append(current_data)
+
+                # # Serialize the filtered and paginated queryset
+                # serializer = CaseSerializer(limited_queryset, many=True)
+                
+                # Return the response
             return Response({
-                "data": serializer.data,
+                "data": response_data,
                 "total_count": total_count
             })
-        
+            
         except Exception as e:
             return Response({
                 'error': f'Error processing file: {str(e)}'

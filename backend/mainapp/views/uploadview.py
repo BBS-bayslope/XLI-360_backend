@@ -486,18 +486,18 @@ class FileUploadViewNew(APIView):
             try:
                 excel_data = pd.ExcelFile(file)
                 raw_data_df = excel_data.parse(sheet_name=0, dtype=str)
-                plaintiffs_df = excel_data.parse(sheet_name=1, dtype=str)
-                defendants_df = excel_data.parse(sheet_name=2, dtype=str)
-                assigneeTimeline_df=excel_data.parse(sheet_name=3, dtype=str)
+                # plaintiffs_df = excel_data.parse(sheet_name=1, dtype=str)
+                # defendants_df = excel_data.parse(sheet_name=2, dtype=str)
+                # assigneeTimeline_df=excel_data.parse(sheet_name=3, dtype=str)
 
                 raw_data_rows = raw_data_df.to_dict('records')
-                plaintiffs_rows = plaintiffs_df.to_dict('records')
-                defendants_rows = defendants_df.to_dict('records')
-                assignee_rows=assigneeTimeline_df.to_dict('records')
+                # plaintiffs_rows = plaintiffs_df.to_dict('records')
+                # defendants_rows = defendants_df.to_dict('records')
+                # assignee_rows=assigneeTimeline_df.to_dict('records')
 
                 chunk_size = 500
                 raw_data_chunks = [raw_data_rows[i:i + chunk_size] for i in range(0, len(raw_data_rows), chunk_size)]
-
+                print("chunks created")
                 with ThreadPoolExecutor(max_workers=4) as executor:
                     raw_data_futures = [executor.submit(self.process_chunk, chunk) for chunk in raw_data_chunks]
 
@@ -505,6 +505,7 @@ class FileUploadViewNew(APIView):
                     for future in as_completed(raw_data_futures):
                         records_to_create.extend(future.result())
 
+                print("updating...")
                 # Step 1: Insert RawData and trigger stored procedure to create Case records
                 with transaction.atomic():
                     RawData.objects.bulk_create(records_to_create, batch_size=500)
@@ -514,36 +515,36 @@ class FileUploadViewNew(APIView):
                     cursor.execute("SELECT process_raw_data()")  # Ensure Case records are created
 
                 # Step 3: Process Plaintiffs & Defendants with the mapped Case records
-                plaintiffs_chunks = [plaintiffs_rows[i:i + chunk_size] for i in range(0, len(plaintiffs_rows), chunk_size)]
-                defendants_chunks = [defendants_rows[i:i + chunk_size] for i in range(0, len(defendants_rows), chunk_size)]
-                with ThreadPoolExecutor(max_workers=4) as executor:
-                    plaintiffs_futures = [executor.submit(self.process_plaintiffs, chunk) for chunk in plaintiffs_chunks]
-                    defendants_futures = [executor.submit(self.process_defendants, chunk) for chunk in defendants_chunks]
+                # plaintiffs_chunks = [plaintiffs_rows[i:i + chunk_size] for i in range(0, len(plaintiffs_rows), chunk_size)]
+                # defendants_chunks = [defendants_rows[i:i + chunk_size] for i in range(0, len(defendants_rows), chunk_size)]
+                # with ThreadPoolExecutor(max_workers=4) as executor:
+                #     plaintiffs_futures = [executor.submit(self.process_plaintiffs, chunk) for chunk in plaintiffs_chunks]
+                #     defendants_futures = [executor.submit(self.process_defendants, chunk) for chunk in defendants_chunks]
 
-                    plaintiffs_to_create = []
-                    defendants_to_create = []
-                    for future in as_completed(plaintiffs_futures):
-                        plaintiffs_to_create.extend(future.result())
+                #     plaintiffs_to_create = []
+                #     defendants_to_create = []
+                #     for future in as_completed(plaintiffs_futures):
+                #         plaintiffs_to_create.extend(future.result())
 
-                    for future in as_completed(defendants_futures):
-                        defendants_to_create.extend(future.result())
+                #     for future in as_completed(defendants_futures):
+                #         defendants_to_create.extend(future.result())
 
-                # Step 4: Insert Plaintiffs & Defendants into DB
-                with transaction.atomic():
-                    PlaintiffDetails.objects.bulk_create(plaintiffs_to_create, batch_size=500)
-                    DefendantDetails.objects.bulk_create(defendants_to_create, batch_size=500)
+                # # Step 4: Insert Plaintiffs & Defendants into DB
+                # with transaction.atomic():
+                #     PlaintiffDetails.objects.bulk_create(plaintiffs_to_create, batch_size=500)
+                #     DefendantDetails.objects.bulk_create(defendants_to_create, batch_size=500)
                      
-                # print("2nd step completed")
-                timeline_chunks = [assignee_rows[i:i + chunk_size] for i in range(0, len(assignee_rows), chunk_size)]
-                with ThreadPoolExecutor(max_workers=4) as executor:
-                    assignee_futures = [executor.submit(self.process_AssigneeChunk, chunk) for chunk in timeline_chunks]
+                # # print("2nd step completed")
+                # timeline_chunks = [assignee_rows[i:i + chunk_size] for i in range(0, len(assignee_rows), chunk_size)]
+                # with ThreadPoolExecutor(max_workers=4) as executor:
+                #     assignee_futures = [executor.submit(self.process_AssigneeChunk, chunk) for chunk in timeline_chunks]
                     
-                    assignee_to_update = []
-                    for future in as_completed(assignee_futures):
-                        assignee_to_update.extend(future.result())
+                #     assignee_to_update = []
+                #     for future in as_completed(assignee_futures):
+                #         assignee_to_update.extend(future.result())
                         
-                with transaction.atomic():
-                    Patent.objects.bulk_update(assignee_to_update, ['assignee_timeline']) 
+                # with transaction.atomic():
+                #     Patent.objects.bulk_update(assignee_to_update, ['assignee_timeline']) 
                     
                 
                 return Response({'message': 'File processed and data inserted successfully!'}, status=status.HTTP_200_OK)
