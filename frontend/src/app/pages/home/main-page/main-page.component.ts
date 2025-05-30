@@ -288,39 +288,53 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.fetchData();
   }
+
+  noDataFound: boolean = false;
   //ye mera code hai
   fetchData(): void {
     this.loader = true;
+
     this.api.getTableData(this.payload).subscribe(
       (response: any) => {
-        this.tabledata = response.data; // Assign the data
-        this.totalCount = response.total_count; // Total items for pagination
+        this.tabledata = response.data.map((item: any) => ({
+          ...item,
+          case_no: item.case_no || item.caseNumber || '',
+          case_name: item.case_name || item.caseName || '',
+        }));
 
-        //   this.api.getFilterData().subscribe((response:any)=>{
-        //     this.litigationVenueOptions=response.litigation_venues;
-        //     this.industryArrays=response.industry;
-        //     this.caseStatusOptions=response.case_status;
-        //     this.filteredCourtName=response.courtName;
-        //     this.patent_types=response.patentType;
-        //     this.acquisition_types=response.acquisition_type;
-        //     this.filteredPatentNos=response.patent_no;
-        // this.filteredCaseNumbers=response.case_no;
-        //     this.filteredPlaintiff=response.plaintiff;
-        //     this.filteredDefendants=response.defendants;
-        //     this.filteredTechnologyKeywords=response.tech_keywords;
-        //     this.filteredTechCategory=response.tech_categories;
-        //   },
-        //   (error) => {
-        //     this.isLoading=false
-        //     console.error('Error fetching data', error);
-        //   }
-        // )
+        // Check if any search filter was applied
+        const searchValue = (
+          this.payload.case_no ||
+          this.payload.case_name ||
+          ''
+        ).toLowerCase();
+
+        if (searchValue) {
+          this.tabledata = this.tabledata.filter(
+            (item) =>
+              item.case_no?.toLowerCase().includes(searchValue) ||
+              item.case_name?.toLowerCase().includes(searchValue)
+          );
+        }
+
+        // Set table data and status flags
+        this.totalCount = response.total_count;
+        this.dataSource.data = this.tabledata;
+        this.noDataFound = this.tabledata.length === 0;
+
         this.loader = false;
-        this.cdr.detectChanges(); // Force UI to update
+        this.cdr.detectChanges();
       },
       (error) => {
-        this.loader = false;
         console.error('Error fetching data', error);
+
+        // On error, reset data
+        this.tabledata = [];
+        this.dataSource.data = [];
+        this.noDataFound = true;
+
+        this.loader = false;
+        this.cdr.detectChanges();
       }
     );
   }
@@ -362,17 +376,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async onSearchInputTextDebounced(searchText: string): Promise<void> {
-    this.isFiltering = !!searchText;
-    this.searchQuery = searchText;
-
-    // Validate if searchText is a 3-digit number but not valid
-    if (searchText && searchText.length === 3 && !/^\d{3}$/.test(searchText)) {
-      this.filteredSearchInputData = [
-        'Please enter a valid 3-digit number for case number search',
-      ];
-      this.cdr.detectChanges();
-      return;
-    }
+    this.isFiltering = !!searchText.trim();
+    this.searchQuery = searchText.trim();
+    this.searchInputText = this.searchQuery;
+    this.filteredSearchInputData = [];
 
     // Reset payload
     this.payload = {
@@ -384,37 +391,45 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
     // If searchText is a 3-digit number, search by case_no (last 3 digits)
-    if (searchText && searchText.length === 3 && /^\d{3}$/.test(searchText)) {
-      this.payload.case_no = searchText;
-    } else {
-      // Otherwise, search by case_name
-      this.payload.case_name = searchText;
-    }
+    // Always search by case_name, even if it's numeric
+    this.payload.case_name = searchText;
 
     // Fetch main data
     this.fetchData();
 
     if (!this.isFiltering) {
+      this.dataSource.data = []; // Clear data only if not filtering
       this.filteredSearchInputData = [];
       this.cdr.detectChanges();
       return;
     }
 
-    const cachedResults = this.searchInCache(searchText);
+    const trimmedSearchText = this.searchQuery.toLowerCase();
+    const isNumeric = /^\d+$/.test(trimmedSearchText);
+    const isLast3DigitSearch = trimmedSearchText.length === 3 && isNumeric;
+
+    if (isLast3DigitSearch) {
+      this.payload.case_no = ''; // Backend will handle last 3 digit match or filter in frontend
+    } else if (isNumeric) {
+      this.payload.case_no = trimmedSearchText;
+    } else {
+      this.payload.case_name = trimmedSearchText;
+    }
+
+    const cachedResults = this.searchInCache(trimmedSearchText);
 
     if (cachedResults.length > 0) {
       if (this.payload.case_no) {
-        // For case_no searches, ensure cache results match last 3 digits
         this.filteredSearchInputData = cachedResults
-          .filter((row: any) => {
-            const caseNo = row.case_no?.toString() || '';
-            return caseNo.slice(-3) === searchText;
-          })
-          .map((row: any) => row.data || row.case_no || '');
+          .map((row: any) =>
+            isNumeric ? row.case_no || '' : row.case_name || ''
+          )
+          .filter((item: string) => !!item);
+        this.dataSource.data = cachedResults;
       } else {
-        this.filteredSearchInputData = cachedResults.map(
-          (row: any) => row.data || row.case_no || ''
-        );
+        this.filteredSearchInputData = cachedResults
+          .map((row: any) => row.data || row.case_no || '')
+          .filter((item: string) => !!item);
       }
     } else {
       this.isLoadingSuggestions = true;
@@ -427,14 +442,16 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
           this.payload.case_no ? 'case_no' : 'case_name'
         );
 
-        if (backendResults.length > 0) {
-          this.filteredSearchInputData = backendResults.map(
-            (row: any) => row.data || row.case_no || ''
-          );
-          this.tempBackendResult = backendResults;
-        } else {
+        if (backendResults.length === 0 || searchText.trim().length > 2) {
           this.filteredSearchInputData = ['No results found'];
+        } else {
+          this.filteredSearchInputData = backendResults
+            .map((row: any) => row.case_name || row.case_no || '')
+            .filter((item: string) => !!item);
         }
+
+        this.dataSource.data = backendResults;
+        this.tempBackendResult = backendResults;
       } catch (error) {
         console.error('Error fetching backend suggestions:', error);
         this.filteredSearchInputData = ['Error loading suggestions'];
@@ -447,13 +464,23 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   searchInCache(searchText: string): ExcelData[] {
-    if (!searchText) return this.excelData; // Return all if no search query
+    if (!searchText) return this.excelData;
 
     const normalizedQuery = searchText.toLowerCase();
+    const isThreeDigit = /^\d{1,3}$/.test(normalizedQuery);
 
     return this.excelData.filter((row) => {
+      const caseNo = row.case_no?.toString();
+
+      if (isThreeDigit && caseNo && caseNo.length >= 3) {
+        // Match last 3 digits of the case number
+        const lastThree = caseNo.slice(-3);
+        return lastThree === normalizedQuery;
+      }
+
+      // General full-text search on flattened data
       const flattenedRow = this.flattenExcelData(row).toLowerCase();
-      return flattenedRow.includes(normalizedQuery); // Perform partial matching
+      return flattenedRow.includes(normalizedQuery);
     });
   }
 
@@ -2598,8 +2625,12 @@ function levenshteinDistance(a: string, b: string): number {
   return matrix[a.length][b.length];
 }
 
+
+
 function calculateSimilarity(a: string, b: string): number {
   const distance = levenshteinDistance(a.toLowerCase(), b.toLowerCase());
   const maxLength = Math.max(a.length, b.length);
   return ((maxLength - distance) / maxLength) * 100; // Similarity in percentage
 }
+
+

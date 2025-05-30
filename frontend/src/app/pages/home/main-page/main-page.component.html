@@ -4,6 +4,10 @@
     grid-template-rows: 1fr;
     padding: 20px;
     padding-bottom: 10px;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
   ">
   <div style="
       grid-column: 2/3;
@@ -13,16 +17,6 @@
       gap: 15px;
       align-items: flex-start;
     ">
-    <!-- <mat-form-field style="width: 200px" appearance="outline">
-      <mat-label>Search By</mat-label>
-      <mat-select [(value)]="selectedSearchField" (selectionChange)="onSearchFieldChange($event)"
-        panelClass="custom-dropdown-panel">
-        <mat-option *ngFor="let option of searchOptions" [value]="option.value">
-          {{ option.label }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field> -->
-
     <mat-form-field appearance="outline" style="width: 100%">
       <mat-label>Quick Search</mat-label>
       <input
@@ -31,7 +25,6 @@
         (input)="onSearchInputText(searchInputText)"
         [placeholder]="'Quick Search'"
       />
-      
       <button
         mat-icon-button
         matSuffix
@@ -42,51 +35,9 @@
         <mat-icon>clear</mat-icon>
       </button>
     </mat-form-field>
-    
-    
-
-    <!-- <mat-form-field appearance="outline" style="width: 80%">
-      <mat-label>Search litigation cases</mat-label>
-      <input
-        [disabled]="excelData === []"
-        matInput
-        [(ngModel)]="searchInputText"
-        [matAutocomplete]="autoSearch"
-        (input)="onSearchInputText(searchInputText)"
-      />
-      <button
-        mat-icon-button
-        matSuffix
-        (click)="clearSearchTextInput()"
-        *ngIf="searchInputText"
-      >
-        <mat-icon>clear</mat-icon>
-      </button>
-      <mat-autocomplete #autoSearch="matAutocomplete">
-        <mat-option
-          (click)="onSearchTextOptionSelected(item)"
-          *ngFor="let item of filteredSearchInputData"
-          [value]="item"
-        >
-          {{ item }}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field> -->
-
-    <!-- <button
-      style="
-        border-radius: 5px;
-        height: 70%;
-        color: black;
-        border: 1px solid grey;
-        background-color: rgb(241, 241, 241);
-      "
-      mat-raised-button
-    >
-      <mat-icon>sort</mat-icon>Advanced Search
-    </button> -->
   </div>
 </div>
+
 <mat-sidenav-container class="drawer-container">
   <mat-sidenav #drawer mode="side" opened>
     <mat-accordion style="height: 100vh">
@@ -96,25 +47,21 @@
           justify-content: flex-start;
           align-items: center;
           padding-left: 10px;
-          width:30%
+          width: 30%;
         ">
-        <button style="margin-right: 8px" mat-icon-button *ngIf="!menuIcon" (click)="drawer.toggle(); toggleIcon()">
+        <button style="margin-right: px" mat-icon-button *ngIf="!menuIcon" (click)="drawer.toggle(); toggleIcon()">
           <span class="material-symbols-outlined">left_panel_close</span>
         </button>
-        <span style="display: flex; align-items: center; gap: 8px; font-size:16px ">
-          <!-- <mat-icon>filter_list</mat-icon> -->
-          <h4 style="font-size: 18px ;font-weight:bolder; white-space: nowrap;">All Filters</h4>
-
-          <!-- <span *ngIf="isLoadingFilters">
-            <mat-spinner color="accent" diameter="20"></mat-spinner>
-          </span> -->
+        <span style="display: flex; align-items: center; gap: 8px; font-size: 16px;">
+          <h4 style="font-size: 18px; font-weight: bolder; white-space: nowrap;">All Filters</h4>
         </span>
       </span>
       <br />
-      <!-- //litigation venues & Judicial Authorities  -->
+
+      <!-- Litigation Venues & Judicial Authorities -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="line-height: 20px ;font-size: 14px ;font-weight:bolder">
+          <mat-panel-title style="line-height: 20px; font-size: 14px; font-weight: bolder;">
             Litigation Venues & <br />
             Judicial Authorities
           </mat-panel-title>
@@ -125,11 +72,6 @@
             {{ item }}
           </mat-checkbox>
         </section>
-        <!-- <span *ngIf="!isLoadingFilters">
-          <button (click)="getAllLitigationVenues(true)" mat-button>
-            <mat-icon>refresh</mat-icon> Refresh
-          </button>
-        </span> -->
         <div style="
             display: flex;
             flex-direction: row;
@@ -142,14 +84,12 @@
         </div>
       </mat-expansion-panel>
 
-      <!-- //case status  -->
+      <!-- Case Status -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Case Status </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Case Status </mat-panel-title>
         </mat-expansion-panel-header>
-
         <div class="scrollable-radio-group">
-
           <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedCaseStatus"
             (change)="onCaseStatusChange()">
             <mat-radio-button value="All">All</mat-radio-button>
@@ -163,7 +103,7 @@
       <!-- Case Number -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Case Number </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Case Number </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
@@ -171,31 +111,26 @@
             {{ no }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-        <input matInput [(ngModel)]="caseNumberInputValue"
-          [matAutocomplete]="autoSearchCaseNumber" (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
-        <!-- <button mat-icon-button matSuffix (click)="clearSearchCaseNumber()" *ngIf="caseNumberInputValue">
-          <mat-icon>clear</mat-icon>
-        </button> -->
-        <mat-autocomplete #autoSearchCaseNumber="matAutocomplete"
-          (optionSelected)="selectCaseNumber($event.option.value)">
-          <mat-option *ngFor="let caseNumber of filteredCaseNumbers"
-            [value]="caseNumber">
-            {{ caseNumber }}
-          </mat-option>
-          <mat-option *ngIf="filteredCaseNumbers.length === 0 && caseNumberInputValue" disabled>
-            No results found
-          </mat-option>
-        </mat-autocomplete>
+          <input matInput [(ngModel)]="caseNumberInputValue"
+            [matAutocomplete]="autoSearchCaseNumber" (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
+          <mat-autocomplete #autoSearchCaseNumber="matAutocomplete"
+            (optionSelected)="selectCaseNumber($event.option.value)">
+            <mat-option *ngFor="let caseNumber of filteredCaseNumbers" [value]="caseNumber">
+              {{ caseNumber }}
+            </mat-option>
+            <mat-option *ngIf="filteredCaseNumbers.length === 0 && caseNumberInputValue" disabled>
+              No results found
+            </mat-option>
+          </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
 
-      <!-- //case history  -->
+      <!-- Case History -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Case History </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Case History </mat-panel-title>
         </mat-expansion-panel-header>
         <label class="example-value-label" style="color: rgb(10, 9, 9)">In last {{ slider.value }} years</label>
-
         <mat-slider [max]="max" [disabled]="!max" [min]="min" [step]="step" [discrete]="thumbLabel"
           [showTickMarks]="showTicks" style="width: 100%">
           <input matSliderThumb [(ngModel)]="valueSlider" #slider (input)="onYearSliderChange(valueSlider)" />
@@ -205,7 +140,7 @@
       <!-- Case Filed Date -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder">Case Filed Date</mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;">Case Filed Date</mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline">
           <mat-label>Enter a date range</mat-label>
@@ -214,7 +149,6 @@
             <input matEndDate placeholder="End date" (dateChange)="getAllCaseFilledDate(filedDateRangeInput)"
               [formControl]="dateControl" />
           </mat-date-range-input>
-          <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
           <mat-datepicker-toggle matIconSuffix [for]="filedDatePicker"></mat-datepicker-toggle>
           <mat-date-range-picker #filedDatePicker></mat-date-range-picker>
         </mat-form-field>
@@ -223,7 +157,7 @@
       <!-- Case Close Date -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder">Case Close Date</mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;">Case Close Date</mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline">
           <mat-label>Enter a date range</mat-label>
@@ -232,18 +166,16 @@
             <input matEndDate placeholder="End date" (dateChange)="getAllCaseClosedDate(closedDateRangeInput)"
               [formControl]="dateControlClose" />
           </mat-date-range-input>
-          <!-- <mat-hint>MM/DD/YYYY</mat-hint> -->
           <mat-datepicker-toggle matIconSuffix [for]="closedDatePicker"></mat-datepicker-toggle>
           <mat-date-range-picker #closedDatePicker></mat-date-range-picker>
         </mat-form-field>
       </mat-expansion-panel>
 
-      <!-- //Plaintiff  -->
+      <!-- Plaintiff -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Plaintiff </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Plaintiff </mat-panel-title>
         </mat-expansion-panel-header>
-        <!-- Search for Plaintiff -->
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search Plaintiff</mat-label>
           <mat-chip *ngFor="let plaintiff of selectedPlaintiff" (removed)="removePlaintiff(plaintiff)">
@@ -252,14 +184,10 @@
           </mat-chip>
           <input matInput [(ngModel)]="plaintiffInputValue"
             [matAutocomplete]="autoSearchPlaintiff" (input)="onSearchPlaintiffInput(plaintiffInputValue)" />
-          <!-- <button mat-icon-button matSuffix (click)="clearPlaintiffSearch()" *ngIf="plaintiffInputValue">
-            <mat-icon>clear</mat-icon>
-          </button> -->
           <mat-autocomplete #autoSearchPlaintiff="matAutocomplete"
             (optionSelected)="selectPlaintiff($event.option.value)">
-            <mat-option *ngFor="let plaintiff of filteredPlaintiff"
-              [value]="plaintiff">
-              {{ plaintiff}}
+            <mat-option *ngFor="let plaintiff of filteredPlaintiff" [value]="plaintiff">
+              {{ plaintiff }}
             </mat-option>
             <mat-option *ngIf="filteredPlaintiff.length === 0 && plaintiffInputValue" disabled>
               No results found
@@ -268,12 +196,11 @@
         </mat-form-field>
       </mat-expansion-panel>
 
-      <!-- //Defendant -->
+      <!-- Defendant -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Defendant </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Defendant </mat-panel-title>
         </mat-expansion-panel-header>
-
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search Defendant</mat-label>
           <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeDefandant(defendant)">
@@ -282,13 +209,9 @@
           </mat-chip>
           <input matInput [(ngModel)]="defendantInputValue"
             [matAutocomplete]="autoSearchDefendant" (input)="onSearchDefendantInput(defendantInputValue)" />
-          <!-- <button mat-icon-button matSuffix (click)="clearDefendantSearch()" *ngIf="defendantInputValue">
-            <mat-icon>clear</mat-icon>
-          </button> -->
           <mat-autocomplete #autoSearchDefendant="matAutocomplete"
             (optionSelected)="selectDefendant($event.option.value)">
-            <mat-option *ngFor="let defendant of filteredDefendants"
-              [value]="defendant">
+            <mat-option *ngFor="let defendant of filteredDefendants" [value]="defendant">
               {{ defendant }}
             </mat-option>
             <mat-option *ngIf="filteredDefendants.length === 0 && defendantInputValue" disabled>
@@ -298,12 +221,11 @@
         </mat-form-field>
       </mat-expansion-panel>
 
-      <!-- //Industry -->
+      <!-- Industry -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Industry </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Industry </mat-panel-title>
         </mat-expansion-panel-header>
-
         <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Search</mat-label>
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeIndustry(industry)">
@@ -313,7 +235,6 @@
           <input type="search" [(ngModel)]="industryInputValue" (input)="filterIndustry()" matNativeControl
             style="width: 100%;" />
         </mat-form-field>
-
         <section class="example-section">
           <mat-checkbox [checked]="selectedIndustry.has(industry)"
             (change)="onCheckboxIndustryChange($event.checked, industry)" *ngFor="let industry of filteredIndustry">
@@ -325,26 +246,23 @@
         </section>
       </mat-expansion-panel>
 
-      <!-- //Tech Category -->
+      <!-- Tech Category -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Tech Category </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Tech Category </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%;">
           <mat-label>Search</mat-label>
-          <!-- <mat-chip-list #chipList aria-label="Selected Categories"> -->
           <mat-chip *ngFor="let category of selectedTechCategory" (removed)="removeCategory(category)">
             {{ category }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
-          <!-- </mat-chip-list> -->
           <input type="text" [(ngModel)]="techCategoryInputValue" (input)="filterTechCategory()" matNativeControl
             style="width: 100%;" />
         </mat-form-field>
         <section class="example-section">
-          <mat-checkbox [checked]="selectedTechCategory.has(techCategory)" (change)="
-              onCheckboxTechCategoryChange($event.checked, techCategory)
-            " *ngFor="let techCategory of filteredTechCategory">
+          <mat-checkbox [checked]="selectedTechCategory.has(techCategory)" (change)="onCheckboxTechCategoryChange($event.checked, techCategory)"
+            *ngFor="let techCategory of filteredTechCategory">
             {{ techCategory }}
           </mat-checkbox>
           <div *ngIf="filteredTechCategory.length === 0 && techCategoryInputValue" class="no-results">
@@ -356,10 +274,8 @@
       <!-- Technology Keywords -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder">Technology Keywords</mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;">Technology Keywords</mat-panel-title>
         </mat-expansion-panel-header>
-
-        <!-- Search Field -->
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
           <mat-chip *ngFor="let keyword of selectedTechnologyKeywords" (removed)="removeKeyword(keyword)">
@@ -369,13 +285,7 @@
           <input matInput [(ngModel)]="technologyKeywordInputValue"
             (focus)="filterTechnologyKeywords()" (input)="filterTechnologyKeywords()"
             placeholder="Search Technology Keywords" style="width: 100%;" />
-          <!-- <button mat-icon-button matSuffix (click)="clearTechnologyKeywordsSearch()"
-            *ngIf="technologyKeywordInputValue">
-            <mat-icon>clear</mat-icon>
-          </button> -->
         </mat-form-field>
-
-        <!-- Technology Keywords Checkboxes -->
         <div class="example-section">
           <mat-checkbox *ngFor="let keyword of filteredTechnologyKeywords"
             [checked]="selectedTechnologyKeywords.has(keyword)"
@@ -388,13 +298,11 @@
         </div>
       </mat-expansion-panel>
 
-      <!-- //Court Name -->
+      <!-- Court Name -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Court Name </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Court Name </mat-panel-title>
         </mat-expansion-panel-header>
-
-        <!-- Search for Court Names -->
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
           <mat-chip *ngFor="let court of selectedCourtName" (removed)="removeKeyword(court)">
@@ -404,19 +312,7 @@
           <input matInput [(ngModel)]="courtNameInputValue"
             (focus)="onSearchCourtNamesInput(courtNameInputValue)"
             (input)="onSearchCourtNamesInput(courtNameInputValue)" placeholder="Search Court Name" />
-          <!-- <button mat-icon-button matSuffix (click)="clearCourtNamesSearch()" *ngIf="courtNameInputValue">
-            <mat-icon>clear</mat-icon>
-          </button> -->
-          <!-- <section class="example-section" *ngIf="filteredCourtName.length > 0">
-            <mat-autocomplete #autoSearchCourtNames="matAutocomplete">
-              <mat-option *ngFor="let courtName of filteredCourtName" (click)="onCourtNameSelected(courtName)"
-                [value]="courtName">
-                {{ courtName }}
-              </mat-option>
-            </mat-autocomplete>
-          </section> -->
         </mat-form-field>
-
         <section class="example-section">
           <mat-checkbox [checked]="selectedCourtName.has(courtName)"
             (change)="onCheckboxCourtNameChange($event.checked, courtName)" *ngFor="let courtName of filteredCourtName">
@@ -431,7 +327,7 @@
       <!-- Acquisition Type -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Acquisition Type </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Acquisition Type </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-radio-group aria-label="Select an option" (change)="onAcquisitionTypeChange($event.value, true)">
           <mat-radio-button value="">All</mat-radio-button>
@@ -441,10 +337,10 @@
         </mat-radio-group>
       </mat-expansion-panel>
 
-      <!-- //Patent Type -->
+      <!-- Patent Type -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Patent Type </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Patent Type </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedPatentType" (change)="onPatentTypeChange()">
           <mat-radio-button value="All">All</mat-radio-button>
@@ -454,13 +350,11 @@
         </mat-radio-group>
       </mat-expansion-panel>
 
-      <!-- //Patent No. -->
+      <!-- Patent No. -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder"> Patent No. </mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;"> Patent No. </mat-panel-title>
         </mat-expansion-panel-header>
-
-        <!-- Search for Patent Number -->
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
           <mat-chip *ngFor="let patentNo of selectedpatentNo" (removed)="removePatentNo(patentNo)">
@@ -470,9 +364,6 @@
           <input type="text" matInput [(ngModel)]="patentNoInputValue"
             [matAutocomplete]="autoSearchPatentNo" (input)="onSearchPatentNoInput(patentNoInputValue)"
             placeholder="eg. 1104721, etc." />
-          <!-- <button mat-icon-button matSuffix (click)="clearPatentNoSearch()" *ngIf="patentNoInputValue">
-            <mat-icon>clear</mat-icon>
-          </button> -->
           <mat-autocomplete #autoSearchPatentNo="matAutocomplete"
             (optionSelected)="selectPatentNo($event.option.value)">
             <mat-option *ngFor="let patentNo of filteredPatentNos" [value]="patentNo">
@@ -485,13 +376,11 @@
         </mat-form-field>
       </mat-expansion-panel>
 
-      <!-- //Cause of Action -->
+      <!-- Cause of Action -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder">Cause of Action</mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;">Cause of Action</mat-panel-title>
         </mat-expansion-panel-header>
-
-        <!-- Search for Cause of Action -->
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
           <mat-chip *ngFor="let action of selectedCauseOfAction" (removed)="removeactions(action)">
@@ -500,9 +389,6 @@
           </mat-chip>
           <input matInput [(ngModel)]="causeOfActionInputValue"
             [matAutocomplete]="autoSearchCauseOfAction" (input)="onSearchCauseOfActionInput(causeOfActionInputValue)" />
-          <!-- <button mat-icon-button matSuffix (click)="clearCauseOfActionSearch()" *ngIf="causeOfActionInputValue">
-            <mat-icon>clear</mat-icon>
-          </button> -->
           <mat-autocomplete #autoSearchCauseOfAction="matAutocomplete"
             (optionSelected)="selectCauseOfAction($event.option.value)">
             <mat-option *ngFor="let causeOfAction of filteredCauseOfActions" [value]="causeOfAction">
@@ -515,10 +401,10 @@
         </mat-form-field>
       </mat-expansion-panel>
 
-      <!-- //Standard Essential Patent -->
+      <!-- Standard Essential Patent -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder">Standard Essential Patent</mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;">Standard Essential Patent</mat-panel-title>
         </mat-expansion-panel-header>
         <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedStandardPatent" (change)="onStandardPatentChange()">
           <mat-radio-button value="All">All</mat-radio-button>
@@ -528,13 +414,11 @@
         </mat-radio-group>
       </mat-expansion-panel>
 
-      <!-- //Semiconductor Patent -->
+      <!-- Semiconductor Patent -->
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-panel-title style="font-size: 14px ;font-weight:bolder">Semiconductor Patent</mat-panel-title>
+          <mat-panel-title style="font-size: 14px; font-weight: bolder;">Semiconductor Patent</mat-panel-title>
         </mat-expansion-panel-header>
-
-        <!-- Search for Semiconductor Patent -->
         <mat-radio-group aria-label="Select an option" [(ngModel)]="selectedSemiconductorpatent" (change)="onSemiconductorPatentChange()">
           <mat-radio-button value="All">All</mat-radio-button>
           <ng-container *ngFor="let item of semiconductorPatentArrays">
@@ -545,20 +429,20 @@
     </mat-accordion>
   </mat-sidenav>
 
-  
-  <mat-sidenav-content style="height: 100vh; background-color: white; margin: 0; padding: 0;">
+  <mat-sidenav-content class="abc" style="height: auto; background-color: white; margin: 0; padding: 0; overflow: visible;">
     <div class="sticky-header">
-    <!-- All Chips -->
-    <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row">
-      <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
-        <button
-          [ngClass]="{ 'active': selectedYear === year }"
-          (click)="selectYear(year)">
-          {{ year === '' ? 'All' : year }}
-        </button>
+      <!-- Year Filter Buttons -->
+      <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row">
+        <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
+          <button
+            [ngClass]="{ 'active': selectedYear === year }"
+            (click)="selectYear(year)">
+            {{ year === '' ? 'All' : year }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+
     <div class="filter-chips-container" style="
         display: flex;
         flex-direction: row;
@@ -575,13 +459,15 @@
           align-items: center;
           justify-content: flex-start;
         ">
-        <span style="
+        <!-- <span style="
             padding: 10px;
             font-size: 14px;
-            margin-left: 10px;
+            margin-left: 5px;
             margin-top: 5px;
             font-weight: bold;
-          ">Filters</span>
+          ">Filters</span> -->
+
+
         <p style="margin: 0; margin-left: 5px">
           <!-- Case Status Chip -->
           <mat-chip *ngIf="selectedCaseStatus !== ''" (removed)="removeFilter('status')">
@@ -609,8 +495,7 @@
 
           <!-- Case Filled Date Range Chip -->
           <mat-chip *ngIf="selectedFilledStartDate && selectedFilledEndDate" (removed)="removeFilter('caseFilledDate')">
-            Case Filled Date: {{ selectedFilledStartDate | date }} -
-            {{ selectedFilledEndDate | date }}
+            Case Filled Date: {{ selectedFilledStartDate | date }} - {{ selectedFilledEndDate | date }}
             <button matChipRemove [attr.aria-label]="'remove case filled date'">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -618,8 +503,7 @@
 
           <!-- Case Close Date Range Chip -->
           <mat-chip *ngIf="selectedClosedStartDate && selectedClosedEndDate" (removed)="removeFilter('caseClosedDate')">
-            Case Close Date: {{ selectedClosedStartDate | date }} -
-            {{ selectedClosedEndDate | date }}
+            Case Close Date: {{ selectedClosedStartDate | date }} - {{ selectedClosedEndDate | date }}
             <button matChipRemove [attr.aria-label]="'remove case Close date'">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -627,17 +511,15 @@
 
           <!-- Case Number Chip -->
           <mat-chip *ngFor="let caseNumber of selectedCaseNumbers" (removed)="removeFilter('caseNumber', caseNumber)">
-            Case Number : {{ caseNumber }}
+            Case Number: {{ caseNumber }}
             <button matChipRemove [attr.aria-label]="'remove caseNumber'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
           <!-- Plaintiff Chip -->
-          <mat-chip *ngFor="let plaintiffOrPetitioner of selectedPlaintiff" (removed)="
-              removeFilter('plaintiffOrPetitioner', plaintiffOrPetitioner)
-            ">
-            Plaintiff : {{ plaintiffOrPetitioner }}
+          <mat-chip *ngFor="let plaintiffOrPetitioner of selectedPlaintiff" (removed)="removeFilter('plaintiffOrPetitioner', plaintiffOrPetitioner)">
+            Plaintiff: {{ plaintiffOrPetitioner }}
             <button matChipRemove [attr.aria-label]="'remove plaintiffOrPetitioner'">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -645,7 +527,7 @@
 
           <!-- Case Defendant Chip -->
           <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeFilter('defendant', defendant)">
-            Defendant : {{ defendant }}
+            Defendant: {{ defendant }}
             <button matChipRemove [attr.aria-label]="'remove defendant'">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -653,33 +535,31 @@
 
           <!-- Case Industry Chip -->
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeFilter('industry', industry)">
-            Industry : {{ industry }}
+            Industry: {{ industry }}
             <button matChipRemove [attr.aria-label]="'remove industry'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
-          <!-- techCategory Chip -->
-          <mat-chip *ngFor="let techCategory of selectedTechCategory"
-            (removed)="removeFilter('techCategory', techCategory)">
-            Tech Category : {{ techCategory }}
+          <!-- Tech Category Chip -->
+          <mat-chip *ngFor="let techCategory of selectedTechCategory" (removed)="removeFilter('techCategory', techCategory)">
+            Tech Category: {{ techCategory }}
             <button matChipRemove [attr.aria-label]="'remove techCategory'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
-          <!-- technologyKeywords Chip -->
-          <mat-chip *ngFor="let technologyKeywords of selectedTechnologyKeywords"
-            (removed)="removeFilter('technologyKeywords', technologyKeywords)">
-            Technology Keywords : {{ technologyKeywords }}
+          <!-- Technology Keywords Chip -->
+          <mat-chip *ngFor="let technologyKeywords of selectedTechnologyKeywords" (removed)="removeFilter('technologyKeywords', technologyKeywords)">
+            Technology Keywords: {{ technologyKeywords }}
             <button matChipRemove [attr.aria-label]="'remove technologyKeywords'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
-          <!-- courtNames Chip -->
+          <!-- Court Names Chip -->
           <mat-chip *ngFor="let courtNames of selectedCourtName" (removed)="removeFilter('courtNames', courtNames)">
-            CourtNames : {{ courtNames }}
+            CourtNames: {{ courtNames }}
             <button matChipRemove [attr.aria-label]="'remove courtNames'">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -693,7 +573,7 @@
             </button>
           </mat-chip>
 
-          <!-- Patent Type  Chip -->
+          <!-- Patent Type Chip -->
           <mat-chip *ngIf="selectedPatentType !== ''" (removed)="removeFilter('typeOfPatent')">
             Patent Type: {{ selectedPatentType }}
             <button matChipRemove [attr.aria-label]="'remove typeOfPatent'">
@@ -701,38 +581,32 @@
             </button>
           </mat-chip>
 
-          <!-- patentNo Chip -->
+          <!-- Patent No Chip -->
           <mat-chip *ngFor="let patentNo of selectedpatentNo" (removed)="removeFilter('patentNo', patentNo)">
-            Patent No : {{ patentNo }}
+            Patent No: {{ patentNo }}
             <button matChipRemove [attr.aria-label]="'remove patentNo'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
-          <!-- causeOfAction Chip -->
-          <mat-chip *ngFor="let causeOfAction of selectedCauseOfAction"
-            (removed)="removeFilter('causeOfAction', causeOfAction)">
+          <!-- Cause of Action Chip -->
+          <mat-chip *ngFor="let causeOfAction of selectedCauseOfAction" (removed)="removeFilter('causeOfAction', causeOfAction)">
             Cause Of Action: {{ causeOfAction }}
             <button matChipRemove [attr.aria-label]="'remove causeOfAction'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
-          <!-- standardEssentialPatent Chip -->
-          <mat-chip *ngFor="
-              let standardEssentialPatent of selectedStandardEssentialPatent
-            " (removed)="
-              removeFilter('standardEssentialPatent', standardEssentialPatent)
-            ">
+          <!-- Standard Essential Patent Chip -->
+          <mat-chip *ngFor="let standardEssentialPatent of selectedStandardEssentialPatent" (removed)="removeFilter('standardEssentialPatent', standardEssentialPatent)">
             Standard Essential Patent: {{ standardEssentialPatent }}
             <button matChipRemove [attr.aria-label]="'remove standardEssentialPatent'">
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
 
-          <!-- semiconductorPatent Chip -->
-          <mat-chip *ngFor="let semiconductorPatent of selectedSemiconductorPatent"
-            (removed)="removeFilter('semiconductorPatent', semiconductorPatent)">
+          <!-- Semiconductor Patent Chip -->
+          <mat-chip *ngFor="let semiconductorPatent of selectedSemiconductorPatent" (removed)="removeFilter('semiconductorPatent', semiconductorPatent)">
             Standard Essential Patent: {{ semiconductorPatent }}
             <button matChipRemove [attr.aria-label]="'remove semiconductorPatent'">
               <mat-icon>cancel</mat-icon>
@@ -743,29 +617,11 @@
     </div>
 
     <div>
-      <!-- <span class="allFilters">All Filters</span>
-      <span class="allFiltersIcon"><mat-icon>filter_alt</mat-icon></span> -->
-
-      <!-- <mat-icon class="dotMenu"   mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">more_vert</mat-icon> -->
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item>
-          <mat-icon>dialpad</mat-icon>
-          <span>Redial</span>
-        </button>
-        <button mat-menu-item disabled>
-          <mat-icon>voicemail</mat-icon>
-          <span>Check voice mail</span>
-        </button>
-        <button mat-menu-item>
-          <mat-icon>notifications_off</mat-icon>
-          <span>Disable alerts</span>
-        </button>
-      </mat-menu>
       <mat-tab-group [selectedIndex]="tabIndex" mat-stretch-tabs="false" mat-align-tabs="center"
         style="width: 100%; height: auto">
         <mat-tab>
           <ng-template mat-tab-label>
-            <span class="custom-tab-label" style="font-weight: bolder; position:sticky">CaseList</span>
+            <span class="custom-tab-label" style="font-weight: bolder;">CaseList</span>
           </ng-template>
           <div *ngIf="loader" style="
               display: flex;
@@ -776,125 +632,146 @@
             ">
             loading litigation cases..
           </div>
-        
-          <table mat-table *ngIf="!loader" [dataSource]="tabledata"
-            class="mat-elevation-z8" style="display: block; height: 500px; overflow-y: auto; margin: 0; padding: 0 10px; position: sticky;">
-            <!-- Sr. No. Column -->
-            <ng-container matColumnDef="srNo">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;" class="no-wrap">Sr. No.</th>
-              <td mat-cell *matCellDef="let element; let i = index" class="no-wrap">
-                {{ (paginator.pageIndex * paginator.pageSize) + i + 1 }}
-              </td>
-            </ng-container>                        
-            <!-- Case Date Column -->
-            <ng-container matColumnDef="caseComplaintDate">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;">
-                Case Date
-              </th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                {{ formatDate(convertToDate(element.complaint_date)) }}
-              </td>
-            </ng-container>
-        
-            <!-- Case Number Column -->
-            <ng-container matColumnDef="caseNumber">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;">Case Number</th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                <a (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
-                  style="cursor: pointer;color:blue" class="no-wrap">
-                  {{ element.case_no || 'NA' }}
-                </a>
-              </td>
-            </ng-container>
-        
-            <!-- Case Name Column -->
-            <ng-container matColumnDef="caseName">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1; " class="no-text">Case Name</th>
-              <td mat-cell *matCellDef="let element" class="wrap-text" style="width:2%" [innerHTML]="element.case_name | caseNameHighlight :12"></td>
-            </ng-container>
-        
-            <!-- Status Column -->
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;">Status</th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                {{ element.case_status || "NA" }}
-              </td>
-            </ng-container>
-        
-            <!-- Court Column -->
-            <ng-container matColumnDef="court_name">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;">Court Name</th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                {{ element.court_name || "NA" }}
-              </td>
-            </ng-container>
-        
-            <!-- Venue Column -->
-            <ng-container matColumnDef="venue">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;" class="no-wrap">Litigation Venues</th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                {{ element.litigation_venues || "NA" }}
-              </td>
-            </ng-container>
-        
-            <!-- Win Prediction Column -->
-            <ng-container matColumnDef="winningPrediction">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;" class="no-wrap">Win Prediction</th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                <div style="position: relative; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                  <mat-progress-spinner
-                    [diameter]="32"
-                    [mode]="'determinate'"
-                    [value]="100"
-                    color="accent"
-                    style="position: absolute;">
-                  </mat-progress-spinner>
-                  <mat-progress-spinner
-                    [diameter]="32"
-                    [mode]="'determinate'"
-                    [value]="winningPercentage || 0"
-                    color="primary"
-                    style="position: absolute;">
-                  </mat-progress-spinner>
-                  <span style="position: absolute; font-size: 10px; font-weight: 500;">
-                    {{ (winningPercentage || 0) | number:'1.0-0' }}%
-                  </span>
-                </div>
-              </td>
-            </ng-container>
-        
-            <!-- Related Cases Column -->
-            <ng-container matColumnDef="relatedCases">
-              <th mat-header-cell *matHeaderCellDef style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;" class="no-wrap">Related Cases</th>
-              <td mat-cell *matCellDef="let element" class="no-wrap">
-                {{ "NA" }}
-              </td>
-            </ng-container>
-        
-            <!-- Table Header and Row Definitions -->
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-          </table>
-        
-          <div *ngIf="!loader && tabledata.length===0" style="
-              height: 60vh;
-              width: 100%;
-              margin-bottom: 600px;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-            ">
-            No result to display
-          </div>
-        
+          <div class="table-scroll-container" style="overflow-x: scroll; width: 100% ; display: block; overflow-y: hidden; border-bottom: 1px solid #ccc; ">
+          <table
+          mat-table
+          *ngIf="!loader"
+          [dataSource]="tabledata"
+          class="mat-elevation-z8"
+          style="
+            display: block;
+            height: 270px;
+            overflow-y: auto;
+            overflow-x:scroll;
+            margin: 0;
+            padding: 0 10px;
+            position: relative;
+          "
+        >
+          <!-- Sr. No. Column -->
+          <ng-container matColumnDef="srNo">
+            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Sr. No.</th>
+            <td mat-cell *matCellDef="let element; let i = index" class="no-wrap">
+              {{ (paginator.pageIndex * paginator.pageSize) + i + 1 }}
+            </td>
+          </ng-container>
+          <!-- Case Date Column -->
+          <ng-container matColumnDef="caseComplaintDate">
+            <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Date</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              {{ formatDate(convertToDate(element.complaint_date)) }}
+            </td>
+          </ng-container>
+          <!-- Case Number Column -->
+          <ng-container matColumnDef="caseNumber">
+            <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Number</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              <a
+                (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
+                style="cursor: pointer; color: blue"
+                class="no-wrap"
+              >
+                {{ element.case_no || 'NA' }}
+              </a>
+            </td>
+          </ng-container>
+          <!-- Case Name Column -->
+          <ng-container matColumnDef="caseName">
+            <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Case Name</th>
+            <td
+              mat-cell
+              *matCellDef="let element"
+              class="wrap-text2"
+              [innerHTML]="element.case_name | caseNameHighlight:6"
+            ></td>
+          </ng-container>
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="sticky-header">Status</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              {{ element.case_status || "NA" }}
+            </td>
+          </ng-container>
+          <!-- Court Column -->
+          <ng-container matColumnDef="court_name">
+            <th mat-header-cell *matHeaderCellDef class="sticky-header">Court Name</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              {{ element.court_name || "NA" }}
+            </td>
+          </ng-container>
+          <!-- Venue Column -->
+          <ng-container matColumnDef="venue">
+            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Litigation Venues</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              {{ element.litigation_venues || "NA" }}
+            </td>
+          </ng-container>
+          <!-- Win Prediction Column -->
+          <ng-container matColumnDef="winningPrediction">
+            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Win Prediction</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              <div
+                style="
+                  position: relative;
+                  width: 32px;
+                  height: 32px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <mat-progress-spinner
+                  [diameter]="32"
+                  [mode]="'determinate'"
+                  [value]="100"
+                  color="accent"
+                  style="position: absolute"
+                ></mat-progress-spinner>
+                <mat-progress-spinner
+                  [diameter]="32"
+                  [mode]="'determinate'"
+                  [value]="winningPercentage || 0"
+                  color="primary"
+                  style="position: absolute"
+                ></mat-progress-spinner>
+                <span style="position: absolute; font-size: 10px; font-weight: 500">
+                  {{ (winningPercentage || 0) | number:'1.0-0' }}%
+                </span>
+              </div>
+            </td>
+          </ng-container>
+          <!-- Related Cases Column -->
+          <ng-container matColumnDef="relatedCases">
+            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Related Cases</th>
+            <td mat-cell *matCellDef="let element" class="no-wrap">
+              {{ "NA" }}
+            </td>
+          </ng-container>
+          <!-- Table Header and Row Definitions -->
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="sticky-header-row"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+        </div>
+
+        <div *ngIf="!loader && tabledata.length === 0" style="
+        height: 60vh;
+        width: 100%;
+        margin-bottom: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    " class="no-results">
+      {{ searchInputText ? 'No results found for "' + searchInputText + '"' : 'No result to display' }}
+    </div>
+
           <mat-paginator [pageSize]="20" showFirstLastButtons [length]="totalCount"></mat-paginator>
         </mat-tab>
+
         <mat-tab>
           <ng-template mat-tab-label>
             <span class="custom-tab-label" style="font-weight: bolder;">Analytics</span>
           </ng-template>
-        
           <div>
             <app-analytics 
               [filterDataForAnalytics]="filterDataForAnalytics" 
@@ -902,38 +779,30 @@
             </app-analytics>
           </div>
         </mat-tab>
-        
-
 
         <mat-tab>
           <ng-template mat-tab-label>
             <span class="custom-tab-label" style="font-weight: bolder;">Predictions & Recommendations</span>
           </ng-template>
-        
           <div style="height: 150vh; margin: 20px">
             Coming soon..
           </div>
         </mat-tab>
-        
+
         <mat-tab>
           <ng-template mat-tab-label>
             <span class="custom-tab-label" style="font-weight: bolder;">Database</span>
           </ng-template>
-        
           <div style="height: 150vh; margin: 20px">Coming soon..</div>
         </mat-tab>
-        
+
         <mat-tab>
           <ng-template mat-tab-label>
             <span class="custom-tab-label" style="font-weight: bolder;">Reports</span>
           </ng-template>
-        
           <div style="height: 150vh; margin: 20px">Coming soon..</div>
         </mat-tab>
-        
       </mat-tab-group>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
-
-<!-- <app-case-list [caseNumberPass]="selectedDataToPass"></app-case-list>  -->

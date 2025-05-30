@@ -1,16 +1,66 @@
-///main-side hide
-// mat-drawer-container {
-//   height: 160%;
+/* General layout for the drawer container */
+.drawer-container {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  width: 100%;
+}
+
+/* Ensure mat-sidenav layout */
+mat-sidenav {
+  width: 23%;
+  height: 100vh;
+  // margin: 0;
+  // padding: 0;
+  // border-right: none;
+  // background-color: white;
+}
+
+/* Center the inner container while keeping width: 80% */
+:host ::ng-deep .mat-drawer-inner-container {
+  width: 96%;
+  // margin: 0 auto;
+  // padding: 0;
+  // background-color: white;
+}
+// .mat-drawer-inner-container{
+//   width: 100%;
+//     height: 100%;
 // }
 
+/* Ensure mat-expansion-panel and its children take the correct width */
+mat-expansion-panel {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: white;
+}
 
+mat-expansion-panel section,
+mat-expansion-panel mat-form-field {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Style for scrollable radio group (used in Case Status, etc.) */
+.scrollable-radio-group {
+  max-height: 200px;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.scrollable-radio-group::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+}
+
+/* Year filter buttons styling */
 .year-filter-buttons {
-  // margin-bottom: 15px;
+  margin: 0;
 }
 
 .year-filter-buttons button {
   padding: 10px 20px;
-  // margin-right: 5px;
   background-color: #f0f0f0;
   border: 1px solid #ddd;
   cursor: pointer;
@@ -24,58 +74,129 @@
   border-color: #007bff;
 }
 
-.drawer-container {
-  // display: flex;
-  margin: 0 !important;
-  padding: 0 !important;
-  height: auto;
-  width: 100%;
-}
-
-mat-option {
-  border-bottom: 1px solid #242121;
-}
-
-mat-sidenav {
-  width: 30%;
-  height: 100vh;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-right: none;
-}
-
-.sidebar {
-  width: 350px; /* Adjust width as needed */
-  flex-shrink: 0;
-  position: fixed;
-  left: 0;
-  top: 250px;
-  // bottom: 0;
-  overflow-y: auto;
+/* Sticky filter row (year filter buttons) */
+.sticky-filter-row {
+  position: sticky;
+  top: 70px; /* Adjust based on the height of the Quick Search bar */
+  z-index: 999; /* Below Quick Search but above table headers */
   background: white;
-  border-right: 1px solid #ccc;
+  padding: 8px 0;
+  // border-bottom: 1px solid #ccc;
 }
 
-.content {
-  margin-left: 350px; /* Must match sidebar width */
-  flex-grow: 1;
-  padding: 20px;
+/* Ensure mat-sidenav-content can handle scrolling */
+mat-sidenav-content {
+  height: auto;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+/* Ensure the table has a block display for scrolling */
+mat-table {
+  display: block;
+  height: 500px;
+  overflow-y: auto;
   overflow-x: auto;
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0;
+  padding: 0 10px;
+  width: 100%;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 
-// .example-section{
-//   max-height: 200px; /* Adjust height as needed */
-//   overflow-y: auto;
-//   display: flex;
-//   flex-direction: column;
-//   padding: 10px;
-//   border: 1px solid #ddd;
-//   border-radius: 5px;
-// }
+mat-table::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+}
 
-/* Additional styles */
+/* Ensure the header row is sticky */
+mat-header-row {
+  position: sticky;
+  top: 0; /* Stick to the top of the table */
+  z-index: 10; /* Ensure headers stay above table body */
+  background-color: white;
+}
+
+/* Style the header cells */
+mat-header-cell {
+  font-weight: bolder;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  padding: 8px 16px;
+  // border-bottom: 1px solid #ddd;
+}
+
+/* Ensure table rows and cells behave correctly */
+mat-row {
+  display: table-row;
+}
+
+mat-cell {
+  display: table-cell;
+  font-weight: 500;
+  padding: 8px 16px;
+}
+
+/* Hover effect for all rows */
+.mat-row:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Specific style for Case Date column */
+.mat-column-caseComplaintDate {
+  font-weight: 500;
+  color: #2a2a2a;
+}
+
+/* No-wrap class for columns */
+.no-wrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 10%;
+}
+
+/* Wrap-text2 class for Case Name column */
+.wrap-text2 {
+  width: 100px; /* Adjusted fixed width */
+  white-space: normal; /* Allow text to wrap to the next line */
+  overflow-wrap: break-word; /* Wrap at word boundaries when possible */
+  line-height: 1.4; /* Improve spacing between wrapped lines */
+  padding: 8px 12px; /* Add padding for better readability */
+  box-sizing: border-box; /* Ensure padding doesn't affect the width */
+}
+
+/* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
+.wrap-text2 ::ng-deep .highlighted {
+  background-color: #e6f3ff; /* Subtle highlight color */
+  font-weight: 500; /* Slightly bold but not too heavy */
+  color: #333; /* Ensure text is readable */
+}
+
+/* Ensure the table cell aligns properly */
+mat-cell.wrap-text2 {
+  display: table-cell;
+  vertical-align: top; /* Align text to the top of the cell */
+}
+
+/* Custom tab label styling */
+.custom-tab-label {
+  font-weight: bold;
+  cursor: pointer;
+  color: #007bff;
+  transition: color 0.3s, transform 0.2s;
+}
+
+.custom-tab-label:hover {
+  color: #3f51b5;
+  transform: scale(1.05);
+}
+
+/* Additional styles for filter section */
 .filter-header {
   display: flex;
   align-items: center;
@@ -97,318 +218,127 @@ mat-sidenav {
   font-size: 14px;
 }
 
-
-
-.toogle-cross {
-  right: 0px;
-  top: 0px;
-  position: absolute;
-  font-size: 28px;
+/* Ensure mat-option styling */
+mat-option {
+  border-bottom: 1px solid #242121;
 }
 
-// mat-drawer {
-//   background: #ffffff;
-//   // border: 1px solid #d8d8d8;
-//   border-radius: 3px 0px 0px 0px;
-//   // height: 2000px;
-//   width: 300px;
-//   // margin-right: 50px;
-//   // padding-top: 20px;
-//   // top: 50px;
-// }
-
-// mat-expansion-panel {
-//   border-radius: 3px 0px 0px 0px;
-//   background: #ffffff;
-//   // font-family: Poppins;
-
-//   font-weight: 400;
-//   line-height: 45px;
-//   // text-align: left;
-//   color: #000000;
-
-//   // opacity: 0px;
-// }
-
-:host ::ng-deep .mat-drawer-inner-container {
-  width: 80%;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-//   // overflow: auto;
-//   // overflow-y: hidden;
-//   // overscroll-behavior:  ;
-//   overscroll-behavior-y: none;
-//   // -webkit-overflow-scrolling: touch;
-//   justify-content: left;
-//   // align-items: center;
-//   display: flex;
-//   // padding-left: 10px;
-// }
-
-// :host::ng-deep .mat-expansion-panel:not([class*="mat-elevation-z"]) {
-//   // box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-//   box-shadow: none;
-// }
-// :host::ng-deep
-//   .mat-expansion-panel:not(.mat-expanded)
-//   .mat-expansion-panel-header:not([aria-disabled="true"]):hover {
-//   // background: var(--mat-expansion-header-hover-state-layer-color);
-//   // background-color: red;
-//   text-wrap: nowrap;
-//   background: #ffffff;
-// }
-
-// .mat-expansion-panel-header {
-//   text-wrap: nowrap;
-//   margin-right: 5px;
-// }
-
-///main main table
-/// second parrt
-
-.example-sidenav-content {
-  display: flex;
-  height: auto;
-  justify-content: center;
-}
-.toogle {
-  margin-top: 20px;
-  margin-right: 0px;
-  height: 30px;
-  width: 30px;
-  font-size: 35px;
-}
-.allFilters {
-  position: absolute;
-  left: 5rem;
-  top: 25px;
-}
-.allFiltersIcon {
-  position: absolute;
-  left: 9.5rem;
-  top: 20px;
-}
-.dotMenu {
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  margin-top: 20px;
-  margin-right: 5px;
-}
-
-img {
-  height: 40px;
-  width: 40px;
-}
-
-// .example-container {
-//   height: auto;
-// }
-
-::ng-deep .custom-dropdown-panel {
-  max-height: 150px; /* Restrict the height of the dropdown */
-  overflow-y: auto; /* Enable vertical scrolling */
-  scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: #2074f3 #f0f0f0;
-
-  /* For Webkit browsers like Chrome and Edge */
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #2074f3;
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: #f0f0f0;
-  }
-}
-
-.scrollable-radio-group {
-  max-height: 200px;
-  width: 250px;
-  overflow-y: auto;
-  padding-right: 4px;
-
-  /* Show thin scrollbar in Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: #2074f3 transparent;
-
-  /* For Chrome, Safari, Edge */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #2074f3;
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-}
-
-
-/* Hide scrollbar in Chrome, Safari, and Edge */
-.scrollable-radio-group::-webkit-scrollbar {
-  display: none;
-}
-
-
-
-
-
-
-// ---------scss
-// .bold-tab-label .mat-tab-label-content {
-//   font-weight: bold;
-// }
-
-
-
-.custom-tab-label {
-  font-weight: bold;
-  cursor: pointer;
-  color: #007bff;
-  transition: color 0.3s, transform 0.2s;
-}
-
-.custom-tab-label:hover {
-  color: #3f51b5; /* Or any primary/brand color */
-  transform: scale(1.05);
-  // text-decoration: underline;
-}
-
-.mat-row:hover {
-  background-color: #f1f1f1;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.mat-cell, .mat-header-cell {
-  font-weight: 500;
-}
-
-
-/* Hover effect for all rows */
-.mat-row:hover {
-  background-color: #f5f5f5;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-/* Specific style for Case Date column */
-.mat-column-caseComplaintDate {
-  font-weight: 500;
-  color: #2a2a2a;
-}
-
-/* Optional: highlight Case Date on hover */
-.mat-cell:hover .casedate-hover {
-  color: #1976d2;
-  font-weight: bold;
-}
-
-
-.no-wrap {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis; /* Adds ... if text overflows */
-  width: 10%; /* Adjust width as needed */
-}
-
-.wrap-text {
-  width: 500px; /* Set your desired fixed width  */
-  white-space: normal; /* Allow text to wrap */
-  word-break: break-word; /* Break long words to fit within the width */
-  overflow-wrap: break-word; /* Ensure wrapping for modern browsers */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mat-drawer-inner-container {
-  width: 71%;
-}
-
-
-
-
-// ------------------------------------
-// Ensure the table has a block display for scrolling
-mat-table {
-  display: block;
-  height: 500px;
-  overflow-y: auto;
-  margin: 0 !important;
-  padding: 0 10px !important;
+table.mat-table {
   width: 100%;
+  position: relative;
+  border-collapse: collapse;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  display: block; /* Already present in your code */
+  height: 500px; /* Already present in your code */
+  overflow-y: auto; /* Already present in your code */
+  overflow-x: auto;
+}
+.table-scroll-container {
+  overflow-x: scroll; /* force scrollbar always visible */
+  overflow-y: hidden;
+  width: 100%;
+  display: block;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
 }
 
-// Ensure the header row is sticky
-mat-header-row {
-  position: sticky;
+/* Add a minimum width to table so that it overflows horizontally */
+.full-width-table {
+  min-width: 1200px; /* You can adjust this */
+  width: max-content;
+}
+
+/* Optional: make scrollbar always visible on Windows/macOS */
+.table-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 10px;
+}
+
+
+.sticky-header {
+  position: sticky !important;
   top: 0;
-  z-index: 10; // Increased z-index to ensure it stays above rows
   background-color: white;
-}
-
-// Style the header cells
-mat-header-cell {
+  z-index: 10;
   font-weight: bolder;
-  position: sticky;
+  padding: 8px;
+}
+
+.sticky-header-row {
+  position: sticky !important;
   top: 0;
   background-color: white;
-  z-index: 10; // Ensure header cells are above content
-  padding: 8px 16px; // Add some padding for readability
-  border-bottom: 1px solid #ddd; // Add a border to separate header from rows
+  z-index: 10;
 }
 
-// Ensure table rows and cells behave correctly
-mat-row {
-  display: table-row;
+th.mat-header-cell,
+td.mat-cell {
+  padding: 8px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-mat-cell {
-  display: table-cell;
-  font-weight: 500;
-  padding: 8px 16px; // Consistent padding with header cells
+th.mat-header-cell {
+  text-align: left;
 }
-
-// Hover effect for all rows
-.mat-row:hover {
-  background-color: #f5f5f5;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-// Specific style for Case Date column
-.mat-column-caseComplaintDate {
-  font-weight: 500;
-  color: #2a2a2a;
-}
-
-// Optional: highlight Case Date on hover
-.mat-cell:hover .casedate-hover {
-  color: #1976d2;
-  font-weight: bold;
-}
-
-// .no-wrap {
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-// }
 
 .sticky-filter-row {
   position: sticky;
-  top: 0;
-  z-index: 1000; /* Make sure it stays above scrollable content */
-  background: white; /* Match background to avoid transparency */
+  top: 60px; /* Adjust based on search bar height */
+  z-index: 900; /* Below search bar, above table header */
+  background-color: white;
   padding: 8px 0;
-  border-bottom: 1px solid #ccc; /* Optional */
 }
+
+.no-results {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
+
+
+
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+  min-height: 200px;
+}
+
+.no-data-message mat-icon {
+  font-size: 48px;
+  color: #ccc;
+  margin-bottom: 10px;
+}
+
+
+.abc{
+
+}
+
+.mat-drawer-inner-container {
+  width: 100%;
+  height: 100%;
+  /* overflow: auto; */
+  // -webkit-overflow-scrolling: touch;
+}
+
+
+
+.mat-mdc-tab-header {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  margin-right: 73px;}
+
+  [mat-align-tabs=center]>.mat-mdc-tab-header .mat-mdc-tab-labels {
+    justify-content: space-around;}
