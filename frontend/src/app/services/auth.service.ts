@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+// import { Observable } from 'rxjs';
 import {
   Auth,
   signInWithEmailAndPassword,
@@ -33,7 +34,18 @@ import {
   onSnapshot,
 } from '@angular/fire/firestore';
 import { getAuth } from 'firebase/auth';
-import { HttpClient, HttpHeaders, HttpErrorResponse  } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+} from '@angular/common/http';
+
 import {
   BehaviorSubject,
   catchError,
@@ -53,9 +65,9 @@ import {
   throwError,
   merge,
   concat,
-  finalize
+  finalize,
 } from 'rxjs';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
 // import { catchError, finalize, map, mergeMap, switchMap } from 'rxjs/operators';
 import {
   ExcelData,
@@ -100,8 +112,8 @@ export class AuthService {
       this.userSubject.next(user);
     });
   }
-  private baseUrl = 'http://18.220.232.127'; // Base API URL
-  // private baseUrl ="http://127.0.0.1:8000"
+  // private baseUrl = 'http://18.220.232.127'; // Base API URL
+  private baseUrl = 'http://127.0.0.1:8000';
   // Get the current user as an Observable
   getUserState(): Observable<User | null> {
     return this.userSubject.asObservable();
@@ -339,20 +351,22 @@ export class AuthService {
         }
 
         // Send the Google ID token to your backend to exchange for a custom JWT
-        return this.http.post(`${this.baseUrl}/api/google-login/`, { idToken }).pipe(
-          map((response: any) => {
-            // Assuming the backend returns a JWT token and user data
-            localStorage.setItem('access', response.token); // Store the JWT token
-            localStorage.setItem("refresh", response.refresh);
-            console.log(response.token)
-             // Store the JWT token
-            return {
-              email: result.user.email,
-              uid: result.user.uid,
-              token: response.token,
-            };
-          })
-        );
+        return this.http
+          .post(`${this.baseUrl}/api/google-login/`, { idToken })
+          .pipe(
+            map((response: any) => {
+              // Assuming the backend returns a JWT token and user data
+              localStorage.setItem('access', response.token); // Store the JWT token
+              localStorage.setItem('refresh', response.refresh);
+              console.log(response.token);
+              // Store the JWT token
+              return {
+                email: result.user.email,
+                uid: result.user.uid,
+                token: response.token,
+              };
+            })
+          );
       })
     );
   }
@@ -697,74 +711,80 @@ export class AuthService {
   //   );
   // }
 
-
   refreshToken(): Observable<string> {
     const endpoint = `${this.baseUrl}/api/token/refresh/`;
     const refreshToken = localStorage.getItem('refresh');
-  
+
     if (!refreshToken) {
       this.logout();
       return throwError(() => new Error('No refresh token available'));
     }
-  
-    return this.http.post<any>(endpoint, { refresh: refreshToken }, {
-      headers: { 'Skip-Auth-Interceptor': 'true' } // Custom header to signal interceptor to skip
-    }).pipe(
-      switchMap(response => {
-        if (response && response.access) {
-          localStorage.setItem('access', response.access);
-          localStorage.setItem('refresh', response.refresh);
-          return of(response.access);
-        } else {
-          this.logout();
-          return throwError(() => new Error('Invalid refresh response'));
+
+    return this.http
+      .post<any>(
+        endpoint,
+        { refresh: refreshToken },
+        {
+          headers: { 'Skip-Auth-Interceptor': 'true' }, // Custom header to signal interceptor to skip
         }
-      }),
-      catchError(err => {
-        this.logout();
-        return throwError(() => err);
-      })
-    );
-  }
-  
-  
-  // Login function
-    login(payload:object): Observable<any> {
-      const endpoint = `${this.baseUrl}/api/login/`;
-      return this.http.post<any>(endpoint, payload, {
-        headers: { 'Skip-Auth-Interceptor': 'true' } // Custom header to signal interceptor to skip
-      }).pipe(
-        tap(response => {
+      )
+      .pipe(
+        switchMap((response) => {
           if (response && response.access) {
-            localStorage.setItem("access", response.access);
-            localStorage.setItem("refresh", response.refresh);
-            console.log(response.access)
+            localStorage.setItem('access', response.access);
+            localStorage.setItem('refresh', response.refresh);
+            return of(response.access);
+          } else {
+            this.logout();
+            return throwError(() => new Error('Invalid refresh response'));
+          }
+        }),
+        catchError((err) => {
+          this.logout();
+          return throwError(() => err);
+        })
+      );
+  }
+
+  // Login function
+  login(payload: object): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/login/`;
+    return this.http
+      .post<any>(endpoint, payload, {
+        headers: { 'Skip-Auth-Interceptor': 'true' }, // Custom header to signal interceptor to skip
+      })
+      .pipe(
+        tap((response) => {
+          if (response && response.access) {
+            localStorage.setItem('access', response.access);
+            localStorage.setItem('refresh', response.refresh);
+            console.log(response.access);
           } else {
             console.error('Invalid login response', response);
           }
-          
         }),
         catchError((error: HttpErrorResponse) => {
           console.error('Login failed', error);
           return of(null);
         })
       );
-    }
-  
-    // Register function
-    register(payload:object): Observable<any> {
-      const endpoint = `${this.baseUrl}/api/register/`;
-      return this.http.post<any>(endpoint, payload, {
-        headers: { 'Skip-Auth-Interceptor': 'true' } // Custom header to signal interceptor to skip
-      }).pipe(
+  }
+
+  // Register function
+  register(payload: object): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/register/`;
+    return this.http
+      .post<any>(endpoint, payload, {
+        headers: { 'Skip-Auth-Interceptor': 'true' }, // Custom header to signal interceptor to skip
+      })
+      .pipe(
         tap(() => this.router.navigate(['/login'])),
         catchError((error: HttpErrorResponse) => {
           console.error('Registration failed', error);
           return of(null);
         })
       );
-    }
-  
+  }
 
   getPaginatedData(
     collectionName: string,

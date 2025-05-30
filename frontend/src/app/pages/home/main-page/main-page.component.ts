@@ -36,11 +36,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { ApiService } from '../../../services/api.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   ProgressSpinnerMode,
   MatProgressSpinnerModule,
 } from '@angular/material/progress-spinner';
 import { debounce } from 'lodash';
+// CaseNameHighlightPipe
 
 import {
   collection,
@@ -63,10 +65,19 @@ import { ExcelData } from '../../admin/excelDataTpes-interface';
 import { AnalyticsComponent } from './analytics/analytics.component';
 import { Subscription } from 'rxjs/internal/Subscription';
 
+import { NgCircleProgressModule } from 'ng-circle-progress';
+import { CaseNameHighlightPipe } from '../../../case-name-highlight.pipe';
+
 @Component({
   selector: 'app-main-page',
   standalone: true,
   imports: [
+    CaseNameHighlightPipe,
+    MatTableModule,
+    CommonModule,
+    NgCircleProgressModule,
+    NgCircleProgressModule,
+    NgCircleProgressModule,
     MatProgressBarModule,
     MatListModule,
     MatTableModule,
@@ -99,6 +110,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
     MatCardModule,
     MatProgressSpinnerModule,
     AnalyticsComponent,
+    MatTooltipModule
 
     // AnalyticsComponent,
   ],
@@ -108,7 +120,23 @@ import { Subscription } from 'rxjs/internal/Subscription';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
+  splitCaseName(name: string): { before: string; v: string; after: string } {
+    const regex = /\s(v\.?|vs\.?)\s/i; // Matches "v", "v.", "vs", "vs." (case-insensitive)
+    const parts = name.split(regex);
+
+    if (parts.length >= 3) {
+      return {
+        before: parts[0].trim(),
+        v: parts[1].trim(), // v, v., vs, etc.
+        after: parts[2].trim(),
+      };
+    }
+
+    return { before: name, v: '', after: '' };
+  }
+
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
+
   tabIndex: number = 0; // Default to the first tab
   years = ['', '2023', '2024', '2025']; // '' = All
   selectedYear = '';
@@ -121,7 +149,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     'status',
     'venue',
     'winningPrediction',
-    'relatedCases'
+    'relatedCases',
   ];
 
   private router = inject(Router);
@@ -145,6 +173,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   collectionIndex: number = 0; // Track current collection
   litigationVenueOptions: string[] = [];
   selectedCourtNames: string[] = [];
+  selectedSearchField: string = '';
   searchText: string = ''; // Stores search query
   refilteredCourtName: string[] = [];
   filters: { [key: string]: any } = {}; // Active filters
@@ -153,13 +182,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   isFiltering: boolean = false; // Whether the table is in filtered mode
   isLoadingSuggestions: boolean = false;
   excelData2!: ExcelData[];
-  searchBy!: string;
+  searchBy: string = 'case_name';
   private logoClickSubscription!: Subscription;
   isLoadingFilters: boolean = false;
   tempBackendResult!: any[];
   payload: any = {
-    "offset": 0,
-    "limit": this.pageSize
+    offset: 0,
+    limit: this.pageSize,
   };
   tabledata: any[] = [];
   patent_types: any = [];
@@ -167,8 +196,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   totalCount: number = 0;
   currentPage: number = 1;
   loader: boolean = false;
-  winningPercentage:any=50;
-  constructor(private cdr: ChangeDetectorRef, private firestore: Firestore) { }
+  winningPercentage: any = 50;
+  constructor(private cdr: ChangeDetectorRef, private firestore: Firestore) {}
 
   ngOnInit() {
     // this.isLoading = true;
@@ -177,8 +206,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // this.getTotalCount(); // Fetch the total item count for paginator
     // this.loadPage(0, this.pageSize);
     // this.getAllLitigationVenues(); // Fetch unique litigation venues
-    // this.getAllCaseStatus(); 
-
+    // this.getAllCaseStatus();
 
     // this.getAllTechCategory();
     // this.getAllCourtName();
@@ -218,86 +246,87 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.searchText) {
       this.filteredCourtName = [...this.courtNameArrays];
     } else {
-      this.filteredCourtName = this.courtNameArrays.filter(court => 
+      this.filteredCourtName = this.courtNameArrays.filter((court) =>
         court.toLowerCase().includes(this.searchText.toLowerCase())
       );
     }
   }
 
   fetchFilterData(): void {
-    this.loader=true;
-    this.api.getFilterData().subscribe((response: any) => {
-      this.litigationVenueOptions = response.litigation_venues;
-      this.industryArrays = response.industry;
-      this.caseStatusOptions = response.case_status;
-      this.courtNameArrays = response.courtName;
-      this.patent_types = response.patentType;
-      this.acquisition_types = response.acquisition_type;
-      this.patentNoArrays = response.patent_no;
-      this.caseNumbers = response.case_no;
-      this.plaintiffArrays = response.plaintiff;
-      this.defendantArrays = response.defendants;
-      this.technologyKeywordsArrays = response.tech_keywords;
-      this.techCategoryArrays = response.tech_categories;
-      this.courtNameArrays = response.courtName;
-      this.causeOfActionArrays=response.cause_of_action;
-      this.standardEssentialPatentArrays=response.standard_patent;
-      this.semiconductorPatentArrays=response.semiconductor_patent;
-      this.loader=false;
-      this.cdr.detectChanges(); // Force UI to update
-    },
+    this.loader = true;
+    this.api.getFilterData().subscribe(
+      (response: any) => {
+        this.litigationVenueOptions = response.litigation_venues;
+        this.industryArrays = response.industry;
+        this.caseStatusOptions = response.case_status;
+        this.courtNameArrays = response.courtName;
+        this.patent_types = response.patentType;
+        this.acquisition_types = response.acquisition_type;
+        this.patentNoArrays = response.patent_no;
+        this.caseNumbers = response.case_no;
+        this.plaintiffArrays = response.plaintiff;
+        this.defendantArrays = response.defendants;
+        this.technologyKeywordsArrays = response.tech_keywords;
+        this.techCategoryArrays = response.tech_categories;
+        this.courtNameArrays = response.courtName;
+        this.causeOfActionArrays = response.cause_of_action;
+        this.standardEssentialPatentArrays = response.standard_patent;
+        this.semiconductorPatentArrays = response.semiconductor_patent;
+        this.loader = false;
+        this.cdr.detectChanges(); // Force UI to update
+      },
       (error) => {
-        this.loader = false
+        this.loader = false;
         console.error('Error fetching data', error);
       }
-    )
+    );
   }
   selectYear(year: string): void {
     this.selectedYear = year;
-    if (this.selectedYear) {
-      this.payload.year = this.selectedYear;
+    if (year) {
+      this.payload.year = year; // Only add year to payload if it's not empty
+    } else {
+      delete this.payload.year; // Remove the year property when "All" is selected
     }
     this.fetchData();
   }
   //ye mera code hai
   fetchData(): void {
-    this.loader = true
-    this.api.getTableData(this.payload)
-      .subscribe(
-        (response: any) => {
-          this.tabledata = response.data; // Assign the data
-          this.totalCount = response.total_count; // Total items for pagination
+    this.loader = true;
+    this.api.getTableData(this.payload).subscribe(
+      (response: any) => {
+        this.tabledata = response.data; // Assign the data
+        this.totalCount = response.total_count; // Total items for pagination
 
-          //   this.api.getFilterData().subscribe((response:any)=>{
-          //     this.litigationVenueOptions=response.litigation_venues;
-          //     this.industryArrays=response.industry;
-          //     this.caseStatusOptions=response.case_status;
-          //     this.filteredCourtName=response.courtName;
-          //     this.patent_types=response.patentType;
-          //     this.acquisition_types=response.acquisition_type;
-          //     this.filteredPatentNos=response.patent_no;
-          //     this.filteredCaseNumbers=response.case_no;
-          //     this.filteredPlaintiff=response.plaintiff;
-          //     this.filteredDefendants=response.defendants;
-          //     this.filteredTechnologyKeywords=response.tech_keywords;
-          //     this.filteredTechCategory=response.tech_categories;
-          //   },
-          //   (error) => {
-          //     this.isLoading=false
-          //     console.error('Error fetching data', error);
-          //   }
-          // )
-          this.loader = false
-          this.cdr.detectChanges(); // Force UI to update
-        },
-        (error) => {
-          this.loader = false
-          console.error('Error fetching data', error);
-        }
-      );
+        //   this.api.getFilterData().subscribe((response:any)=>{
+        //     this.litigationVenueOptions=response.litigation_venues;
+        //     this.industryArrays=response.industry;
+        //     this.caseStatusOptions=response.case_status;
+        //     this.filteredCourtName=response.courtName;
+        //     this.patent_types=response.patentType;
+        //     this.acquisition_types=response.acquisition_type;
+        //     this.filteredPatentNos=response.patent_no;
+        // this.filteredCaseNumbers=response.case_no;
+        //     this.filteredPlaintiff=response.plaintiff;
+        //     this.filteredDefendants=response.defendants;
+        //     this.filteredTechnologyKeywords=response.tech_keywords;
+        //     this.filteredTechCategory=response.tech_categories;
+        //   },
+        //   (error) => {
+        //     this.isLoading=false
+        //     console.error('Error fetching data', error);
+        //   }
+        // )
+        this.loader = false;
+        this.cdr.detectChanges(); // Force UI to update
+      },
+      (error) => {
+        this.loader = false;
+        console.error('Error fetching data', error);
+      }
+    );
   }
 
-  
   // yha tak
   getFileDetails(
     files: { fileName: string; fileType: string; url: string }[],
@@ -325,58 +354,97 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  async onSearchInputText(
-    searchText: string,
-    searchBy?: string
-  ): Promise<void> {
+  private debounceTimer: any;
+
+  onSearchInputText(searchText: string): void {
+    clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      this.onSearchInputTextDebounced(searchText);
+    }, 300);
+  }
+
+  private async onSearchInputTextDebounced(searchText: string): Promise<void> {
     this.isFiltering = !!searchText;
     this.searchQuery = searchText;
-    this.searchBy = searchBy || '';
-    this.payload.case_name=this.searchInputText
-    this.fetchData()
-    if (!this.isFiltering) {
-      this.filteredSearchInputData = []; // Clear suggestions
+
+    // Validate if searchText is a 3-digit number but not valid
+    if (searchText && searchText.length === 3 && !/^\d{3}$/.test(searchText)) {
+      this.filteredSearchInputData = [
+        'Please enter a valid 3-digit number for case number search',
+      ];
+      this.cdr.detectChanges();
       return;
     }
 
-    // Step 1: Search in the cache
+    // Reset payload
+    this.payload = {
+      offset: 0,
+      limit: this.pageSize,
+      case_name: '',
+      case_no: '',
+      case_date: '',
+    };
+
+    // If searchText is a 3-digit number, search by case_no (last 3 digits)
+    if (searchText && searchText.length === 3 && /^\d{3}$/.test(searchText)) {
+      this.payload.case_no = searchText;
+    } else {
+      // Otherwise, search by case_name
+      this.payload.case_name = searchText;
+    }
+
+    // Fetch main data
+    this.fetchData();
+
+    if (!this.isFiltering) {
+      this.filteredSearchInputData = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
     const cachedResults = this.searchInCache(searchText);
 
     if (cachedResults.length > 0) {
-      // Update suggestions from cache if matches are found
-      this.filteredSearchInputData = cachedResults.map(
-        (row: any) => row.data || ''
-      );
+      if (this.payload.case_no) {
+        // For case_no searches, ensure cache results match last 3 digits
+        this.filteredSearchInputData = cachedResults
+          .filter((row: any) => {
+            const caseNo = row.case_no?.toString() || '';
+            return caseNo.slice(-3) === searchText;
+          })
+          .map((row: any) => row.data || row.case_no || '');
+      } else {
+        this.filteredSearchInputData = cachedResults.map(
+          (row: any) => row.data || row.case_no || ''
+        );
+      }
     } else {
-      // Step 2: Show loader and query the backend
       this.isLoadingSuggestions = true;
 
       try {
         const backendResults = await this.searchInBackend(
           searchText,
           0,
-          this.pageSize
+          this.pageSize,
+          this.payload.case_no ? 'case_no' : 'case_name'
         );
 
         if (backendResults.length > 0) {
-          // Update suggestions from backend if matches are found
           this.filteredSearchInputData = backendResults.map(
-            (row) => row.data || ''
+            (row: any) => row.data || row.case_no || ''
           );
           this.tempBackendResult = backendResults;
         } else {
-          // If no matches are found, show "No results found"
           this.filteredSearchInputData = ['No results found'];
         }
       } catch (error) {
         console.error('Error fetching backend suggestions:', error);
         this.filteredSearchInputData = ['Error loading suggestions'];
       } finally {
-        this.isLoadingSuggestions = false; // Hide loader
+        this.isLoadingSuggestions = false;
       }
     }
 
-    // Update the UI with suggestions
     this.cdr.detectChanges();
   }
 
@@ -431,7 +499,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   // Selected field for search
-  selectedSearchField: string = this.searchOptions[0].value; // Default to "Case Name"
+  // ; // Default to "Case Name"
 
   onSearchFieldChange(event: any): void {
     this.selectedSearchField = event.value;
@@ -465,7 +533,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   async searchInBackend(
     searchText: string,
     pageIndex: number,
-    pageSize: number
+    pageSize: number,
+    searchBy: string
   ): Promise<any[]> {
     const normalizedQuery = searchText;
     const collectionName = this.collectionNames[this.collectionIndex];
@@ -574,7 +643,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
           const backendResults = await this.searchInBackend(
             this.searchQuery,
             pageIndex,
-            remainingSize
+            remainingSize,
+            this.searchBy
           );
 
           // Merge results and maintain pagination
@@ -599,7 +669,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
             );
             const collectionRef = collection(this.firestore, collectionName);
 
-
             let queryRef = query(
               collectionRef,
               // where('caseDetails.status', '==', this.selectedCaseStatus), // changefirst
@@ -608,7 +677,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
             );
 
             if (this.selectedCaseStatus) {
-              queryRef = query(queryRef, where('caseDetails.status', '==', this.selectedCaseStatus));
+              queryRef = query(
+                queryRef,
+                where('caseDetails.status', '==', this.selectedCaseStatus)
+              );
             }
             if (this.lastVisible[currentCollectionIndex]) {
               queryRef = query(
@@ -806,17 +878,16 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // }
 
   ngAfterViewInit() {
-    //ye mera code 
+    //ye mera code
     this.paginator.page.subscribe((event) => {
       this.payload.offset = event.pageIndex;
-      this.payload.limit = event.pageSize
-      console.log(event.pageIndex,"dd")
+      this.payload.limit = event.pageSize;
+      console.log(event.pageIndex, 'dd');
       this.fetchData();
       this.cdr.detectChanges();
     });
 
     //
-
 
     // this.paginator.page.subscribe((event) => {
     //   if (this.selectedSources.size > 0) {
@@ -836,19 +907,17 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   onCheckboxLitigationVenueChange(isChecked: boolean, venue: string): void {
     if (isChecked) {
       this.selectedSources.add(venue);
-      this.payload.litigation_venues = this.selectedSources
+      this.payload.litigation_venues = this.selectedSources;
     } else {
       this.selectedSources.delete(venue);
     }
 
-
-    this.payload.litigation_venues = Array.from(this.selectedSources)
+    this.payload.litigation_venues = Array.from(this.selectedSources);
     this.fetchData();
     console.log('Current Selected Sources:', Array.from(this.selectedSources));
   }
 
   isFilteredLoading: boolean = false;
-
 
   onCaseStatusChange(): void {
     if (this.selectedCaseStatus === 'All') {
@@ -856,8 +925,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     console.log('Selected Case Status:', this.selectedCaseStatus);
-    this.payload.case_status = this.selectedCaseStatus
-    this.fetchData()
+    this.payload.case_status = this.selectedCaseStatus;
+    this.fetchData();
     // this.fetchFilteredDataByCaseStatus(); // Fetch data based on the selected case status
   }
   caseStatusOptions: string[] = [];
@@ -907,8 +976,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   //
   //
 
-  max: number=5;
-  min: number=0;
+  max: number = 5;
+  min: number = 0;
   showTicks = false;
   step = 1;
   thumbLabel = false;
@@ -938,6 +1007,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   standardEPInputValue!: string;
 
   searchInputText: string = '';
+  // selectedSearchField: string = 'caseDetails.caseNumber';
   filteredSearchInputData: any[] = [];
 
   selectedCaseNumbers: Set<string> = new Set();
@@ -1021,22 +1091,22 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'status':
         this.selectedCaseStatus = ''; // Clear case status filter
         delete this.payload.case_status;
-        this.fetchData()
+        this.fetchData();
         break;
 
       case 'litigationVenues':
         if (value) {
           this.selectedSources.delete(value); // Remove specific source filter
-          this.payload.litigation_venues=Array.from(this.selectedSources)
-          this.fetchData()
+          this.payload.litigation_venues = Array.from(this.selectedSources);
+          this.fetchData();
         }
         break;
 
       case 'caseHistory':
         this.yearValueSelected = undefined; // Clear case history filter
-        this.valueSlider=0
-        this.payload.filed_date_list=[]
-        this.fetchData()
+        this.valueSlider = 0;
+        this.payload.filed_date_list = [];
+        this.fetchData();
         break;
 
       case 'caseFilledDate':
@@ -1045,8 +1115,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedFilledEndDate = null;
         this.caseFilledDateArrays = [];
         this.resetDate();
-        this.payload.filed_date_list=[]
-        this.fetchData()
+        this.payload.filed_date_list = [];
+        this.fetchData();
         break;
 
       case 'caseClosedDate':
@@ -1055,40 +1125,40 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectedClosedEndDate = null;
         this.caseClosedDateArrays = [];
         this.resetDateClose();
-        this.payload.case_closed_data_list=[]
-        this.fetchData()
+        this.payload.case_closed_data_list = [];
+        this.fetchData();
         break;
 
       case 'caseNumber':
         if (value) {
-          this.removeCaseNo(value)
+          this.removeCaseNo(value);
         }
         break;
 
       case 'plaintiffOrPetitioner':
         if (value) {
-          this.removePlaintiff(value)
+          this.removePlaintiff(value);
           // this.clearPlaintiffSearch();
         }
         break;
 
       case 'defendant':
         if (value) {
-          this.removeDefandant(value)
+          this.removeDefandant(value);
         }
         break;
 
       case 'industry':
         if (value) {
           // this.selectedIndustry.delete(value);
-          this.removeIndustry(value)
+          this.removeIndustry(value);
         }
         break;
 
       case 'techCategory':
         if (value) {
           // this.selectedTechCategory.delete(value);
-          this.removeCategory(value)
+          this.removeCategory(value);
         }
         break;
 
@@ -1096,54 +1166,54 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         if (value) {
           // this.selectedTechnologyKeywords.delete(value);
           // this.clearTechnologyKeywordsSearch();
-          this.removeKeyword(value)
+          this.removeKeyword(value);
         }
         break;
 
       case 'courtNames':
         if (value) {
           // this.selectedCourtName.delete(value);
-          this.removeCourt(value)
+          this.removeCourt(value);
         }
         break;
 
       case 'acquiredPatentOrOrganicPatent':
         this.selectedAcquisitionType = '';
-        this.payload.acquisition_type=''
-        this.fetchData()
+        this.payload.acquisition_type = '';
+        this.fetchData();
         break;
 
       case 'typeOfPatent':
         this.selectedPatentType = '';
-        this.payload.patent_type=""
-        this.fetchData()
+        this.payload.patent_type = '';
+        this.fetchData();
         break;
 
       case 'patentNo':
         if (value) {
-          this.removePatentNo(value)
+          this.removePatentNo(value);
         }
         break;
 
       case 'causeOfAction':
         if (value) {
-          this.removeactions(value)
+          this.removeactions(value);
         }
         break;
 
       case 'standardEssentialPatent':
         if (value) {
-          this.selectedStandardPatent=''
-          this.payload.standard_patent=""
-          this.fetchData()
+          this.selectedStandardPatent = '';
+          this.payload.standard_patent = '';
+          this.fetchData();
         }
         break;
 
       case 'semiconductorPatent':
         if (value) {
-          this.selectedSemiconductorpatent=''
-          this.payload.semiconductor_patent=''
-          this.fetchData()
+          this.selectedSemiconductorpatent = '';
+          this.payload.semiconductor_patent = '';
+          this.fetchData();
         }
         break;
 
@@ -1334,8 +1404,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   clearSearchTextInput() {
     try {
       this.searchInputText = ''; // Reset search input text
-      this.payload.case_name=""
-      this.fetchData()
+      this.payload.case_name = '';
+      this.payload.case_no = '';
+      this.fetchData();
       this.filteredSearchInputData = []; // Clear any filtered data
       this.isFiltering = false; // Reset filtering flag
       this.isLoadingSuggestions = false; // Stop any loading indication
@@ -1366,10 +1437,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   getAllIndustry() {
     const values = this.uniqueList('dataSource.data?.industry');
     this.industryArrays = values;
-    console.log(this.industryArrays, "fdgs")
+    console.log(this.industryArrays, 'fdgs');
     return values;
   }
-
 
   formatDateISO(date: Date): string {
     return date.toISOString().split('T')[0]; // Convert to 'YYYY-MM-DD'
@@ -1379,17 +1449,27 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     const newDate = new Date(date); // Create a new Date object
     newDate.setDate(newDate.getDate() + 1); // Increment the day
     return newDate;
-  };
+  }
   getAllCaseFilledDate(dateRangeInput: any) {
     const startDate = dateRangeInput.value.start;
     const endDate = dateRangeInput.value.end;
 
-    console.log('Filled Start Date:', this.formatDateISO(this.incrementDateByOne(startDate)));
-    console.log('Filled FilledEnd Date:', this.formatDateISO(this.incrementDateByOne(endDate)));
+    console.log(
+      'Filled Start Date:',
+      this.formatDateISO(this.incrementDateByOne(startDate))
+    );
+    console.log(
+      'Filled FilledEnd Date:',
+      this.formatDateISO(this.incrementDateByOne(endDate))
+    );
     this.payload.filed_date_list = [];
-    this.payload.filed_date_list.push(this.formatDateISO(this.incrementDateByOne(startDate)));
-    this.payload.filed_date_list.push(this.formatDateISO(this.incrementDateByOne(endDate)));
-    this.fetchData()
+    this.payload.filed_date_list.push(
+      this.formatDateISO(this.incrementDateByOne(startDate))
+    );
+    this.payload.filed_date_list.push(
+      this.formatDateISO(this.incrementDateByOne(endDate))
+    );
+    this.fetchData();
     const values = this.uniqueList('caseDetails.caseComplaintDate');
     console.log('filled uniqueList' + values);
     const caseFilledDateArrays: Date[] = [];
@@ -1419,12 +1499,22 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   getAllCaseClosedDate(dateRangeInputClosedDate: any) {
     const startDate = dateRangeInputClosedDate.value.start;
     const endDate = dateRangeInputClosedDate.value.end;
-    console.log('Closed Start Date:', this.formatDateISO(this.incrementDateByOne(startDate)));
-    console.log('Closed FilledEnd Date:', this.formatDateISO(this.incrementDateByOne(endDate)));
+    console.log(
+      'Closed Start Date:',
+      this.formatDateISO(this.incrementDateByOne(startDate))
+    );
+    console.log(
+      'Closed FilledEnd Date:',
+      this.formatDateISO(this.incrementDateByOne(endDate))
+    );
     this.payload.case_closed_data_list = [];
-    this.payload.case_closed_data_list.push(this.formatDateISO(this.incrementDateByOne(startDate)));
-    this.payload.case_closed_data_list.push(this.formatDateISO(this.incrementDateByOne(endDate)));
-    this.fetchData()
+    this.payload.case_closed_data_list.push(
+      this.formatDateISO(this.incrementDateByOne(startDate))
+    );
+    this.payload.case_closed_data_list.push(
+      this.formatDateISO(this.incrementDateByOne(endDate))
+    );
+    this.fetchData();
 
     const values = this.uniqueList('caseDetails.caseClosedDate');
     const caseClosedDateArrays: Date[] = [];
@@ -1480,7 +1570,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         value !== undefined &&
         value !== null &&
         self.findIndex((v) => JSON.stringify(v) === JSON.stringify(value)) ===
-        index
+          index
     );
   }
 
@@ -1695,7 +1785,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // function for  selectedPlaintiff
   filterPlaintiff() {
     const searchTerm = this.plaintiffInputValue.toLowerCase(); // Get the input value
-    console.log()
+    console.log();
     this.filteredPlaintiff = this.plaintiffArrays.filter(
       (Plaintiff) => Plaintiff.toLowerCase().includes(searchTerm) // Filter based on the input
     );
@@ -1704,10 +1794,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectPlaintiff(plaintiff: string) {
     if (!this.selectedPlaintiff.has(plaintiff)) {
       this.selectedPlaintiff.add(plaintiff); // Add to selection if not already selected
-      this.payload.plaintiff=Array.from(this.selectedPlaintiff);
-      this.fetchData()
+      this.payload.plaintiff = Array.from(this.selectedPlaintiff);
+      this.fetchData();
     }
-    this.plaintiffInputValue=""
+    this.plaintiffInputValue = '';
     console.log(
       'Currently selected plaintiff:',
       Array.from(this.selectedPlaintiff)
@@ -1715,25 +1805,25 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
-  removePlaintiff(plaintiff:string){
+  removePlaintiff(plaintiff: string) {
     this.selectedPlaintiff.delete(plaintiff);
     this.payload.plaintiff = Array.from(this.selectedPlaintiff);
-    this.fetchData()
+    this.fetchData();
   }
 
-  removeDefandant(defendant:string){
+  removeDefandant(defendant: string) {
     this.selectedDefendant.delete(defendant);
     this.payload.defendants = Array.from(this.selectedDefendant);
-    this.fetchData()
+    this.fetchData();
   }
 
   selectDefendant(defendant: string) {
     if (!this.selectedDefendant.has(defendant)) {
       this.selectedDefendant.add(defendant); // Add to selection if not already selected
       this.payload.defendants = Array.from(this.selectedDefendant);
-      this.fetchData()
+      this.fetchData();
     }
-    this.defendantInputValue=""
+    this.defendantInputValue = '';
     console.log(
       'defendant selected plaintiff:',
       Array.from(this.selectedDefendant)
@@ -1757,9 +1847,12 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Filter and remove duplicates
     this.filteredTechnologyKeywords = Array.from(
-      new Set(this.technologyKeywordsArrays.filter((keyword) => keyword.includes(searchTerm)))
+      new Set(
+        this.technologyKeywordsArrays.filter((keyword) =>
+          keyword.includes(searchTerm)
+        )
+      )
     );
-
   }
 
   onTechnologyKeywordChanged(keyword: string, isChecked: boolean) {
@@ -1768,15 +1861,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.selectedTechnologyKeywords.delete(keyword); // Remove from the set if unchecked
     }
-    this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords)
-    this.fetchData()
+    this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords);
+    this.fetchData();
     // this.updateDataSource(); // Update the dataSource based on the selected keywords
   }
 
-  removeKeyword(keyword: string){
+  removeKeyword(keyword: string) {
     this.selectedTechnologyKeywords.delete(keyword);
-    this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords)
-    this.fetchData()
+    this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords);
+    this.fetchData();
   }
 
   updateDataSource() {
@@ -1805,10 +1898,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectPatentNo(patentNo: string) {
     if (!this.selectedpatentNo.has(patentNo)) {
       this.selectedpatentNo.add(patentNo); // Add to selection if not already selected
-      this.payload.patent_no=Array.from(this.selectedpatentNo)
-      this.fetchData()
+      this.payload.patent_no = Array.from(this.selectedpatentNo);
+      this.fetchData();
     }
-    this.patentNoInputValue=''
+    this.patentNoInputValue = '';
     console.log(
       'patentNo selected technologyKeywords:',
       Array.from(this.selectedpatentNo)
@@ -1819,8 +1912,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectCauseOfAction(causeOfAction: string) {
     if (!this.selectedCauseOfAction.has(causeOfAction)) {
       this.selectedCauseOfAction.add(causeOfAction); // Add to selection if not already selected
-      this.payload.causeOfaction=Array.from(this.selectedCauseOfAction)
-      this.fetchData()
+      this.payload.causeOfaction = Array.from(this.selectedCauseOfAction);
+      this.fetchData();
     }
     console.log(
       'causeOfAction selected causeOfAction:',
@@ -1829,10 +1922,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
-  removeactions(action:string){
+  removeactions(action: string) {
     this.selectedCauseOfAction.delete(action);
-    this.payload.causeOfaction=Array.from(this.selectedCauseOfAction)
-    this.fetchData()
+    this.payload.causeOfaction = Array.from(this.selectedCauseOfAction);
+    this.fetchData();
   }
 
   // function for  selected standardEssentialPatent
@@ -1876,10 +1969,10 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
-  removeCaseNo(no: string){
+  removeCaseNo(no: string) {
     this.selectedCaseNumbers.delete(no); // Add to selection if not already selected
-      this.payload.case_no=Array.from(this.selectedCaseNumbers);
-      this.fetchData();
+    this.payload.case_no = Array.from(this.selectedCaseNumbers);
+    this.fetchData();
   }
 
   // function for  selectedCaseNumber
@@ -1891,13 +1984,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   selectCaseNumber(caseNo: string) {
-    console.log(caseNo)
+    console.log(caseNo);
     if (!this.selectedCaseNumbers.has(caseNo)) {
       this.selectedCaseNumbers.add(caseNo); // Add to selection if not already selected
-      this.payload.case_no=Array.from(this.selectedCaseNumbers);
+      this.payload.case_no = Array.from(this.selectedCaseNumbers);
       this.fetchData();
     }
-    this.caseNumberInputValue=""
+    this.caseNumberInputValue = '';
     console.log(
       'Currently selected case numbers:',
       Array.from(this.selectedCaseNumbers)
@@ -1930,15 +2023,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedIndustry.delete(industry); // Remove from selection
     }
     this.payload.industry = Array.from(this.selectedIndustry);
-    this.fetchData()
+    this.fetchData();
     console.log('Selected Industries:', Array.from(this.selectedIndustry));
     this.applyFilters();
   }
 
   removeCategory(category: string) {
     this.selectedTechCategory.delete(category);
-    this.payload.tech_category = Array.from(this.selectedTechCategory)
-    this.fetchData()
+    this.payload.tech_category = Array.from(this.selectedTechCategory);
+    this.fetchData();
   }
   // function for  selectedTechCategory
   filterTechCategory() {
@@ -1954,15 +2047,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.selectedTechCategory.delete(techCategory); // Remove from selection
     }
-    this.payload.tech_category = Array.from(this.selectedTechCategory)
-    this.fetchData()
+    this.payload.tech_category = Array.from(this.selectedTechCategory);
+    this.fetchData();
     this.applyFilters();
   }
 
   removeCourt(court: string) {
     this.selectedCourtName.delete(court);
-    this.payload.court_name = Array.from(this.selectedCourtName)
-    this.fetchData()
+    this.payload.court_name = Array.from(this.selectedCourtName);
+    this.fetchData();
   }
 
   // function for  selectedCourtName
@@ -1980,7 +2073,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedCourtName.delete(courtName); // Remove from selection
     }
     this.payload.court_name = Array.from(this.selectedCourtName);
-    this.fetchData()
+    this.fetchData();
     this.applyFilters();
   }
 
@@ -1991,15 +2084,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // Format the dates as ISO strings (or customize as needed)
     const startDate = pastDate.toISOString().split('T')[0];
     const endDate = today.toISOString().split('T')[0];
-    if(yearValueSelected===0){
-      this.payload.filed_date_list=[];
-    }
-    else{
-      this.payload.filed_date_list=[];
+    if (yearValueSelected === 0) {
+      this.payload.filed_date_list = [];
+    } else {
+      this.payload.filed_date_list = [];
       this.payload.filed_date_list.push(startDate);
       this.payload.filed_date_list.push(endDate);
     }
-    this.fetchData()
+    this.fetchData();
     console.log('Selected Date Range:', { startDate, endDate });
 
     console.log(yearValueSelected);
@@ -2024,9 +2116,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedAcquisitionType = ''; // Clear the selected acquisition type
     }
     this.payload.acquisition_type = this.selectedAcquisitionType;
-    this.fetchData()
+    this.fetchData();
     // Filter data directly based on acquisition type
-    
+
     this.applyFilters(); // Apply general filters if no acquisition type is selected
   }
 
@@ -2036,8 +2128,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     console.log('Selected Patent Type:', this.selectedPatentType);
-    this.payload.patent_type = this.selectedPatentType
-    this.fetchData()
+    this.payload.patent_type = this.selectedPatentType;
+    this.fetchData();
     this.applyFilters();
   }
 
@@ -2047,8 +2139,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     console.log('Selected Patent Type:', this.selectedStandardPatent);
-    this.payload.standard_patent = this.selectedStandardPatent
-    this.fetchData()
+    this.payload.standard_patent = this.selectedStandardPatent;
+    this.fetchData();
     this.applyFilters();
   }
 
@@ -2058,8 +2150,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     console.log('Selected Patent Type:', this.selectedSemiconductorpatent);
-    this.payload.semiconductor_patent = this.selectedSemiconductorpatent
-    this.fetchData()
+    this.payload.semiconductor_patent = this.selectedSemiconductorpatent;
+    this.fetchData();
     this.applyFilters();
   }
 
@@ -2067,7 +2159,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('Selected case details:', caseDetails);
     this.api.updateSelectedCase(caseDetails); // Push data to the subject
     // this.router.navigate(['case-list']); // Navigate to the case-list page
-    this.router.navigate(['case-list'], { queryParams: { caseno: caseDetails } });
+    this.router.navigate(['case-list'], {
+      queryParams: { caseno: caseDetails },
+    });
   }
 
   convertToDate(timestamp: any): Date | null {
@@ -2098,12 +2192,25 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   formatDate(date: Date | null): string {
     if (!date) return '';
-    
+
     const day = date.getDate(); // No need to pad single-digit days
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     const month = monthNames[date.getMonth()];
     const year = date.getFullYear();
-  
+
     return `${day} ${month}, ${year}`;
   }
 
@@ -2178,10 +2285,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   onSearchCaseNumberInput(caseNumberText: string) {
     const lowerCaseTerm = caseNumberText.toLowerCase();
     this.filteredCaseNumbers = [];
-    this.filteredCaseNumbers=this.caseNumbers.filter(
-      (item)=>item.toLowerCase()
-      .includes(lowerCaseTerm)
-    )
+    this.filteredCaseNumbers = this.caseNumbers.filter((item) =>
+      item.toLowerCase().includes(lowerCaseTerm)
+    );
     // Remove duplicates
     this.filteredCaseNumbers = Array.from(new Set(this.filteredCaseNumbers));
   }
@@ -2189,7 +2295,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   onCaseNumberSelected(caseNumber: string) {
     this.caseNumberInputValue = caseNumber;
     this.payload.case_no = caseNumber;
-    this.fetchData()
+    this.fetchData();
     // Filter the table data to show only the selected case number
     this.dataSource.data = this.excelData.filter(
       (item) => item.data.caseDetails?.caseNumber === caseNumber
@@ -2202,8 +2308,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   clearSearchCaseNumber() {
     // this.removeFilter('caseNumber',this.caseNumberInputValue);
     this.caseNumberInputValue = '';
-    this.payload.case_no = ''
-    this.fetchData()
+    this.payload.case_no = '';
+    this.fetchData();
     this.filteredCaseNumbers = [];
     this.selectedCaseNumbers.clear();
     this.applyFilters();
@@ -2212,12 +2318,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Logic for searching Plaintiffs
   onSearchPlaintiffInput(plaintiffText: string) {
     const lowerCaseTerm = plaintiffText.toLowerCase();
-    this.filteredPlaintiff = this.plaintiffArrays
-      .filter(
-        (item) =>
-          item.toLowerCase()
-            .includes(lowerCaseTerm)
-      );
+    this.filteredPlaintiff = this.plaintiffArrays.filter((item) =>
+      item.toLowerCase().includes(lowerCaseTerm)
+    );
 
     // Remove duplicates based on plaintiff and caseNumber combination
     // this.filteredPlaintiff = Array.from(
@@ -2228,7 +2331,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Select plaintiff
   onPlaintiffSelected(plaintiff: string) {
     this.payload.plaintiff = plaintiff;
-    this.fetchData()
+    this.fetchData();
     this.dataSource.data = this.excelData.filter((item) =>
       item.data.legalEntities?.plaintiffOrPetitioner
         ?.toLowerCase()
@@ -2240,7 +2343,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Clear the search box for plaintiff
   clearPlaintiffSearch() {
     this.payload.plaintiff = '';
-    this.fetchData()
+    this.fetchData();
     this.plaintiffInputValue = '';
     this.filteredPlaintiff = [];
     this.selectedPlaintiff.clear();
@@ -2251,12 +2354,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   onSearchDefendantInput(defendantText: string) {
     const lowerCaseTerm = defendantText.toLowerCase();
 
-    this.filteredDefendants = this.defendantArrays
-      .filter(
-        (item) =>
-          item.toLowerCase()
-            .includes(lowerCaseTerm)
-      );
+    this.filteredDefendants = this.defendantArrays.filter((item) =>
+      item.toLowerCase().includes(lowerCaseTerm)
+    );
 
     // Remove duplicates based on defendant and caseNumber combination
     // this.filteredDefendants = Array.from(
@@ -2267,7 +2367,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   onDefendantSelected(defendant: string) {
     this.defendantInputValue = defendant;
     this.payload.defendants = defendant;
-    this.fetchData()
+    this.fetchData();
     // Filter the table based on the selected defendant
     this.dataSource.data = this.excelData.filter((item) =>
       item.data.legalEntities?.defendant
@@ -2283,7 +2383,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Clear the search box for defendant
   clearDefendantSearch() {
     this.payload.defendants = '';
-    this.fetchData()
+    this.fetchData();
     this.defendantInputValue = '';
     this.filteredDefendants = [];
     this.selectedDefendant.clear();
@@ -2309,25 +2409,25 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   clearTechnologyKeywordsSearch() {
     this.technologyKeywordInputValue = '';
     delete this.payload.tech_keyword;
-    this.fetchData()
+    this.fetchData();
   }
 
   // Logic for searching Court Names
   onSearchCourtNamesInput(courtNameText: string) {
     const lowerCaseTerm = courtNameText.toLowerCase();
-    this.filteredCourtName = this.courtNameArrays
-      .filter((courtName) => courtName?.toLowerCase().includes(lowerCaseTerm));
+    this.filteredCourtName = this.courtNameArrays.filter((courtName) =>
+      courtName?.toLowerCase().includes(lowerCaseTerm)
+    );
 
     this.filteredCourtName = Array.from(new Set(this.filteredCourtName));
   }
   // Logic for selecting a court name
 
-
   onCourtNameSelected(event: any) {
-    let courtName=event.value
+    let courtName = event.value;
     this.courtNameInputValue = courtName; // Update the input field with the selected court name
-    this.payload.court_name=this.selectedCourtNames
-    this.fetchData()
+    this.payload.court_name = this.selectedCourtNames;
+    this.fetchData();
     // Optional: You can update your data source based on the selected court name if needed
     // const selectedData = this.excelData.filter(
     //   (item) => item.data.caseDetails.courtNames === courtName
@@ -2340,16 +2440,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.courtNameInputValue = ''; // Reset the input value
     this.filteredCourtName = []; // Clear the suggestions
     delete this.payload.court_name;
-    this.fetchData()
+    this.fetchData();
   }
 
   // Logic for searching Patent Number
   onSearchPatentNoInput(patentNoText: string) {
     const lowerCaseTerm = patentNoText.toLowerCase();
-    this.filteredPatentNos = this.patentNoArrays
-      .filter(
-        (patentNo) => patentNo?.toLowerCase().includes(lowerCaseTerm) // Use optional chaining
-      );
+    this.filteredPatentNos = this.patentNoArrays.filter(
+      (patentNo) => patentNo?.toLowerCase().includes(lowerCaseTerm) // Use optional chaining
+    );
 
     // Remove duplicates
     this.filteredPatentNos = Array.from(new Set(this.filteredPatentNos));
@@ -2361,7 +2460,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   //   this.payload.patent_no = patentNo;
   //   this.fetchData()
-   
+
   // }
   removePatentNo(patentNo: string) {
     this.selectedpatentNo.delete(patentNo);
@@ -2383,10 +2482,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Logic for searching Cause of Action
   onSearchCauseOfActionInput(causeText: string) {
     const lowerCaseTerm = causeText.toLowerCase();
-    this.filteredCauseOfActions = this.causeOfActionArrays
-      .filter(
-        (cause) => cause?.toLowerCase().includes(lowerCaseTerm) // Use optional chaining
-      );
+    this.filteredCauseOfActions = this.causeOfActionArrays.filter(
+      (cause) => cause?.toLowerCase().includes(lowerCaseTerm) // Use optional chaining
+    );
 
     // Remove duplicates
     this.filteredCauseOfActions = Array.from(
@@ -2397,16 +2495,16 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Select cause of action
   onCauseOfActionSelected(cause: string) {
     this.causeOfActionInputValue = cause; // Update the input field with the selected cause of action
-    this.payload.causeOfaction=cause
-    this.fetchData()
+    this.payload.causeOfaction = cause;
+    this.fetchData();
   }
 
   // Clear the search box for cause of action
   clearCauseOfActionSearch() {
     this.causeOfActionInputValue = ''; // Reset the input value
     this.filteredCauseOfActions = []; // Clear the suggestions
-    this.payload.causeOfaction=''
-    this.fetchData()
+    this.payload.causeOfaction = '';
+    this.fetchData();
     // Optionally reset the data source to show all data again
   }
 
