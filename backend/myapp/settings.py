@@ -195,3 +195,6 @@ LOGGING = {
 SECURE_SSL_REDIRECT = False  # Enable in production with HTTPS
 CSRF_COOKIE_SECURE = False  # Enable in production
 SESSION_COOKIE_SECURE = False  # Enable in production
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -533,45 +533,135 @@ import re
 # from .serializers import CaseSerializer
 
 import logging
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 class CaseListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        logger.debug(f"Request headers: {request.headers}")
+        # logger.debug(f"Request headers: {request.headers}")
         try:
-            # Extract filter parameters
+            # Extract filter params
             case_name = request.data.get("case_name", "")
             case_number = request.data.get("case_number", "")
             params_offset = int(request.data.get("offset", 0))
             params_limit = int(request.data.get("limit", 10))
 
-            # case_date = request.data.get("case_date", "")
-
-            # Start with all cases
+            # Initial queryset
             queryset = Case.objects.all()
 
             # Apply filters
             if case_name or case_number:
-                
                 if case_number and len(case_number) == 3 and case_number.isdigit():
                     queryset = queryset.annotate(
-                            last_3_digits=Right("case_no", 3)
-                ).filter(last_3_digits=case_number)
+                        last_3_digits=Right("case_no", 3)
+                    ).filter(last_3_digits=case_number)
                 else:
                     search_term = case_name or case_number
-                queryset = queryset.filter(
-                    Q(case_name__icontains=search_term) | Q(case_no__icontains=search_term)
-                )
-            # Pagination
+                    queryset = queryset.filter(
+                        Q(case_name__icontains=search_term) | Q(case_no__icontains=search_term)
+                    )
+
+            # Pagination: offset here means page number, so convert to row offset
             offset = params_offset * params_limit
             total_count = queryset.count()
-            limited_queryset = queryset[offset:offset + params_limit]
+            limited_queryset = list(queryset[offset:offset + params_limit])
 
-            serializer = CaseSerializer(limited_queryset, many=True)
+            # Early exit if no results
+            if not limited_queryset:
+                return Response({
+                    "data": [],
+                    "total_count": total_count
+                })
+
+            # Limit candidate set for similar cases (exclude current limited cases)
+            limited_case_ids = [case.id for case in limited_queryset]
+            candidates = list(
+                Case.objects.exclude(id__in=limited_case_ids)
+                .prefetch_related('patents')
+                .order_by('-id')[:100]  # Limit to 100 recent cases
+            )
+            candidate_ids = [c.id for c in candidates]
+
+            # Bulk fetch CaseDetails for limited cases and candidates
+            details_map = {
+                detail.case_id: detail
+                for detail in CaseDetails.objects.filter(case_id__in=limited_case_ids + candidate_ids)
+            }
+
+            # Precompute patent tech categories for all cases (limited + candidates)
+            tech_categories_map = {}
+            all_cases = limited_queryset + candidates
+            for case in all_cases:
+                tech_categories = set(case.patents.exclude(
+                    Q(tech_category__isnull=True) |
+                    Q(tech_category__exact='') |
+                    Q(tech_category__iexact='not found')
+                ).values_list('tech_category', flat=True))
+                tech_categories_map[case.id] = tech_categories
+
+            response_data = []
+
+            # Now process each limited case for similar cases
+            for case in limited_queryset:
+                current_data = CaseSerializer(case).data
+                case_details = details_map.get(case.id)
+
+                if not case_details:
+                    current_data["similar_cases"] = []
+                    response_data.append(current_data)
+                    continue
+
+                plaintiff = case_details.plaintiff.strip() if case_details.plaintiff else ""
+                defendant = case_details.defendant.strip() if case_details.defendant else ""
+                judge = case_details.judge.strip() if case_details.judge else ""
+                case_tech_cats = tech_categories_map.get(case.id, set())
+
+                similar_cases = []
+
+                for other in candidates:
+                    other_details = details_map.get(other.id)
+                    if not other_details:
+                        continue
+
+                    score = 0
+                    match_reasons = []
+
+                    other_plaintiff = other_details.plaintiff.strip() if other_details.plaintiff else ""
+                    other_defendant = other_details.defendant.strip() if other_details.defendant else ""
+                    other_judge = other_details.judge.strip() if other_details.judge else ""
+                    other_tech_cats = tech_categories_map.get(other.id, set())
+
+                    if plaintiff and other_plaintiff == plaintiff:
+                        score += 3
+                        match_reasons.append("plaintiff")
+
+                    if defendant and other_defendant == defendant:
+                        score += 3
+                        match_reasons.append("defendant")
+
+                    if judge and other_judge == judge:
+                        score += 2
+                        match_reasons.append("judge")
+
+                    if case_tech_cats.intersection(other_tech_cats):
+                        score += 1
+                        match_reasons.append("tech_category")
+
+                    if score > 0:
+                        similar_cases.append({
+                            "case_no": other.case_no,
+                            "match_reasons": match_reasons,
+                            "score": score
+                        })
+
+                # Sort and limit top 5
+                similar_cases = sorted(similar_cases, key=lambda x: -x["score"])[:5]
+                current_data["similar_cases"] = similar_cases
+                response_data.append(current_data)
+
             return Response({
-                "data": serializer.data,
+                "data": response_data,
                 "total_count": total_count
             })
 

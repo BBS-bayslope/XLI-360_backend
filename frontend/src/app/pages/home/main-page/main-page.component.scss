@@ -333,12 +333,32 @@ th.mat-header-cell {
 
 
 
-.mat-mdc-tab-header {
-  display: flex;
-  overflow: hidden;
-  position: relative;
-  flex-shrink: 0;
-  margin-right: 73px;}
+// .mat-mdc-tab-header {
+//   display: flex;
+//   overflow: hidden;
+//   position: relative;
+//   flex-shrink: 0;
+//   margin-right: 73px;}
 
-  [mat-align-tabs=center]>.mat-mdc-tab-header .mat-mdc-tab-labels {
-    justify-content: space-around;}
+::ng-deep .mat-drawer-side {
+  box-shadow: none;
+  border-right-style: none !important; 
+  border-right-color: var(--mat-sidenav-container-divider-color);
+}
+
+    ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
+      justify-content: space-evenly;
+      margin-left: -58px;
+  }
+  ::ng-deep .mat-mdc-tab-labels {
+    margin-bottom: 13px;
+  }
+  
+  :host ::ng-deep {
+    .plaintiff {
+      color: rgb(0, 128, 0) !important;
+    }
+    .defendant {
+      color: brown !important;
+    }
+  }

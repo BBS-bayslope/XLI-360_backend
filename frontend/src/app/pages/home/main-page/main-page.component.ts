@@ -42,8 +42,12 @@ import {
 } from '@angular/material/progress-spinner';
 import { debounce } from 'lodash';
 // CaseNameHighlightPipe
+import { MatTooltipModule } from '@angular/material/tooltip';
+// import { MatTableModule } from '@angular/material/table';
+
 
 import {
+  // CaseNameHighlightPipe,
   collection,
   DocumentData,
   Firestore,
@@ -71,6 +75,7 @@ import { CaseNameHighlightPipe } from '../../../case-name-highlight.pipe';
   selector: 'app-main-page',
   standalone: true,
   imports: [
+    MatTooltipModule,
     CaseNameHighlightPipe,
     MatTableModule,
     CommonModule,
@@ -2602,6 +2607,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // Optionally reset the data source to show all data again
     this.dataSource.data = this.excelData; // Show all data if that's the desired behavior
   }
+
+  
 }
 
 function levenshteinDistance(a: string, b: string): number {
@@ -2623,6 +2630,9 @@ function levenshteinDistance(a: string, b: string): number {
   }
 
   return matrix[a.length][b.length];
+
+
+  
 }
 
 
@@ -2632,5 +2642,6 @@ function calculateSimilarity(a: string, b: string): number {
   const maxLength = Math.max(a.length, b.length);
   return ((maxLength - distance) / maxLength) * 100; // Similarity in percentage
 }
+
 
 
