@@ -160,7 +160,6 @@ mat-cell {
   width: 10%;
 }
 
-/* Wrap-text2 class for Case Name column */
 .wrap-text2 {
   width: 100px; /* Adjusted fixed width */
   white-space: normal; /* Allow text to wrap to the next line */
@@ -353,7 +352,7 @@ th.mat-header-cell {
   ::ng-deep .mat-mdc-tab-labels {
     margin-bottom: 13px;
   }
-  
+
   :host ::ng-deep {
     .plaintiff {
       color: rgb(0, 128, 0) !important;
@@ -362,3 +361,5 @@ th.mat-header-cell {
       color: brown !important;
     }
   }
+
+  

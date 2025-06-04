@@ -744,7 +744,7 @@
           <ng-container matColumnDef="relatedCases">
             <th mat-header-cell *matHeaderCellDef
               style="font-weight: bolder; position: sticky; top: 0; background-color: white; z-index: 1;"
-              class="no-wrap">Similar Cases</th>
+              class="wrap-text2">Similar Cases</th>
             <td mat-cell *matCellDef="let element" class="no-wrap">
               <ng-container *ngIf="element.similar_cases && element.similar_cases.length > 0; else noCases">
                 <ng-container *ngFor="let relatedCase of element.similar_cases; let i = index">

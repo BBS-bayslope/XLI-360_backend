@@ -533,13 +533,13 @@ import re
 # from .serializers import CaseSerializer
 
 import logging
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 class CaseListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # logger.debug(f"Request headers: {request.headers}")
+        logger.debug(f"Request headers: {request.headers}")
         try:
             # Extract filter params
             case_name = request.data.get("case_name", "")
@@ -547,7 +547,6 @@ class CaseListView(APIView):
             params_offset = int(request.data.get("offset", 0))
             params_limit = int(request.data.get("limit", 10))
 
-            # Initial queryset
             queryset = Case.objects.all()
 
             # Apply filters
@@ -562,102 +561,94 @@ class CaseListView(APIView):
                         Q(case_name__icontains=search_term) | Q(case_no__icontains=search_term)
                     )
 
-            # Pagination: offset here means page number, so convert to row offset
             offset = params_offset * params_limit
             total_count = queryset.count()
             limited_queryset = list(queryset[offset:offset + params_limit])
 
-            # Early exit if no results
             if not limited_queryset:
-                return Response({
-                    "data": [],
-                    "total_count": total_count
-                })
+                return Response({"data": [], "total_count": total_count})
 
-            # Limit candidate set for similar cases (exclude current limited cases)
             limited_case_ids = [case.id for case in limited_queryset]
-            candidates = list(
-                Case.objects.exclude(id__in=limited_case_ids)
-                .prefetch_related('patents')
-                .order_by('-id')[:100]  # Limit to 100 recent cases
-            )
-            candidate_ids = [c.id for c in candidates]
 
-            # Bulk fetch CaseDetails for limited cases and candidates
-            details_map = {
-                detail.case_id: detail
-                for detail in CaseDetails.objects.filter(case_id__in=limited_case_ids + candidate_ids)
+            # Fetch CaseDetails in bulk
+            all_case_ids = limited_case_ids
+            candidate_queryset = (
+                Case.objects.exclude(id__in=limited_case_ids)
+                .prefetch_related("patents")
+                .order_by("-id")[:100]
+            )
+            candidates = list(candidate_queryset)
+            all_case_ids += [c.id for c in candidates]
+
+            case_details_map = {
+                d.case_id: d for d in CaseDetails.objects.filter(case_id__in=all_case_ids)
             }
 
-            # Precompute patent tech categories for all cases (limited + candidates)
-            tech_categories_map = {}
-            all_cases = limited_queryset + candidates
-            for case in all_cases:
-                tech_categories = set(case.patents.exclude(
+            # Pre-fetch patents with tech_category for all relevant cases
+            patents = (
+                Case.objects.filter(id__in=all_case_ids)
+                .prefetch_related("patents")
+            )
+
+            tech_map = {}
+            for case in patents:
+                tech_set = set(case.patents.exclude(
                     Q(tech_category__isnull=True) |
                     Q(tech_category__exact='') |
                     Q(tech_category__iexact='not found')
                 ).values_list('tech_category', flat=True))
-                tech_categories_map[case.id] = tech_categories
+                tech_map[case.id] = tech_set
 
             response_data = []
 
-            # Now process each limited case for similar cases
             for case in limited_queryset:
                 current_data = CaseSerializer(case).data
-                case_details = details_map.get(case.id)
+                case_detail = case_details_map.get(case.id)
 
-                if not case_details:
+                if not case_detail:
                     current_data["similar_cases"] = []
                     response_data.append(current_data)
                     continue
 
-                plaintiff = case_details.plaintiff.strip() if case_details.plaintiff else ""
-                defendant = case_details.defendant.strip() if case_details.defendant else ""
-                judge = case_details.judge.strip() if case_details.judge else ""
-                case_tech_cats = tech_categories_map.get(case.id, set())
+                plaintiff = (case_detail.plaintiff or "").strip()
+                defendant = (case_detail.defendant or "").strip()
+                judge = (case_detail.judge or "").strip()
+                case_tech = tech_map.get(case.id, set())
 
                 similar_cases = []
 
                 for other in candidates:
-                    other_details = details_map.get(other.id)
-                    if not other_details:
+                    other_detail = case_details_map.get(other.id)
+                    if not other_detail:
                         continue
 
                     score = 0
-                    match_reasons = []
+                    reasons = []
 
-                    other_plaintiff = other_details.plaintiff.strip() if other_details.plaintiff else ""
-                    other_defendant = other_details.defendant.strip() if other_details.defendant else ""
-                    other_judge = other_details.judge.strip() if other_details.judge else ""
-                    other_tech_cats = tech_categories_map.get(other.id, set())
-
-                    if plaintiff and other_plaintiff == plaintiff:
+                    if plaintiff and (other_detail.plaintiff or "").strip() == plaintiff:
                         score += 3
-                        match_reasons.append("plaintiff")
+                        reasons.append("plaintiff")
 
-                    if defendant and other_defendant == defendant:
+                    if defendant and (other_detail.defendant or "").strip() == defendant:
                         score += 3
-                        match_reasons.append("defendant")
+                        reasons.append("defendant")
 
-                    if judge and other_judge == judge:
+                    if judge and (other_detail.judge or "").strip() == judge:
                         score += 2
-                        match_reasons.append("judge")
+                        reasons.append("judge")
 
-                    if case_tech_cats.intersection(other_tech_cats):
+                    if case_tech & tech_map.get(other.id, set()):
                         score += 1
-                        match_reasons.append("tech_category")
+                        reasons.append("tech_category")
 
                     if score > 0:
                         similar_cases.append({
                             "case_no": other.case_no,
-                            "match_reasons": match_reasons,
+                            "match_reasons": reasons,
                             "score": score
                         })
 
-                # Sort and limit top 5
-                similar_cases = sorted(similar_cases, key=lambda x: -x["score"])[:5]
-                current_data["similar_cases"] = similar_cases
+                current_data["similar_cases"] = sorted(similar_cases, key=lambda x: -x["score"])[:5]
                 response_data.append(current_data)
 
             return Response({
@@ -666,11 +657,12 @@ class CaseListView(APIView):
             })
 
         except Exception as e:
-            logger.error(f"Error in CaseListView: {str(e)}")
-            return Response({
-                'error': f'Error processing request: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            import traceback
+            logger.error(f"Error in CaseListView: {traceback.format_exc()}")
+            return Response(
+                {'error': f'Internal Server Error: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class FilterDataView(APIView):
@@ -696,7 +688,7 @@ class FilterDataView(APIView):
                 if venue:  # Skip blank or None values
                     # Split by comma if multiple venues are stored in a single field
                     unique_venues.update([v.strip() for v in venue.split(",")])
-             
+
             
             unique_court_names = Case.objects.values_list('court_name', flat=True).distinct()
             unique_patent_types = Case.objects.filter(patents__isnull=False).values_list('patents__patent_type', flat=True).distinct()

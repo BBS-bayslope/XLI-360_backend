@@ -39,8 +39,8 @@ import {Router} from '@angular/router';
   providedIn: 'root',
 })
 export class ApiService {
-  // private baseUrl = 'http://18.220.232.127'; // Base API URL
-  private baseUrl ="http://127.0.0.1:8000"
+  private baseUrl = 'http://18.220.232.127'; // Base API URL
+  // private baseUrl ="http://127.0.0.1:8000"
   private tokenKey: string = "access"; // Key to store token in localStorage
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
