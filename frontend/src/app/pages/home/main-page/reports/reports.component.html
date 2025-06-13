@@ -1,0 +1,28 @@
+<div class="reports-container">
+    <h2>PDF Reports</h2>
+  
+    <!-- PDF Viewer Section -->
+    <div class="pdf-viewer" *ngIf="showPdf">
+      <button class="close-btn" (click)="closePdf()">Close PDF</button>
+      <div *ngIf="selectedPdfUrl">
+        <iframe [src]="selectedPdfUrl" width="100%" height="600px" frameborder="0"></iframe>
+      </div>
+    </div>
+  
+    <!-- PDF List Section -->
+    <div class="pdf-list" *ngIf="reports.length; else noReports">
+      <div class="pdf-item" *ngFor="let report of reports">
+        <img src="pdf.png" alt="PDF Icon" class="pdf-icon" />
+        <div class="pdf-details">
+          <button class="year-btn">{{ report.year }}</button>
+          <div class="actions">
+            <button class="view-btn" (click)="viewFile(report.id)">View</button>
+            <button class="download-btn" (click)="downloadFile(report.id)">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template #noReports>
+      <p class="no-reports">No reports available.</p>
+    </ng-template>
+  </div>

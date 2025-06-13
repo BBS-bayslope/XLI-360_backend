@@ -918,9 +918,24 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     scales: {
       x: {
         beginAtZero: true, // Ensures the y-axis starts at 0
+        ticks: {
+          color: '#000', // Dark color for X-axis labels
+          font: {
+            weight: 'bold', // Bold font
+            size: 14,       // Optional: control font size
+          },
+        },
       },
       y: {
         beginAtZero: true,
+        ticks:{
+          color: '#000',
+          font:{
+weight:'bold',
+size:14,
+
+          }
+        }
       },
     },
     plugins: {
@@ -953,9 +968,24 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     scales: {
       x: {
         beginAtZero: true, // Ensures the y-axis starts at 0
+        ticks: {
+          color: '#000', // Black color for x-axis labels
+          font: {
+            weight: 'bold', // Bold font for x-axis labels
+            size: 14, // Font size
+          },
+        },
+
       },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: '#000', // Black color for x-axis labels
+          font: {
+            weight: 'bold', // Bold font for x-axis labels
+            size: 14, // Font size
+          },
+        },
       },
     },
     plugins: {
@@ -988,9 +1018,23 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     scales: {
       x: {
         beginAtZero: true, // Ensures the y-axis starts at 0
+        ticks: {
+          color: '#000', // Dark color for X-axis labels
+          font: {
+            weight: 'bold', // Bold font
+            size: 14,       // Optional: control font size
+          },
+        },
       },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: '#000', // Dark color for X-axis labels
+          font: {
+            weight: 'bold', // Bold font
+            size: 14,       // Optional: control font size
+          },
+        },
       },
     },
     plugins: {
@@ -1023,9 +1067,23 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     scales: {
       x: {
         beginAtZero: true, // Ensures the y-axis starts at 0
+        ticks: {
+          color: '#000', // Black color for x-axis labels
+          font: {
+            weight: 'bold', // Bold font for x-axis labels
+            size: 14, // Font size
+          },
+        },
       },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: '#000', // Black color for x-axis labels
+          font: {
+            weight: 'bold', // Bold font for x-axis labels
+            size: 14, // Font size
+          },
+        },
       },
     },
     plugins: {
@@ -1058,9 +1116,24 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     scales: {
       x: {
         beginAtZero: true, // Ensures the y-axis starts at 0
+        ticks: {
+          color: '#000', // Black color for x-axis labels
+          font: {
+            weight: 'bold', // Bold font for x-axis labels
+            size: 14, // Font size
+          },
+        },
+        
       },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: '#000', // Black color for x-axis labels
+          font: {
+            weight: 'bold', // Bold font for x-axis labels
+            size: 14, // Font size
+          },
+        },
       },
     },
     plugins: {
@@ -1428,9 +1501,23 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     scales: {
       x: {
         beginAtZero: true, // Ensures the y-axis starts at 0
+        ticks: {
+          color: '#000', // Dark color for X-axis labels
+          font: {
+            weight: 'bold', // Bold font
+            size: 14,       // Optional: control font size
+          },
+        },
       },
       y: {
         beginAtZero: true,
+        ticks: {
+          color: '#000', // Dark color for X-axis labels
+          font: {
+            weight: 'bold', // Bold font
+            size: 14,       // Optional: control font size
+          },
+        },
       },
     },
     plugins: {

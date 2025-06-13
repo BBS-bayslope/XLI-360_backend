@@ -91,4 +91,14 @@ export class HeaderComponent implements OnInit {
       );
     });
   }
+
+  goToBuyer() {
+    window.location.href =
+      'http://ec2-3-144-99-241.us-east-2.compute.amazonaws.com/buyer';
+  }
+  goToSell(){
+    window.location.href =
+      'http://ec2-3-144-99-241.us-east-2.compute.amazonaws.com/user-seller-data';
+
+  }
 }

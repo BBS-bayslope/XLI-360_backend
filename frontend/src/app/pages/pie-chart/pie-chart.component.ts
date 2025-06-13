@@ -46,12 +46,24 @@ export class PieChartComponent implements OnChanges {
         label: {
           type: 'spider',
           labelHeight: 20,
-          content: (data) => `${(data as ChartData).region}: ${(data as ChartData).qty}`,
+          content: (data) =>
+            `${(data as ChartData).region}: ${(data as ChartData).qty}`,
+          style: {
+            fontWeight: 'bold', // Make the label text bold
+            fill: '#000000', // Set the label text color to black
+          },
         },
         interactions: [{ type: 'element-active' }],
         legend: {
           layout: 'horizontal',
           position: 'bottom',
+          itemName: {
+            style: {
+              fontWeight: 'bold',
+              fill: '#000000',
+              fontSize: 12,
+            },
+          },
         },
       });
 

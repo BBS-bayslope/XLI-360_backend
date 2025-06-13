@@ -11,3 +11,33 @@ body {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.dark-mode {
+  background-color: grey !important;
+  color: #ffffff !important;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+
+
+::ng-deep .mat-drawer-inner-container {
+  width: 100% !important;
+  height: 65% !important;
+  background: var(--content-bg); /* Optional */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* Add transition */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect: lift slightly */
+::ng-deep .mat-drawer-inner-container:hover {
+  transform: translateY(-4px); /* Lift up */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+}

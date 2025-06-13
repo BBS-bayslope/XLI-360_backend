@@ -8,6 +8,7 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
+import { DarkModeService } from 'angular-dark-mode';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -43,11 +44,13 @@ import {
 import { debounce } from 'lodash';
 // CaseNameHighlightPipe
 import { MatTooltipModule } from '@angular/material/tooltip';
+// import { DarkModeService } from 'angular-dark-mode';
 // import { MatTableModule } from '@angular/material/table';
 
 
 import {
   // CaseNameHighlightPipe,
+  // DarkModeService,
   collection,
   DocumentData,
   Firestore,
@@ -70,11 +73,15 @@ import { Subscription } from 'rxjs/internal/Subscription';
 
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { CaseNameHighlightPipe } from '../../../case-name-highlight.pipe';
+import { ReportsComponent } from './reports/reports.component';
 
 @Component({
   selector: 'app-main-page',
   standalone: true,
   imports: [
+    // AngularDarkModeModule,
+    ReportsComponent,
+    MatIconModule,
     MatTooltipModule,
     CaseNameHighlightPipe,
     MatTableModule,
@@ -123,6 +130,12 @@ import { CaseNameHighlightPipe } from '../../../case-name-highlight.pipe';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
+  getRange(length: number): number[] {
+    return Array(Math.ceil(length / 2))
+      .fill(0)
+      .map((_, i) => i);
+  }
+
   splitCaseName(name: string): { before: string; v: string; after: string } {
     const regex = /\s(v\.?|vs\.?)\s/i; // Matches "v", "v.", "vs", "vs." (case-insensitive)
     const parts = name.split(regex);
@@ -141,7 +154,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
 
   tabIndex: number = 0; // Default to the first tab
-  years = ['', '2023', '2024', '2025']; // '' = All
+  years = ['2025', '2024', '2023','']; // '' = All
   selectedYear = '';
   displayedColumns: string[] = [
     'srNo',
@@ -200,9 +213,20 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   currentPage: number = 1;
   loader: boolean = false;
   winningPercentage: any = 50;
-  constructor(private cdr: ChangeDetectorRef, private firestore: Firestore) {}
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private firestore: Firestore,
+    public darkModeService: DarkModeService
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.darkModeService.darkMode$.subscribe((isDarkMode) => {
+      if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+      } else {
+        document.body.classList.remove('dark-mode');
+      }
+    });
     // this.isLoading = true;
     this.fetchData();
     this.fetchFilterData();
@@ -283,6 +307,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error('Error fetching data', error);
       }
     );
+  }
+  toggleDarkMode() {
+    console.log('Toggling dark mode...');
+    this.darkModeService.toggle();
+    // Manual workaround
+    this.darkModeService.darkMode$.subscribe((isDarkMode) => {
+      document.body.classList.toggle('dark-mode', isDarkMode);
+    });
   }
   selectYear(year: string): void {
     this.selectedYear = year;
@@ -2607,8 +2639,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // Optionally reset the data source to show all data again
     this.dataSource.data = this.excelData; // Show all data if that's the desired behavior
   }
-
-  
 }
 
 function levenshteinDistance(a: string, b: string): number {
@@ -2642,6 +2672,3 @@ function calculateSimilarity(a: string, b: string): number {
   const maxLength = Math.max(a.length, b.length);
   return ((maxLength - distance) / maxLength) * 100; // Similarity in percentage
 }
-
-
-

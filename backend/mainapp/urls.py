@@ -4,7 +4,13 @@ from .views.uploadview import FileUploadView, FileUploadViewNew
 from .views.analytics import CaseStatisticsView, PlaintiffTypeCountView, IndustryStats, CaseEntityListing
 from .views.userView import RegisterView, LoginView, GoogleLoginView
 from rest_framework_simplejwt.views import TokenRefreshView
+from mainapp.views.views import ReportListView,ViewReportView
 
+from django.conf import settings
+from django.conf.urls.static import static
+
+
+from mainapp.views.views import ReportListView, ViewReportView
 urlpatterns = [
     path('upload/', FileUploadView.as_view(), name='api-upload-file'),
     path('validate-data/', ValidateRawDataAPIView.as_view(), name='validate-data'),
@@ -20,4 +26,9 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('google-login/', GoogleLoginView.as_view(), name='google-login'),
+
+
+
+    path('reports/', ReportListView.as_view(), name='report-list'),
+    path('view/<int:report_id>/', ViewReportView.as_view(), name='view-report'),
 ]

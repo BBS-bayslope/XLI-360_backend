@@ -1,11 +1,14 @@
-<header>
+  <header >
   <div
     style="
       display: flex;
       flex-direction: row;
       justify-content: space-between;
       padding: 10px 10px;
-      background-color: #f7f7f7;
+      background-color: black;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      
     "
   >
     <div
@@ -47,16 +50,17 @@
       >
         Subscribe
       </button>
+      <!-- [routerLink]="user ? '/account-settings' : 'login'" -->
       <button
-        [routerLink]="user ? '/account-settings' : 'login'"
+        
         mat-icon-button
         class="hover-icon"
       >
         <mat-icon>account_circle</mat-icon>
       </button>
-      <button mat-icon-button class="hover-icon">
+      <!-- <button mat-icon-button class="hover-icon">
         <mat-icon>headphones</mat-icon>
-      </button>
+      </button> -->
       <button routerLink="/" mat-icon-button class="hover-icon">
         <mat-icon>home</mat-icon>
       </button>
@@ -64,19 +68,25 @@
         [cdkMenuTriggerFor]="menu"
         class="example-standalone-trigger"
         mat-stroked-button
+        style="color: white;
+    font-weight: bolder;"
       >
         Buy / Sell Patents
       </button>
       <ng-template #menu>
         <div class="example-menu" cdkMenu>
           <button
-            mat-raised-button
-            style="margin-bottom: 5px; background-color: #0cd138; color: white"
-            cdkMenuItem
-          >
-            Buy Patents
-          </button>
-          <button mat-raised-button color="primary" cdkMenuItem>
+          mat-raised-button
+          style="margin-bottom: 5px; background-color: #0cd138; color: white"
+          cdkMenuItem
+          (click)="goToBuyer()"
+        >
+          Buy Patents
+        </button>
+        
+        
+          <button mat-raised-button color="primary" cdkMenuItem
+          (click)="goToSell()">
             Sell Patents
           </button>
         </div>

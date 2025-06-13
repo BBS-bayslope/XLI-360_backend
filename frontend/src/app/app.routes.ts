@@ -12,6 +12,7 @@ import { SubscriptionsComponent } from './pages/subscriptions/subscriptions.comp
 import { AccountSettingsComponent } from './pages/account-settings/account-settings.component';
 import { MainPageComponent } from './pages/home/main-page/main-page.component';
 import { CaseListComponent } from './pages/home/main-page/case-list/case-list.component';
+import { ReportsComponent } from './pages/home/main-page/reports/reports.component';
 
 export const routes: Routes = [
   { path: 'adminds', component: AdminDashboardComponent },
@@ -35,6 +36,10 @@ export const routes: Routes = [
     path: 'account-settings',
     component: AccountSettingsComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: 'app-reports',
+    component: ReportsComponent,
   },
   // {path:'caseDetails/:docId', component:CaseListComponent},
   // {path:'',redirectTo:'main-page', pathMatch:'full'},

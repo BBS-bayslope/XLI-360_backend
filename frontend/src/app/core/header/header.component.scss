@@ -1,48 +1,249 @@
-/* Default color */
-.hover-icon mat-icon {
-  transition: color 0.2s ease; /* Smooth transition for color */
+// /* Default color */
+// .hover-icon mat-icon {
+//   transition: color 0.2s ease; /* Smooth transition for color */
+// }
+// .hover-icon{
+//   color: whitesmoke;
+// }
+
+// /* Hover color */
+// .hover-icon:hover mat-icon {
+//   color: blue; /* Change to your desired hover color */
+// }
+
+// .example-menu {
+//   display: inline-flex;
+//   flex-direction: column;
+//   min-width: 180px;
+//   max-width: 280px;
+//   background-color: transparent;
+//   padding: 6px 0;
+// }
+
+// .example-menu-item,
+// .example-standalone-trigger {
+//   background-color: transparent;
+//   cursor: pointer;
+//   border: none;
+
+//   user-select: none;
+//   min-width: 64px;
+//   line-height: 36px;
+//   padding: 0 16px;
+//   color: white;
+// }
+
+// .example-menu-item:hover {
+//   background-color: rgb(208, 208, 208);
+// }
+
+// .example-menu-item:active {
+//   background-color: rgb(170, 170, 170);
+// }
+
+// .example-standalone-item {
+//   background-color: rgb(239, 239, 239);
+// }
+// .example-standalone-item:hover {
+//   background-color: rgb(208, 208, 208);
+// }
+// .example-standalone-item[aria-expanded="true"] {
+//   background-color: rgb(208, 208, 208);
+// }
+
+
+
+
+/* Header container styling with a deep navy blue gradient */
+header {
+  background: linear-gradient(90deg, black 0%, black 100%); /* Deep navy blue gradient */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow for a premium look */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 10px 20px;
 }
 
-/* Hover color */
-.hover-icon:hover mat-icon {
-  color: blue; /* Change to your desired hover color */
+/* Logo section styling */
+header div[routerLink] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05); /* Subtle zoom effect on hover */
+  }
+
+  img {
+    height: 60px;
+    width: auto;
+    filter: brightness(1.2); /* Slightly brighter for visibility */
+  }
 }
 
+/* Navigation section styling */
+header div[style*="flex-direction: row-reverse"] {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Subscribe button styling with gold gradient */
+button[mat-raised-button][routerLink="subscriptions"] {
+  background: linear-gradient(90deg, #D4AF37, #B8972E); /* Gold gradient */
+  color: #1A3C6D; /* Deep navy blue text */
+  font-family: "Roboto", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 20px;
+  margin-left: 10px;
+  border-radius: 6px;
+  border: none;
+  transition: transform 0.3s ease, background 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #B8972E, #D4AF37); /* Reverse gradient on hover */
+    transform: translateY(-2px); /* Subtle lift effect */
+    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98); /* Slight press effect */
+  }
+}
+
+/* Icon buttons styling */
+button[mat-icon-button].hover-icon {
+  color: #E6F0FA; /* Light blue default */
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+button[mat-icon-button].hover-icon mat-icon {
+  transition: color 0.3s ease, transform 0.3s ease;
+  color: #E6F0FA; /* Light blue default */
+}
+
+button[mat-icon-button].hover-icon:hover {
+  color: #D4AF37; /* Gold on hover */
+  transform: scale(1.1); /* Subtle zoom effect */
+}
+
+button[mat-icon-button].hover-icon:hover mat-icon {
+  color: #D4AF37; /* Gold on hover */
+  transform: scale(1.1);
+}
+
+/* Buy/Sell Patents button styling */
+button.example-standalone-trigger {
+  background-color: transparent;
+  border: 1px solid #D4AF37; /* Gold border */
+  color: #E6F0FA; /* Light blue text */
+  font-family: "Roboto", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background-color: #D4AF37; /* Gold background on hover */
+    color: #1A3C6D; /* Deep navy blue text */
+    transform: translateY(-2px);
+  }
+}
+
+/* Menu styling */
 .example-menu {
   display: inline-flex;
   flex-direction: column;
   min-width: 180px;
   max-width: 280px;
-  background-color: transparent;
-  padding: 6px 0;
+  background-color: #1A3C6D; /* Deep navy blue background */
+  padding: 8px 0;
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow */
 }
 
-.example-menu-item,
-.example-standalone-trigger {
+/* Menu items styling */
+.example-menu-item {
   background-color: transparent;
   cursor: pointer;
   border: none;
-
   user-select: none;
   min-width: 64px;
   line-height: 36px;
   padding: 0 16px;
+  color: #E6F0FA; /* Light blue text */
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background-color: #D4AF37; /* Gold background on hover */
+    color: #1A3C6D; /* Deep navy blue text */
+    transform: translateX(5px); /* Subtle slide effect */
+  }
+
+  &:active {
+    background-color: #B8972E; /* Slightly darker gold */
+    transform: scale(0.98); /* Slight press effect */
+  }
 }
 
-.example-menu-item:hover {
-  background-color: rgb(208, 208, 208);
+/* Buy Patents button in menu */
+button[cdkMenuItem][style*="background-color: #0cd138"] {
+  background: linear-gradient(90deg, #D4AF37, #B8972E); /* Gold gradient */
+  color: #1A3C6D; /* Deep navy blue text */
+  margin-bottom: 5px;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+  }
 }
 
-.example-menu-item:active {
-  background-color: rgb(170, 170, 170);
+/* Sell Patents button in menu */
+button[cdkMenuItem][color="primary"] {
+  background: linear-gradient(90deg, #1A3C6D, #2A4B8A); /* Deep navy blue gradient */
+  color: #E6F0FA; /* Light blue text */
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #D4AF37, #B8972E); /* Gold gradient on hover */
+    color: #1A3C6D;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+  }
 }
 
+/* Standalone item (if used elsewhere) */
 .example-standalone-item {
-  background-color: rgb(239, 239, 239);
-}
-.example-standalone-item:hover {
-  background-color: rgb(208, 208, 208);
-}
-.example-standalone-item[aria-expanded="true"] {
-  background-color: rgb(208, 208, 208);
+  background-color: #E6F0FA; /* Light blue background */
+  border-radius: 4px;
+  margin: 2px 8px;
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1A3C6D; /* Deep navy blue text */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background-color: #D4AF37; /* Gold background on hover */
+    color: #1A3C6D;
+    transform: translateY(-2px);
+  }
+
+  &[aria-expanded="true"] {
+    background-color: #D4AF37; /* Gold when expanded */
+    color: #1A3C6D;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  }
 }

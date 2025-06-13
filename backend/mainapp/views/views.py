@@ -1,5 +1,8 @@
 from django.shortcuts import render
 # Create your views here.
+
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.utils.decorators import method_decorator
 import pandas as pd
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,6 +20,10 @@ from ..serializers import CaseSerializer
 from django.db.models.functions import Upper, Lower
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import json
+
+from mainapp.models import Report
+from mainapp.serializers import ReportSerializer
+from django.http import FileResponse
 
 def MainPage(request):
     return render(request,'index.html') 
@@ -889,3 +896,56 @@ class FilterDataView(APIView):
 
 #         except Exception as e:
 #             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class ReportListView(APIView):
+    def get(self, request):
+        reports = Report.objects.all()
+        serializer = ReportSerializer(reports, many=True, context={'request': request})
+        return Response(serializer.data)
+
+# @method_decorator(xframe_options_exempt, name='dispatch')
+# class ViewReportView(APIView):
+#     permission_classes = [AllowAny]
+#     def get(self, request, report_id):
+#         try:
+#             report = Report.objects.get(id=report_id)
+#             return FileResponse(report.file, content_type='application/pdf', as_attachment=False)
+#         except Report.DoesNotExist:
+#             return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+# from django.http import FileResponse, Http404
+# from rest_framework.response import Response
+# from rest_framework import status
+# from .models import Report
+# from django.utils.decorators import method_decorator
+# from django.views.decorators.clickjacking import xframe_options_exempt
+# from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+import os
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+class ViewReportView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, report_id):
+        try:
+            report = Report.objects.get(id=report_id)
+
+            # Determine if this is a download request
+            download = request.GET.get('download', 'false').lower() == 'true'
+
+            file_path = report.file.path
+            if not os.path.exists(file_path):
+                raise Http404("File not found on disk.")
+
+            response = FileResponse(open(file_path, 'rb'), content_type='application/pdf', as_attachment=download)
+            if download:
+                response['Content-Disposition'] = f'attachment; filename="report_{report_id}.pdf"'
+            return response
+
+        except Report.DoesNotExist:
+            return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
