@@ -112,8 +112,8 @@ export class AuthService {
       this.userSubject.next(user);
     });
   }
-  private baseUrl = 'http://18.220.232.127'; // Base API URL
-  // private baseUrl = 'http://127.0.0.1:8000';
+  // private baseUrl = 'http://18.220.232.127'; // Base API URL
+  private baseUrl = 'http://127.0.0.1:8000';
   // Get the current user as an Observable
   getUserState(): Observable<User | null> {
     return this.userSubject.asObservable();
