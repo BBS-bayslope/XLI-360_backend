@@ -1,0 +1,16 @@
+
+<div class="admin-upload-container">
+    <h2>Admin Upload</h2>
+    <div class="upload-form">
+      <div class="form-group">
+        <label for="fileInput">Select PDF File:</label>
+        <input type="file" id="fileInput" accept="application/pdf" (change)="onFileSelected($event)">
+      </div>
+      <div class="form-group">
+        <label for="yearInput">Year:</label>
+        <input type="text" id="yearInput" [(ngModel)]="year" placeholder="e.g., 2024" maxlength="4">
+  </div>
+      <button class="upload-btn" (click)="uploadReport()">Upload Report</button>
+    </div>
+    <p *ngIf="uploadMessage" class="upload-message">{{ uploadMessage }}</p>
+  </div>

@@ -1,5 +1,7 @@
 from django.shortcuts import render
 # Create your views here.
+# from mainapp.views.models import Report
+from mainapp.models import Report
 
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.utils.decorators import method_decorator
@@ -24,6 +26,10 @@ import json
 from mainapp.models import Report
 from mainapp.serializers import ReportSerializer
 from django.http import FileResponse
+
+# from mainapp.views.views import upload_report_view 
+
+
 
 def MainPage(request):
     return render(request,'index.html') 
@@ -152,6 +158,8 @@ class FileUploadView(APIView):
                 return Response({'error': f'Error processing file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class ValidateRawDataAPIView(APIView):
     def get(self, request):
@@ -949,3 +957,22 @@ class ViewReportView(APIView):
 
         except Report.DoesNotExist:
             return Response({'error': 'Report not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+from django.shortcuts import render
+# from .models import Report
+
+
+def upload_report_view(request):
+    context = {}
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        year = request.POST.get('year')
+
+        if file and year:
+            Report.objects.create(file=file, year=year)
+            context['message'] = "Report uploaded successfully!"
+        else:
+            context['error'] = "Both file and year are required."
+
+    return render(request, 'uploadpdf.html', context)

@@ -8,7 +8,8 @@ from mainapp.views.views import ReportListView,ViewReportView
 
 from django.conf import settings
 from django.conf.urls.static import static
-
+# from .views import upload_report_view
+from mainapp.views.views import upload_report_view
 
 from mainapp.views.views import ReportListView, ViewReportView
 urlpatterns = [
@@ -28,7 +29,13 @@ urlpatterns = [
     path('google-login/', GoogleLoginView.as_view(), name='google-login'),
 
 
-
     path('reports/', ReportListView.as_view(), name='report-list'),
     path('view/<int:report_id>/', ViewReportView.as_view(), name='view-report'),
+
+    # from django.urls import path
+    
+
+# urlpatterns = [
+    path('upload-ui/', upload_report_view, name='upload_ui'),
+# ]
 ]

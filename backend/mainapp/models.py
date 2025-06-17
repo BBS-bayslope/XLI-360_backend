@@ -95,7 +95,7 @@ class RawData(models.Model):
     chances_of_winning=models.TextField(blank=True,null=True)
     is_valid=models.BooleanField(default=True,blank=True,null=True)
     is_processed=models.BooleanField(default=False,blank=True,null=True)
-
+    is_synced = models.BooleanField(default=False)
     def __str__(self):
         return self.case_no
     
@@ -164,7 +164,6 @@ class Patent(models.Model):
     def __str__(self):
         return self.patent_no
 
-
 class CasePatent(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     patent = models.ForeignKey(Patent, on_delete=models.CASCADE)
@@ -174,7 +173,7 @@ class CasePatent(models.Model):
         unique_together = ('case', 'patent')  # Prevents duplicates
     def __str__(self):
         return f"Case {self.case.case_no} - Patent {self.patent.patent_no}"
-  
+
 class PlaintiffDetails(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE)
     plaintiff = models.TextField(blank=True, null=True)
@@ -196,7 +195,6 @@ class DefendantDetails(models.Model):
 
     def __str__(self):
         return f"Case {self.case.case_no}: {self.defendant_law_firm}"
-
 
 class Report(models.Model):
     file = models.FileField(upload_to='reports/')

@@ -13,6 +13,7 @@ import { AccountSettingsComponent } from './pages/account-settings/account-setti
 import { MainPageComponent } from './pages/home/main-page/main-page.component';
 import { CaseListComponent } from './pages/home/main-page/case-list/case-list.component';
 import { ReportsComponent } from './pages/home/main-page/reports/reports.component';
+import { AdminUploadComponent } from './pages/admin-upload/admin-upload.component';
 
 export const routes: Routes = [
   { path: 'adminds', component: AdminDashboardComponent },
@@ -47,4 +48,5 @@ export const routes: Routes = [
   // { path: '', redirectTo: 'main-page', pathMatch: 'full' },
   // { path: '', redirectTo: 'login', pathMatch: 'full' },
   // {path:'',redirectTo:'login'}
+  { path: 'admin-upload', component: AdminUploadComponent },
 ];
