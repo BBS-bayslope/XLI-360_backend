@@ -114,6 +114,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myapp.wsgi.application'
 
+# DEBUG = True
+# ALLOWED_HOSTS = ['*']  # temporarily allow all for debugging
+
+
 # Database
 DATABASES = {
     'default': {

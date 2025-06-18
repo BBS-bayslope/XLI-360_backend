@@ -313,7 +313,7 @@
       <!-- Court Name -->
       <mat-expansion-panel #courtnamePanel="matExpansionPanel">
         <mat-expansion-panel-header>
-          <mat-panel-title class="carde"  [ngClass]="{ 'active-title': courtnamePanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Court Name </mat-panel-title>
+          <mat-panel-title class="wrap-text2"  [ngClass]="{ 'active-title': courtnamePanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Court Name </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
           <mat-label>Search</mat-label>
@@ -643,7 +643,7 @@
           class="mat-elevation-z8"
           style="
             display: block;
-            height: 238px;
+            height: 40.44vh;
             overflow-y: auto;
             overflow-x:scroll;
             margin: 0;
@@ -691,14 +691,16 @@
           <!-- Status Column -->
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef class="sticky-header">Status</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
+            <td mat-cell 
+            *matCellDef="let element" 
+            class="no-wrap">
               {{ element.case_status || "NA" }}
             </td>
           </ng-container>
           <!-- Court Column -->
           <ng-container matColumnDef="court_name">
-            <th mat-header-cell *matHeaderCellDef class="sticky-header">Court Name</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
+            <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Court Name</th>
+            <td mat-cell *matCellDef="let element" class="wrap-text2">
               {{ element.court_name || "NA" }}
             </td>
           </ng-container>
