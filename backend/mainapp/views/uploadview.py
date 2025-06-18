@@ -789,7 +789,9 @@ class FileUploadViewNew(APIView):
             workbook = openpyxl.load_workbook(file_content, read_only=True)
             sheet_name = workbook.sheetnames[0]
             sheet = workbook[sheet_name]
-            row_count = sum(1 for _ in sheet.iter_rows(min_row=2))
+            # row_count = sum(1 for _ in sheet.iter_rows(min_row=2))
+            row_count = sheet.max_row - 1
+            print("Total data rows:", row_count)
 
             def read_sheet_in_chunks(sheet_name, chunksize):
                 sheet = workbook[sheet_name]
