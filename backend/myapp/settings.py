@@ -71,6 +71,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4200",
     "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com",
     "http://ec2-18-220-232-127.us-east-2.compute.amazonaws.com",
+    "http://18.220.232.127", 
+
 ]
 
 CORS_ALLOW_HEADERS = [

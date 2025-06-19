@@ -35,13 +35,21 @@ import {
 } from '@angular/fire/firestore';
 import { user, User } from '@angular/fire/auth';
 import {Router} from '@angular/router';
+
+// Define Report interface (same as in reports.component.ts)
+interface Report {
+  id: number;
+  file_url: string;
+  year: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = 'http://18.220.232.127'; // Base API URL
-  // private baseUrl ="http://127.0.0.1:8000"
-  private tokenKey: string = "access"; // Key to store token in localStorage
+  // private baseUrl = 'http://18.220.232.127'; // Base API URL
+  private baseUrl = 'http://127.0.0.1:8000';
+  private tokenKey: string = 'access'; // Key to store token in localStorage
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
   selectedCaseDocId: any;
@@ -51,10 +59,17 @@ export class ApiService {
 
   private firestore = inject(Firestore);
 
-  constructor(private http: HttpClient,
-    public router: Router,
-  ) {}
-  
+  constructor(private http: HttpClient, public router: Router) {}
+
+  // Get Authorization headers with JWT token
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem(this.tokenKey);
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+  }
+
   // Remove token on logout
   logout(): void {
     localStorage.removeItem(this.tokenKey);
@@ -73,14 +88,14 @@ export class ApiService {
   refreshToken(): Observable<string> {
     const endpoint = `${this.baseUrl}/api/token/refresh/`;
     const refreshToken = localStorage.getItem('refresh');
-  
+
     if (!refreshToken) {
       this.logout();
       return throwError(() => new Error('No refresh token available'));
     }
-  
+
     return this.http.post<any>(endpoint, { refresh: refreshToken }).pipe(
-      switchMap(response => {
+      switchMap((response) => {
         if (response && response.access) {
           localStorage.setItem('access', response.access);
           localStorage.setItem('refresh', response.refresh);
@@ -90,26 +105,25 @@ export class ApiService {
           return throwError(() => new Error('Invalid refresh response'));
         }
       }),
-      catchError(err => {
+      catchError((err) => {
         this.logout();
         return throwError(() => err);
       })
     );
   }
-  
+
   // Login function
-  login(payload:object): Observable<any> {
+  login(payload: object): Observable<any> {
     const endpoint = `${this.baseUrl}/api/login/`;
     return this.http.post<any>(endpoint, payload).pipe(
-      tap(response => {
+      tap((response) => {
         if (response && response.access) {
           localStorage.setItem(this.tokenKey, response.access);
-          localStorage.setItem("refresh", response.refresh);
-          console.log(response.access)
+          localStorage.setItem('refresh', response.refresh);
+          console.log(response.access);
         } else {
           console.error('Invalid login response', response);
         }
-        
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Login failed', error);
@@ -119,7 +133,7 @@ export class ApiService {
   }
 
   // Register function
-  register(payload:object): Observable<any> {
+  register(payload: object): Observable<any> {
     const endpoint = `${this.baseUrl}/api/register/`;
     return this.http.post<any>(endpoint, payload).pipe(
       tap(() => this.router.navigate(['/login'])),
@@ -132,7 +146,7 @@ export class ApiService {
 
   getTableData(payload: object): Observable<any> {
     const endpoint = `${this.baseUrl}/api/case-list/`;
-    return this.http.post<any>(endpoint,  payload );
+    return this.http.post<any>(endpoint, payload);
   }
   getFilterData(): Observable<any> {
     const endpoint = `${this.baseUrl}/api/filter-data/`;
@@ -140,7 +154,7 @@ export class ApiService {
   }
   getDetails(payload: object): Observable<any> {
     const endpoint = `${this.baseUrl}/api/case-details/`;
-    return this.http.post<any>(endpoint,payload);
+    return this.http.post<any>(endpoint, payload);
   }
   getCaseStats(): Observable<any> {
     const endpoint = `${this.baseUrl}/api/case-stats/`;
@@ -154,8 +168,6 @@ export class ApiService {
     const endpoint = `${this.baseUrl}/api/industry-stats/`;
     return this.http.get<any>(endpoint);
   }
-
-
 
   private _selectedCaseId: string = ''; // Private variable to hold the value
 
@@ -428,5 +440,64 @@ export class ApiService {
 
   emitLogoClick(): void {
     this.logoClickSubject.next();
+  }
+
+  // Fetch reports from /api/reports/
+  getReports(): Observable<Report[]> {
+    const endpoint = `${this.baseUrl}/api/reports/`; // Adjusted to /api/reports/
+    const headers = this.getAuthHeaders();
+    return this.http.get<Report[]>(endpoint, { headers }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          return this.handleUnauthorizedError().pipe(
+            switchMap(() => this.getReports()) // Retry after token refresh
+          );
+        }
+        console.error('Error fetching reports:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // View report file by ID
+  viewReport(reportId: number): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/view/${reportId}/`;
+    const headers = this.getAuthHeaders();
+    return this.http.get(endpoint, { headers, responseType: 'blob' }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          return this.handleUnauthorizedError().pipe(
+            switchMap(() => this.viewReport(reportId))
+          );
+        }
+        console.error('Error viewing report:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Download report file by ID
+  downloadReport(reportId: number): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/view/${reportId}/?download=true`;
+    const headers = this.getAuthHeaders();
+    return this.http.get(endpoint, { headers, responseType: 'blob' }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          return this.handleUnauthorizedError().pipe(
+            switchMap(() => this.downloadReport(reportId))
+          );
+        }
+        console.error('Error downloading report:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  private handleUnauthorizedError(): Observable<string> {
+    return this.refreshToken().pipe(
+      catchError((err) => {
+        this.logout();
+        return throwError(() => err);
+      })
+    );
   }
 }

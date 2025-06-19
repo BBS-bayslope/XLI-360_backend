@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; // ✅ Import
+import { ApiService } from '../../../../services/api.service';
 
 interface Report {
   id: number;
@@ -22,14 +23,18 @@ export class ReportsComponent implements OnInit {
   selectedPdfUrl: SafeResourceUrl | null = null; // ✅ SafeResourceUrl
   showPdf: boolean = false;
 
-  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {} // ✅ Inject DomSanitizer
+  constructor(
+    private apiService: ApiService,
+    private http: HttpClient,
+    private sanitizer: DomSanitizer
+  ) {} // ✅ Inject DomSanitizer
 
   ngOnInit(): void {
     this.fetchReports();
   }
 
   fetchReports(): void {
-    this.http.get<Report[]>('http://localhost:8000/api/reports/').subscribe({
+    this.apiService.getReports().subscribe({
       next: (data) => {
         this.reports = data;
         console.log('Fetched reports', this.reports);
@@ -42,13 +47,17 @@ export class ReportsComponent implements OnInit {
 
   viewFile(reportId: number): void {
     console.log('View button clicked for report ID:', reportId);
-    const report = this.reports.find((r) => r.id === reportId);
-    if (report) {
-      const unsafeUrl = `http://localhost:8000/api/view/${reportId}/`;
-      this.selectedPdfUrl =
-        this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl); // ✅ Bypass
-      this.showPdf = true;
-    }
+    this.apiService.viewReport(reportId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        this.selectedPdfUrl =
+          this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        this.showPdf = true;
+      },
+      error: (error) => {
+        console.error('Error viewing PDF:', error);
+      },
+    });
   }
 
   closePdf(): void {
@@ -57,14 +66,20 @@ export class ReportsComponent implements OnInit {
   }
 
   downloadFile(reportId: number): void {
-    const downloadUrl = `http://localhost:8000/api/view/${reportId}/?download=true`;
-
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.setAttribute('download', `report_${reportId}.pdf`); 
-    // link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    this.apiService.downloadReport(reportId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `report_${reportId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      },
+      error: (error) => {
+        console.error('Error downloading PDF:', error);
+      },
+    });
   }
 }
