@@ -772,9 +772,6 @@ class FileUploadViewNew(APIView):
         logger.info("RawData sync completed.")
 
 
-
-
-
     def post(self, request):
         file = request.FILES.get('file')
         if not file:
@@ -786,11 +783,11 @@ class FileUploadViewNew(APIView):
             logger.info("Starting file processing")
 
             file_content = BytesIO(file.read())
-            workbook = openpyxl.load_workbook(file_content, read_only=True)
+            workbook = openpyxl.load_workbook(file_content, read_only=True, data_only=True)
             sheet_name = workbook.sheetnames[0]
             sheet = workbook[sheet_name]
-            # row_count = sum(1 for _ in sheet.iter_rows(min_row=2))
-            row_count = sheet.max_row - 1
+            row_count = sum(1 for _ in sheet.iter_rows(min_row=2))
+            # row_count = sheet.max_row - 1
             print("Total data rows:", row_count)
 
             def read_sheet_in_chunks(sheet_name, chunksize):
@@ -809,7 +806,7 @@ class FileUploadViewNew(APIView):
             raw_data_records = []
             total_rows_processed = 0
             for chunk in read_sheet_in_chunks(sheet_name, chunk_size):
-                with ThreadPoolExecutor(max_workers=2) as executor:
+                with ThreadPoolExecutor(max_workers=1) as executor:
                     futures = [executor.submit(self.process_chunk, chunk)]
                     for future in as_completed(futures):
                         raw_data_records.extend(future.result())

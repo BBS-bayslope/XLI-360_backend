@@ -906,8 +906,9 @@ class FilterDataView(APIView):
 #             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+from rest_framework.permissions import AllowAny
 class ReportListView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         reports = Report.objects.all()
         serializer = ReportSerializer(reports, many=True, context={'request': request})
