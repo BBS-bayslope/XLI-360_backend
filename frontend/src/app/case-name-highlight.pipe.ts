@@ -28,7 +28,7 @@ export class CaseNameHighlightPipe implements PipeTransform {
     console.log('Pipe Input:', value);
     if (!value) return value;
 
-    const parts = value.split(/\s*V\.\s*/);
+    const parts = value.split(/\s*v\.\s*/);
     console.log('Split Parts:', parts);
     if (parts.length !== 2) {
       const formattedText = this.addLineBreaks(value, maxWords);
@@ -43,7 +43,7 @@ export class CaseNameHighlightPipe implements PipeTransform {
     console.log('Formatted Plaintiff:', formattedPlaintiff);
     console.log('Formatted Defendant:', formattedDefendant);
 
-    const highlightedText = `<span class="plaintiff">${formattedPlaintiff}</span> V. <span class="defendant">${formattedDefendant}</span>`;
+    const highlightedText = `<span class="plaintiff">${formattedPlaintiff}</span> v. <span class="defendant">${formattedDefendant}</span>`;
     console.log('Highlighted Text:', highlightedText);
     return this.sanitizer.bypassSecurityTrustHtml(highlightedText);
   }

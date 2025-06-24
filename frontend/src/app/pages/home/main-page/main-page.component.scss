@@ -1,436 +1,1350 @@
+// // :root {
+// //   --primary-color: #A100FF; /* Accenture's purple for primary elements */
+// //   --accent-color: #E6CCFF; /* A softer purple for secondary elements/backgrounds */
+// //   --text-color: #000000; /* Black for text */
+// //   --background: #121212; /* Light mode background (same as before) */
+// //   --content-bg: #FFFFFF; /* Light mode content background */
+// // }
+// // .dark-mode {
+// //   background-color: #1e1e1e;
+// //   color: #ffffff;
+// // }
+
+// // /* Optional transition for smooth effect */
+// // body {
+// //   transition: background-color 0.3s ease, color 0.3s ease;
+// // }
+
+
+// // body.dark-mode {
+// //   background-color: #2d3436;
+// //   color: #dfe6e9;
+// // }
+// // :root {
+// //   --background: #FFFFFF; /* Light mode */
+// //   --content-bg: #FFFFFF;
+// //   --text-color: #000000;
+// // }
+
+// // body.dark-mode {
+// //   --background: #000000; /* Dark mode */
+// //   --content-bg: #1A1A1A;
+// //   --text-color: #FFFFFF;
+// // }
+
+// // body, html {
+// //   background: var(--background);
+// // }
+
+// // mat-sidenav-content {
+// //   background-color: var(--content-bg);
+// // }
+
+// // body.light-mode {
+// //   background-color: #dfe6e9;
+// //   color: #2d3436;
+// // }
+// // /* General layout for the drawer container */
+// // .drawer-container {
+// //   margin: 0;
+// //   padding: 0;
+// //   height: auto;
+// //   width: 100%;
+// // }
+
+// // /* Ensure mat-sidenav layout */
+// // mat-sidenav {
+// //   width: 23%;
+// //   height: 100vh;
+// //   background-color: var(--content-bg);
+// // }
+
+// // /* Center the inner container while keeping width: 80% */
+// // :host ::ng-deep .mat-drawer-inner-container {
+// //   width: 96%;
+// // }
+
+// // /* Ensure mat-expansion-panel and its children take the correct width */
+// // mat-expansion-panel {
+// //   width: 100%;
+// //   box-sizing: border-box;
+// //   background-color: white;
+// // }
+
+// // mat-expansion-panel section,
+// // mat-expansion-panel mat-form-field {
+// //   width: 100%;
+// //   box-sizing: border-box;
+// // }
+
+// // /* Style for scrollable radio group (used in Case Status, etc.) */
+// // .scrollable-radio-group {
+// //   max-height: 200px;
+// //   width: 100%;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   scrollbar-width: none; /* Hide scrollbar for Firefox */
+// // }
+
+// // .scrollable-radio-group::-webkit-scrollbar {
+// //   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+// // }
+
+// // /* Year filter buttons styling */
+// // .year-filter-buttons {
+// //   margin: 0;
+// // }
+
+// // .year-filter-buttons button {
+// //   padding: 10px 20px;
+// //   background-color: #E6CCFF; /* Softer purple for inactive buttons */
+// //   border: 1px solid #A100FF; /* Purple border */
+// //   cursor: pointer;
+// //   border-radius: 4px;
+// //   font-weight: 500;
+// //   color: #000000; /* Black text */
+// // }
+
+// // .year-filter-buttons button.active {
+// //   background-color: #A100FF; /* Purple for active buttons */
+// //   color: white; /* White text for contrast */
+// //   border-color: #A100FF;
+// // }
+
+// // /* Sticky filter row (year filter buttons) */
+// // .sticky-filter-row {
+// //   position: sticky;
+// //   top: 70px; /* Adjust based on the height of the Quick Search bar */
+// //   z-index: 999; /* Below Quick Search but above table headers */
+// //   background: white;
+// //   padding: 8px 0;
+// // }
+
+// // /* Ensure mat-sidenav-content can handle scrolling */
+// // mat-sidenav-content {
+// //   height: auto;
+// //   background-color:  var(--content-bg);
+// //   margin: 0;
+// //   padding: 0;
+// //   overflow-y: auto; /* Allow scrolling if content overflows */
+// // }
+
+// // /* Ensure the table has a block display for scrolling */
+// // mat-table {
+// //   display: block;
+// //   height: 500px;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   margin: 0;
+// //   padding: 0 10px;
+// //   width: 100%;
+// //   scrollbar-width: none; /* Hide scrollbar for Firefox */
+// // }
+
+// // mat-table::-webkit-scrollbar {
+// //   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+// // }
+
+// // /* Ensure the header row is sticky */
+// // mat-header-row {
+// //   position: sticky;
+// //   top: 0; /* Stick to the top of the table */
+// //   z-index: 10; /* Ensure headers stay above table body */
+// //   background-color: white;
+// // }
+
+// // /* Style the header cells */
+// // mat-header-cell {
+// //   font-weight: bolder;
+// //   position: sticky;
+// //   top: 0;
+// //   background-color: white;
+// //   z-index: 10;
+// //   padding: 8px 16px;
+// //   color: #000000; /* Black text */
+// // }
+
+// // /* Ensure table rows and cells behave correctly */
+// // mat-row {
+// //   display: table-row;
+// // }
+
+// // mat-cell {
+// //   display: table-cell;
+// //   font-weight: 500;
+// //   padding: 8px 16px;
+// //   color: #000000; /* Black text */
+// // }
+
+// // /* Hover effect for all rows */
+// // .mat-row:hover {
+// //   background-color: #F5E6FF; /* Very light purple on hover */
+// //   cursor: pointer;
+// //   transition: background-color 0.2s ease-in-out;
+// // }
+
+// // /* Specific style for Case Date column */
+// // .mat-column-caseComplaintDate {
+// //   font-weight: 500;
+// //   color: #000000; /* Black text */
+// // }
+
+// // /* No-wrap class for columns */
+// // .no-wrap {
+// //   white-space: nowrap;
+// //   overflow: hidden;
+// //   text-overflow: ellipsis;
+// //   width: 10%;
+// //   // font-weight: 800;
+// // }
+
+// // .wrap-text2 {
+// //   width: 100px; /* Adjusted fixed width */
+// //   white-space: normal; /* Allow text to wrap to the next line */
+// //   overflow-wrap: break-word; /* Wrap at word boundaries when possible */
+// //   line-height: 1.4; /* Improve spacing between wrapped lines */
+// //   padding: 8px 12px; /* Add padding for better readability */
+// //   box-sizing: border-box; /* Ensure padding doesn't affect the width */
+// // }
+
+// // /* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
+// // .wrap-text2 ::ng-deep .highlighted {
+// //   background-color: #E6CCFF; /* Softer purple highlight */
+// //   font-weight: 500; /* Slightly bold but not too heavy */
+// //   color: #000000; /* Black text */
+// // }
+
+// // /* Ensure the table cell aligns properly */
+// // mat-cell.wrap-text2 {
+// //   display: table-cell;
+// //   vertical-align: top; /* Align text to the top of the cell */
+// // }
+
+// // /* Custom tab label styling */
+// // .custom-tab-label {
+// //   font-weight: bold;
+// //   cursor: pointer;
+// //   color: #A100FF; /* Purple for tab labels */
+// //   transition: color 0.3s, transform 0.2s;
+// // }
+
+// // .custom-tab-label:hover {
+// //   color: #7A00CC; /* Darker purple on hover */
+// //   transform: scale(1.05);
+// // }
+
+// // /* Additional styles for filter section */
+// // .filter-header {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 10px;
+// //   padding: 10px;
+// // }
+
+// // .filter-options {
+// //   display: flex;
+// //   flex-wrap: wrap;
+// //   padding: 10px;
+// // }
+
+// // .loading-spinner {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 5px;
+// //   padding: 10px;
+// //   font-size: 14px;
+// // }
+
+// // /* Ensure mat-option styling */
+// // mat-option {
+// //   border-bottom: 1px solid #000000; /* Black border */
+// // }
+
+// // table.mat-table {
+// //   width: 100%;
+// //   position: relative;
+// //   border-collapse: collapse;
+// //   overflow-x: auto; /* Enable horizontal scrolling */
+// //   display: block; /* Already present in your code */
+// //   height: 500px; /* Already present in your code */
+// //   overflow-y: auto; /* Already present in your code */
+// //   overflow-x: auto;
+// // }
+
+// // .table-scroll-container {
+// //   width: 100%;
+// //   display: block;
+// // }
+
+// // /* Add a minimum width to table so that it overflows horizontally */
+// // .full-width-table {
+// //   min-width: 1200px; /* You can adjust this */
+// //   width: max-content;
+// // }
+
+// // /* Optional: make scrollbar always visible on Windows/macOS */
+// // .table-scroll-container::-webkit-scrollbar {
+// //   height: 8px;
+// // }
+
+// // .table-scroll-container::-webkit-scrollbar-thumb {
+// //   background-color: #A100FF; /* Purple scrollbar */
+// //   border-radius: 10px;
+// // }
+
+// // .sticky-header {
+// //   position: sticky !important;
+// //   top: 0;
+// //   background-color: white;
+// //   z-index: 10;
+// //   font-weight: bolder;
+// //   padding: 8px;
+// // }
+
+// // .sticky-header-row {
+// //   position: sticky !important;
+// //   top: 0;
+// //   background-color: white;
+// //   z-index: 10;
+// // }
+
+// // th.mat-header-cell,
+// // td.mat-cell {
+// //   padding: 8px;
+// //   border-bottom: 1px solid #A100FF; /* Purple border */
+// // }
+
+// // th.mat-header-cell {
+// //   text-align: left;
+// //   color: #000000; /* Black text */
+// // }
+
+// // .sticky-filter-row {
+// //   position: sticky;
+// //   top: 60px; 
+// //   z-index: 900; 
+// //   background-color: white;
+// //   padding: 8px 0;
+// // }
+
+// // .no-results {
+// //   font-size: 16px;
+// //   color: #666;
+// //   text-align: center;
+// //   padding: 20px;
+// // }
+
+// // .no-data-message {
+// //   display: flex;
+// //   flex-direction: column;
+// //   align-items: center;
+// //   justify-content: center;
+// //   padding: 20px;
+// //   color: #666;
+// //   font-style: italic;
+// //   min-height: 200px;
+// // }
+
+// // .no-data-message mat-icon {
+// //   font-size: 48px;
+// //   color: #A100FF; /* Purple icon */
+// //   margin-bottom: 10px;
+// // }
+
+// // .mat-drawer-inner-container {
+// //   width: 100%;
+// //   height: 68%;
+// // }
+
+// // ::ng-deep .mat-drawer-side {
+// //   box-shadow: none;
+// //   border-right-style: none !important; 
+// //   border-right-color: var(--mat-sidenav-container-divider-color);
+// // }
+
+// // ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
+// //   justify-content: space-evenly;
+// //   margin-left: -58px;
+// // }
+
+// // ::ng-deep .mat-mdc-tab-labels {
+// //   margin-bottom: 13px;
+// // }
+
+// // :host ::ng-deep {
+// //   .plaintiff {
+// //     color: #A100FF !important; /* Purple for plaintiff */
+// //   }
+// //   .defendant {
+// //     color: brown !important; /* Black for defendant */
+// //   }
+// // }
+
+
+
+
+// // .carde {
+// //   transition: transform 0.3s ease;
+// //   line-height: 20px;
+// //   font-size: 14px;
+// //   font-weight: bolder;
+// //   color: black; /* Default color */
+// //   // box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+// // }
+
+// // .carde:hover {
+// //   // transform: scale(1.05); /* 5% bahar nikalta hai */
+// //   transform: translateY(-5px);
+// // }
+
+
+
+
+
+
+
+
+// // // ------------------------------
+
+
+// // :root {
+// //   --primary-color: #1976D2; /* Professional blue for primary elements */
+// //   --accent-color: #90CAF9; /* Lighter blue for secondary elements */
+// //   --text-color: #212121; /* Dark gray for text in light mode */
+// //   --background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Subtle gray gradient for light mode */
+// //   --content-bg: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Same gradient for content background */
+// // }
+
+// // .dark-mode {
+// //   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient for dark mode */
+// //   color: #ffffff;
+// // }
+
+// // /* Optional transition for smooth effect */
+// // body {
+// //   transition: background-color 0.3s ease, color 0.3s ease;
+// // }
+
+// // body.dark-mode {
+// //   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient */
+// //   color: #E0E0E0; /* Light gray text for dark mode */
+// //   --background: linear-gradient(135deg, #212529, #343A40); /* Update variable for dark mode */
+// //   --content-bg: linear-gradient(135deg, #212529, #343A40); /* Update content background for dark mode */
+// //   --text-color: #E0E0E0; /* Light gray text in dark mode */
+// // }
+
+// // body, html {
+// //   background: var(--background);
+// // }
+
+// // mat-sidenav-content {
+// //   background: var(--content-bg);
+// // }
+
+// // body.light-mode {
+// //   background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Light mode gradient */
+// //   color: #212121; /* Dark gray text */
+// // }
+
+// // /* General layout for the drawer container */
+// // .drawer-container {
+// //   margin: 0;
+// //   padding: 0;
+// //   height: auto;
+// //   width: 100%;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Sidenav styles */
+// // mat-sidenav {
+// //   width: 23%;
+// //   height: 100vh;
+// //   background: var(--content-bg); /* Same gradient background as the rest of the UI */
+// // }
+
+// // .mat-drawer-inner-container {
+// //   width: 100%;
+// //   height: 68%;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // ::ng-deep .mat-drawer-side {
+// //   box-shadow: none;
+// //   border-right-style: none !important; 
+// //   border-right-color: var(--mat-sidenav-container-divider-color);
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Ensure mat-expansion-panel and its children take the correct width */
+// // mat-expansion-panel {
+// //   width: 100%;
+// //   box-sizing: border-box;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // mat-expansion-panel section,
+// // mat-expansion-panel mat-form-field {
+// //   width: 100%;
+// //   box-sizing: border-box;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Style for scrollable radio group (used in Case Status, etc.) */
+// // .scrollable-radio-group {
+// //   max-height: 200px;
+// //   width: 100%;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   scrollbar-width: none; /* Hide scrollbar for Firefox */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .scrollable-radio-group::-webkit-scrollbar {
+// //   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+// // }
+
+// // /* Year filter buttons styling */
+// // .year-filter-buttons {
+// //   display: flex;
+// //   gap: 10px;
+// //   margin: 0;
+// // }
+
+// // .year-filter-buttons button {
+// //   padding: 12px 24px;
+// //   background-color: #e3f2fd; /* Inactive light blue */
+// //   border: 1px solid #1976d2;
+// //   color: #212121;
+// //   border-radius: 8px;
+// //   font-weight: 500;
+// //   font-size: 16px;
+// //   cursor: pointer;
+// //   transition: all 0.3s ease;
+// //   box-shadow: 0 2px 6px rgba(25, 118, 210, 0.15);
+// // }
+
+// // .year-filter-buttons button:hover {
+// //   background-color: #bbdefb; /* Slightly darker on hover */
+// //   transform: translateY(-2px);
+// //   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+// // }
+
+// // .year-filter-buttons button:active {
+// //   background-color: #90caf9;
+// //   transform: scale(0.97);
+// //   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+// // }
+
+// // .year-filter-buttons button.active {
+// //   background-color: #1976d2;
+// //   color: white;
+// //   border-color: #1976d2;
+// //   box-shadow: 0 4px 10px rgba(25, 118, 210, 0.5);
+// // }
+
+
+// // /* Sticky filter row (year filter buttons) */
+// // .sticky-filter-row {
+// //   position: sticky;
+// //   top: 70px; /* Adjust based on the height of the Quick Search bar */
+// //   z-index: 999; /* Below Quick Search but above table headers */
+// //   background: var(--content-bg); /* Consistent background */
+// //   padding: 8px 0;
+// // }
+
+// // /* Ensure mat-sidenav-content can handle scrolling */
+// // mat-sidenav-content {
+// //   height: auto;
+// //   background: var(--content-bg); /* Consistent background */
+// //   margin: 0;
+// //   padding: 0;
+// //   overflow-y: auto; /* Allow scrolling if content overflows */
+// // }
+
+// // /* Ensure the table has a block display for scrolling */
+// // mat-table {
+// //   display: block;
+// //   height: 500px;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   margin: 0;
+// //   padding: 0 10px;
+// //   width: 100%;
+// //   scrollbar-width: none; /* Hide scrollbar for Firefox */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // mat-table::-webkit-scrollbar {
+// //   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+// // }
+
+// // /* Ensure the header row is sticky */
+// // mat-header-row {
+// //   position: sticky;
+// //   top: 0; /* Stick to the top of the table */
+// //   z-index: 10; /* Ensure headers stay above table body */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Style the header cells */
+// // mat-header-cell {
+// //   font-weight: bolder;
+// //   position: sticky;
+// //   top: 0;
+// //   background: var(--content-bg); /* Consistent background */
+// //   z-index: 10;
+// //   padding: 8px 16px;
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // /* Ensure table rows and cells behave correctly */
+// // mat-row {
+// //   display: table-row;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // mat-cell {
+// //   display: table-cell;
+// //   font-weight: 500;
+// //   padding: 8px 16px;
+// //   color: var(--text-color); /* Consistent text color */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Alternating row colors for better readability */
+// // mat-row:nth-child(even) {
+// //   background: #E8ECEF; /* Slightly darker shade of the gradient for even rows */
+// // }
+
+// // body.dark-mode mat-row:nth-child(even) {
+// //   background: #343A40; /* Slightly lighter shade of the dark gradient */
+// // }
+
+// // /* Hover effect for all rows */
+// // .mat-row:hover {
+// //   background-color: #E3F2FD; /* Light blue on hover */
+// //   cursor: pointer;
+// //   transition: background-color 0.2s ease-in-out;
+// // }
+
+// // /* Specific style for Case Date column */
+// // .mat-column-caseComplaintDate {
+// //   font-weight: 500;
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // /* No-wrap class for columns */
+// // .no-wrap {
+// //   white-space: nowrap;
+// //   overflow: hidden;
+// //   text-overflow: ellipsis;
+// //   width: 10%;
+// // }
+
+// // .wrap-text2 {
+// //   width: 100px; /* Adjusted fixed width */
+// //   white-space: normal; /* Allow text to wrap to the next line */
+// //   overflow-wrap: break-word; /* Wrap at word boundaries when possible */
+// //   line-height: 1.4; /* Improve spacing between wrapped lines */
+// //   padding: 8px 12px; /* Add padding for better readability */
+// //   box-sizing: border-box; /* Ensure padding doesn't affect the width */
+// // }
+
+// // /* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
+// // .wrap-text2 ::ng-deep .highlighted {
+// //   background-color: #E3F2FD; /* Light blue highlight */
+// //   font-weight: 500; /* Slightly bold but not too heavy */
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // /* Ensure the table cell aligns properly */
+// // mat-cell.wrap-text2 {
+// //   display: table-cell;
+// //   vertical-align: top; /* Align text to the top of the cell */
+// // }
+
+// // /* Custom tab label styling */
+// // .custom-tab-label {
+// //   font-weight: bold;
+// //   cursor: pointer;
+// //   color: #1976D2; /* Blue for tab labels */
+// //   transition: color 0.3s, transform 0.2s;
+// // }
+
+// // .custom-tab-label:hover {
+// //   color: #1565C0; /* Darker blue on hover */
+// //   transform: scale(1.05);
+// // }
+
+// // /* Additional styles for filter section */
+// // .filter-header {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 10px;
+// //   padding: 10px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .filter-options {
+// //   display: flex;
+// //   flex-wrap: wrap;
+// //   padding: 10px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .loading-spinner {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 5px;
+// //   padding: 10px;
+// //   font-size: 14px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Ensure mat-option styling */
+// // mat-option {
+// //   border-bottom: 1px solid var(--accent-color); /* Light blue border */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // table.mat-table {
+// //   width: 100%;
+// //   position: relative;
+// //   border-collapse: collapse;
+// //   overflow-x: auto; /* Enable horizontal scrolling */
+// //   display: block;
+// //   height: 500px;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .table-scroll-container {
+// //   width: 100%;
+// //   display: block;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Add a minimum width to table so that it overflows horizontally */
+// // .full-width-table {
+// //   min-width: 1200px; /* You can adjust this */
+// //   width: max-content;
+// // }
+
+// // /* Optional: make scrollbar always visible on Windows/macOS */
+// // .table-scroll-container::-webkit-scrollbar {
+// //   height: 8px;
+// // }
+
+// // .table-scroll-container::-webkit-scrollbar-thumb {
+// //   background-color: #1976D2; /* Blue scrollbar */
+// //   border-radius: 10px;
+// // }
+
+// // .sticky-header {
+// //   position: sticky !important;
+// //   top: 0;
+// //   background: var(--content-bg); /* Consistent background */
+// //   z-index: 10;
+// //   font-weight: bolder;
+// //   padding: 8px;
+// // }
+
+// // .sticky-header-row {
+// //   position: sticky !important;
+// //   top: 0;
+// //   background: var(--content-bg); /* Consistent background */
+// //   z-index: 10;
+// // }
+
+// // th.mat-header-cell,
+// // td.mat-cell {
+// //   padding: 8px;
+// //   border-bottom: 1px solid #90CAF9; /* Light blue border */
+// // }
+
+// // th.mat-header-cell {
+// //   text-align: left;
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // .sticky-filter-row {
+// //   position: sticky;
+// //   top: 60px; 
+// //   z-index: 900; 
+// //   background: var(--content-bg); /* Consistent background */
+// //   padding: 8px 0;
+// // }
+
+// // .no-results {
+// //   font-size: 16px;
+// //   color: #666;
+// //   text-align: center;
+// //   padding: 20px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .no-data-message {
+// //   display: flex;
+// //   flex-direction: column;
+// //   align-items: center;
+// //   justify-content: center;
+// //   padding: 20px;
+// //   color: #666;
+// //   font-style: italic;
+// //   min-height: 200px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .no-data-message mat-icon {
+// //   font-size: 48px;
+// //   color: #1976D2; /* Blue icon */
+// //   margin-bottom: 10px;
+// // }
+
+// // ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
+// //   justify-content: space-evenly;
+// //   margin-left: -58px;
+// // }
+
+// // ::ng-deep .mat-mdc-tab-labels {
+// //   margin-bottom: 13px;
+// // }
+
+// // :host ::ng-deep {
+// //   .plaintiff {
+// //     color: #1976D2 !important; /* Blue for plaintiff */
+// //   }
+// //   .defendant {
+// //     color: #D32F2F !important; /* Red for defendant */
+// //   }
+// // }
+
+// // .carde {
+// //   transition: transform 0.3s ease;
+// //   line-height: 20px;
+// //   font-size: 14px;
+// //   font-weight: bolder;
+// //   color: black; /* Default color */
+// // }
+
+// // .carde:hover {
+// //   transform: translateY(-5px);
+// // }
+// // .active-title {
+// //   color: #1976D2 !important; /* Purple when panel is expanded */
+// // }
+
+
+
+// // ::ng-deep .mat-drawer-inner-container {
+// //   width: 100%;
+// //   height: 68%;
+// //   overflow: auto;
+// //   -webkit-overflow-scrolling: touch;
+// // }
+
+
+
+
+
+
+// // :root {
+// //   --primary-color: #1976D2; /* Professional blue for primary elements */
+// //   --accent-color: #90CAF9; /* Lighter blue for secondary elements */
+// //   --text-color: #212121; /* Dark gray for text in light mode */
+// //   --background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Subtle gray gradient for light mode */
+// //   --content-bg: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Same gradient for content background */
+// // }
+
+// // .dark-mode {
+// //   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient for dark mode */
+// //   color: #ffffff;
+// // }
+
+// // /* Optional transition for smooth effect */
+// // body {
+// //   transition: background-color 0.3s ease, color 0.3s ease;
+// // }
+
+// // body.dark-mode {
+// //   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient */
+// //   color: #E0E0E0; /* Light gray text for dark mode */
+// //   --background: linear-gradient(135deg, #212529, #343A40); /* Update variable for dark mode */
+// //   --content-bg: linear-gradient(135deg, #212529, #343A40); /* Update content background for dark mode */
+// //   --text-color: #E0E0E0; /* Light gray text in dark mode */
+// // }
+
+// // body, html {
+// //   background: var(--background);
+// // }
+
+// // mat-sidenav-content {
+// //   background: var(--content-bg);
+// // }
+
+// // body.light-mode {
+// //   background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Light mode gradient */
+// //   color: #212121; /* Dark gray text */
+// // }
+
+// // /* General layout for the drawer container */
+// // .drawer-container {
+// //   margin: 0;
+// //   padding: 0;
+// //   height: auto;
+// //   width: 100%;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Sidenav styles */
+// // mat-sidenav {
+// //   width: 23%;
+// //   height: 100vh;
+// //   background: var(--content-bg); /* Same gradient background as the rest of the UI */
+// // }
+
+// // .mat-drawer-inner-container {
+// //   width: 100%;
+// //   height: 69%; 
+// //   background: var(--content-bg); /* Consistent background */
+// //   overflow: auto;
+// //   -webkit-overflow-scrolling: touch;
+// // }
+// // /* Use this in global styles.scss or component .scss */
+
+// // ::ng-deep .mat-drawer-inner-container {
+// //   width: 100% !important;
+// //   height: 69% !important;
+// //   background: var(--content-bg); /* Optional: match your app theme */
+// //   overflow: auto;
+// //   -webkit-overflow-scrolling: touch;
+// // }
+
+
+
+// // ::ng-deep .mat-drawer-side {
+// //   box-shadow: none;
+// //   border-right-style: none !important;
+// //   border-right-color: var(--mat-sidenav-container-divider-color);
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Ensure mat-expansion-panel and its children take the correct width */
+// // mat-expansion-panel {
+// //   width: 100%;
+// //   box-sizing: border-box;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // mat-expansion-panel section,
+// // mat-expansion-panel mat-form-field {
+// //   width: 100%;
+// //   box-sizing: border-box;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Style for scrollable radio group (used in Case Status, etc.) */
+// // .scrollable-radio-group {
+// //   max-height: 200px;
+// //   width: 100%;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   scrollbar-width: none; /* Hide scrollbar for Firefox */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .scrollable-radio-group::-webkit-scrollbar {
+// //   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+// // }
+
+// // /* Year filter buttons styling */
+// // .year-filter-buttons {
+// //   display: flex;
+// //   gap: 10px;
+// //   margin: 0;
+// // }
+
+// // .year-filter-buttons button {
+// //   padding: 12px 24px;
+// //   background-color: #e3f2fd; /* Inactive light blue */
+// //   border: 1px solid #1976d2;
+// //   color: #212121;
+// //   border-radius: 8px;
+// //   font-weight: 500;
+// //   font-size: 16px;
+// //   cursor: pointer;
+// //   transition: all 0.3s ease;
+// //   box-shadow: 0 2px 6px rgba(25, 118, 210, 0.15);
+// // }
+
+// // .year-filter-buttons button:hover {
+// //   background-color: #bbdefb; /* Slightly darker on hover */
+// //   transform: translateY(-2px);
+// //   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+// // }
+
+// // .year-filter-buttons button:active {
+// //   background-color: #90caf9;
+// //   transform: scale(0.97);
+// //   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+// // }
+
+// // .year-filter-buttons button.active {
+// //   background-color: #1976d2;
+// //   color: white;
+// //   border-color: #1976d2;
+// //   box-shadow: 0 4px 10px rgba(25, 118, 210, 0.5);
+// // }
+
+// // /* Sticky filter row (year filter buttons) */
+// // .sticky-filter-row {
+// //   position: sticky;
+// //   top: 70px; /* Adjust based on the height of the Quick Search bar */
+// //   z-index: 999; /* Below Quick Search but above table headers */
+// //   background: var(--content-bg); /* Consistent background */
+// //   padding: 8px 0;
+// // }
+
+// // /* Ensure mat-sidenav-content can handle scrolling */
+// // mat-sidenav-content {
+// //   height: auto;
+// //   background: var(--content-bg); /* Consistent background */
+// //   margin: 0;
+// //   padding: 0;
+// //   overflow-y: auto; /* Allow scrolling if content overflows */
+// // }
+
+// // /* Ensure the table has a block display for scrolling */
+// // mat-table {
+// //   display: block;
+// //   height: 500px;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   margin: 0;
+// //   padding: 0 10px;
+// //   width: 100%;
+// //   scrollbar-width: none; /* Hide scrollbar for Firefox */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // mat-table::-webkit-scrollbar {
+// //   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+// // }
+
+// // /* Ensure the header row is sticky */
+// // mat-header-row {
+// //   position: sticky;
+// //   top: 0; /* Stick to the top of the table */
+// //   z-index: 10; /* Ensure headers stay above table body */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Style the header cells */
+// // mat-header-cell {
+// //   font-weight: bolder;
+// //   position: sticky;
+// //   top: 0;
+// //   background: var(--content-bg); /* Consistent background */
+// //   z-index: 10;
+// //   padding: 8px 16px;
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // /* Ensure table rows and cells behave correctly */
+// // mat-row {
+// //   display: table-row;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // mat-cell {
+// //   display: table-cell;
+// //   font-weight: 500;
+// //   padding: 8px 16px;
+// //   color: var(--text-color); /* Consistent text color */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Alternating row colors for better readability */
+// // mat-row:nth-child(even) {
+// //   background: #E8ECEF; /* Slightly darker shade of the gradient for even rows */
+// // }
+
+// // body.dark-mode mat-row:nth-child(even) {
+// //   background: #343A40; /* Slightly lighter shade of the dark gradient */
+// // }
+
+// // /* Hover effect for all rows */
+// // .mat-row:hover {
+// //   background-color: #E3F2FD; /* Light blue on hover */
+// //   cursor: pointer;
+// //   transition: background-color 0.2s ease-in-out;
+// // }
+
+// // /* Specific style for Case Date column */
+// // .mat-column-caseComplaintDate {
+// //   font-weight: 500;
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // /* No-wrap class for columns */
+// // .no-wrap {
+// //   white-space: nowrap;
+// //   overflow: hidden;
+// //   text-overflow: ellipsis;
+// //   width: 10%;
+// // }
+
+// // .wrap-text2 {
+// //   width: 100px; /* Adjusted fixed width */
+// //   white-space: normal; /* Allow text to wrap to the next line */
+// //   overflow-wrap: break-word; /* Wrap at word boundaries when possible */
+// //   line-height: 1.4; /* Improve spacing between wrapped lines */
+// //   padding: 8px 12px; /* Add padding for better readability */
+// //   box-sizing: border-box; /* Ensure padding doesn't affect the width */
+// // }
+
+// // /* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
+// // .wrap-text2 ::ng-deep .highlighted {
+// //   background-color: #E3F2FD; /* Light blue highlight */
+// //   font-weight: 500; /* Slightly bold but not too heavy */
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // /* Ensure the table cell aligns properly */
+// // mat-cell.wrap-text2 {
+// //   display: table-cell;
+// //   vertical-align: top; /* Align text to the top of the cell */
+// // }
+
+// // /* Custom tab label styling */
+// // .custom-tab-label {
+// //   font-weight: bold;
+// //   cursor: pointer;
+// //   color: #1976D2; /* Blue for tab labels */
+// //   transition: color 0.3s, transform 0.2s;
+// // }
+
+// // .custom-tab-label:hover {
+// //   color: #1565C0; /* Darker blue on hover */
+// //   transform: scale(1.05);
+// // }
+
+// // /* Additional styles for filter section */
+// // .filter-header {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 10px;
+// //   padding: 10px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .filter-options {
+// //   display: flex;
+// //   flex-wrap: wrap;
+// //   padding: 10px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .loading-spinner {
+// //   display: flex;
+// //   align-items: center;
+// //   gap: 5px;
+// //   padding: 10px;
+// //   font-size: 14px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Ensure mat-option styling */
+// // mat-option {
+// //   border-bottom: 1px solid var(--accent-color); /* Light blue border */
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // table.mat-table {
+// //   width: 100%;
+// //   position: relative;
+// //   border-collapse: collapse;
+// //   overflow-x: auto; /* Enable horizontal scrolling */
+// //   display: block;
+// //   height: 500px;
+// //   overflow-y: auto;
+// //   overflow-x: auto;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .table-scroll-container {
+// //   width: 100%;
+// //   display: block;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // /* Add a minimum width to table so that it overflows horizontally */
+// // .full-width-table {
+// //   min-width: 1200px; /* You can adjust this */
+// //   width: max-content;
+// // }
+
+// // /* Optional: make scrollbar always visible on Windows/macOS */
+// // .table-scroll-container::-webkit-scrollbar {
+// //   height: 8px;
+// // }
+
+// // .table-scroll-container::-webkit-scrollbar-thumb {
+// //   background-color: #1976D2; /* Blue scrollbar */
+// //   border-radius: 10px;
+// // }
+
+// // .sticky-header {
+// //   position: sticky !important;
+// //   top: 0;
+// //   background: var(--content-bg); /* Consistent background */
+// //   z-index: 10;
+// //   font-weight: bolder;
+// //   padding: 8px;
+// // }
+// // .sticky-header, .mat-header-row {
+// //   background-color: white !important;
+// //   z-index: 2;
+// // }
+
+// // .sticky-header-row {
+// //   background-color: white !important;
+// //   z-index: 2;
+// //   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+// // }
+
+
+// // /* Optional: add subtle bottom border */
+// // .mat-header-row th {
+// //   border-bottom: 1px solid #ccc;
+// // }
+
+// // .sticky-header-row {
+// //   position: sticky !important;
+// //   top: 0;
+// //   background: var(--content-bg); /* Consistent background */
+// //   z-index: 10;
+// // }
+
+// // th.mat-header-cell,
+// // td.mat-cell {
+// //   padding: 8px;
+// //   border-bottom: 1px solid #90CAF9; /* Light blue border */
+// // }
+
+// // th.mat-header-cell {
+// //   text-align: left;
+// //   color: var(--text-color); /* Consistent text color */
+// // }
+
+// // .no-results {
+// //   font-size: 16px;
+// //   color: #666;
+// //   text-align: center;
+// //   padding: 20px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .no-data-message {
+// //   display: flex;
+// //   flex-direction: column;
+// //   align-items: center;
+// //   justify-content: center;
+// //   padding: 20px;
+// //   color: #666;
+// //   font-style: italic;
+// //   min-height: 200px;
+// //   background: var(--content-bg); /* Consistent background */
+// // }
+
+// // .no-data-message mat-icon {
+// //   font-size: 48px;
+// //   color: #1976D2; /* Blue icon */
+// //   margin-bottom: 10px;
+// // }
+
+// // ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
+// //   justify-content: space-evenly;
+// //   margin-left: -58px;
+// // }
+
+// // ::ng-deep .mat-mdc-tab-labels {
+// //   margin-bottom: 13px;
+// // }
+
+// // :host ::ng-deep {
+// //   .plaintiff {
+// //     color: #1976D2 !important; /* Blue for plaintiff */
+// //   }
+// //   .defendant {
+// //     color: #D32F2F !important; /* Red for defendant */
+// //   }
+// // }
+
+// // .carde {
+// //   transition: transform 0.3s ease;
+// //   line-height: 20px;
+// //   font-size: 14px;
+// //   font-weight: bolder;
+// //   color: black; /* Default color */
+// // }
+
+// // .carde:hover {
+// //   transform: translateY(-5px);
+// // }
+
+// // .active-title {
+// //   color: #1976D2 !important; /* Blue when panel is expanded */
+// // }
+
+
+// // /* Light gray and white alternate rows */
+// // .even-row {
+// //   background-color: lightgrey;  /* dark grey */
+// // }
+
+// // .odd-row {
+// //   background-color: white;  /* lightgrey */
+// // }
+
+// // /* Optional: Hover effect for rows */
+// // tr.mat-row:hover {
+// //   background-color: #e0e0e0;
+// //   transition: background-color 0.2s ease;
+// // }
+
+
+
+
+
+
+
 // :root {
-//   --primary-color: #A100FF; /* Accenture's purple for primary elements */
-//   --accent-color: #E6CCFF; /* A softer purple for secondary elements/backgrounds */
-//   --text-color: #000000; /* Black for text */
-//   --background: #121212; /* Light mode background (same as before) */
-//   --content-bg: #FFFFFF; /* Light mode content background */
-// }
-// .dark-mode {
-//   background-color: #1e1e1e;
-//   color: #ffffff;
+//   --primary-color: #1A3C6D; /* Deep navy blue for primary elements */
+//   --accent-color: #D4AF37; /* Gold for secondary elements and accents */
+//   --text-color: #333333; /* Dark gray for text in light mode */
+//   --background: linear-gradient(135deg, #F9FBFF, #FFFFFF); /* Subtle light blue to white gradient */
+//   --content-bg: linear-gradient(135deg, #F9FBFF, #FFFFFF); /* Same gradient for content */
 // }
 
-// /* Optional transition for smooth effect */
+// .dark-mode {
+//   background: linear-gradient(135deg, #1A3C6D, #2A4B8A); /* Deep navy blue gradient for dark mode */
+//   color: #E0E0E0; /* Light gray text */
+// }
+
+// /* Smooth transition for theme changes */
 // body {
 //   transition: background-color 0.3s ease, color 0.3s ease;
-// }
-
-
-// body.dark-mode {
-//   background-color: #2d3436;
-//   color: #dfe6e9;
-// }
-// :root {
-//   --background: #FFFFFF; /* Light mode */
-//   --content-bg: #FFFFFF;
-//   --text-color: #000000;
+//   font-family: "Roboto", sans-serif; /* Clean, modern font */
 // }
 
 // body.dark-mode {
-//   --background: #000000; /* Dark mode */
-//   --content-bg: #1A1A1A;
-//   --text-color: #FFFFFF;
-// }
-
-// body, html {
-//   background: var(--background);
-// }
-
-// mat-sidenav-content {
-//   background-color: var(--content-bg);
-// }
-
-// body.light-mode {
-//   background-color: #dfe6e9;
-//   color: #2d3436;
-// }
-// /* General layout for the drawer container */
-// .drawer-container {
-//   margin: 0;
-//   padding: 0;
-//   height: auto;
-//   width: 100%;
-// }
-
-// /* Ensure mat-sidenav layout */
-// mat-sidenav {
-//   width: 23%;
-//   height: 100vh;
-//   background-color: var(--content-bg);
-// }
-
-// /* Center the inner container while keeping width: 80% */
-// :host ::ng-deep .mat-drawer-inner-container {
-//   width: 96%;
-// }
-
-// /* Ensure mat-expansion-panel and its children take the correct width */
-// mat-expansion-panel {
-//   width: 100%;
-//   box-sizing: border-box;
-//   background-color: white;
-// }
-
-// mat-expansion-panel section,
-// mat-expansion-panel mat-form-field {
-//   width: 100%;
-//   box-sizing: border-box;
-// }
-
-// /* Style for scrollable radio group (used in Case Status, etc.) */
-// .scrollable-radio-group {
-//   max-height: 200px;
-//   width: 100%;
-//   overflow-y: auto;
-//   overflow-x: auto;
-//   scrollbar-width: none; /* Hide scrollbar for Firefox */
-// }
-
-// .scrollable-radio-group::-webkit-scrollbar {
-//   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
-// }
-
-// /* Year filter buttons styling */
-// .year-filter-buttons {
-//   margin: 0;
-// }
-
-// .year-filter-buttons button {
-//   padding: 10px 20px;
-//   background-color: #E6CCFF; /* Softer purple for inactive buttons */
-//   border: 1px solid #A100FF; /* Purple border */
-//   cursor: pointer;
-//   border-radius: 4px;
-//   font-weight: 500;
-//   color: #000000; /* Black text */
-// }
-
-// .year-filter-buttons button.active {
-//   background-color: #A100FF; /* Purple for active buttons */
-//   color: white; /* White text for contrast */
-//   border-color: #A100FF;
-// }
-
-// /* Sticky filter row (year filter buttons) */
-// .sticky-filter-row {
-//   position: sticky;
-//   top: 70px; /* Adjust based on the height of the Quick Search bar */
-//   z-index: 999; /* Below Quick Search but above table headers */
-//   background: white;
-//   padding: 8px 0;
-// }
-
-// /* Ensure mat-sidenav-content can handle scrolling */
-// mat-sidenav-content {
-//   height: auto;
-//   background-color:  var(--content-bg);
-//   margin: 0;
-//   padding: 0;
-//   overflow-y: auto; /* Allow scrolling if content overflows */
-// }
-
-// /* Ensure the table has a block display for scrolling */
-// mat-table {
-//   display: block;
-//   height: 500px;
-//   overflow-y: auto;
-//   overflow-x: auto;
-//   margin: 0;
-//   padding: 0 10px;
-//   width: 100%;
-//   scrollbar-width: none; /* Hide scrollbar for Firefox */
-// }
-
-// mat-table::-webkit-scrollbar {
-//   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
-// }
-
-// /* Ensure the header row is sticky */
-// mat-header-row {
-//   position: sticky;
-//   top: 0; /* Stick to the top of the table */
-//   z-index: 10; /* Ensure headers stay above table body */
-//   background-color: white;
-// }
-
-// /* Style the header cells */
-// mat-header-cell {
-//   font-weight: bolder;
-//   position: sticky;
-//   top: 0;
-//   background-color: white;
-//   z-index: 10;
-//   padding: 8px 16px;
-//   color: #000000; /* Black text */
-// }
-
-// /* Ensure table rows and cells behave correctly */
-// mat-row {
-//   display: table-row;
-// }
-
-// mat-cell {
-//   display: table-cell;
-//   font-weight: 500;
-//   padding: 8px 16px;
-//   color: #000000; /* Black text */
-// }
-
-// /* Hover effect for all rows */
-// .mat-row:hover {
-//   background-color: #F5E6FF; /* Very light purple on hover */
-//   cursor: pointer;
-//   transition: background-color 0.2s ease-in-out;
-// }
-
-// /* Specific style for Case Date column */
-// .mat-column-caseComplaintDate {
-//   font-weight: 500;
-//   color: #000000; /* Black text */
-// }
-
-// /* No-wrap class for columns */
-// .no-wrap {
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   width: 10%;
-//   // font-weight: 800;
-// }
-
-// .wrap-text2 {
-//   width: 100px; /* Adjusted fixed width */
-//   white-space: normal; /* Allow text to wrap to the next line */
-//   overflow-wrap: break-word; /* Wrap at word boundaries when possible */
-//   line-height: 1.4; /* Improve spacing between wrapped lines */
-//   padding: 8px 12px; /* Add padding for better readability */
-//   box-sizing: border-box; /* Ensure padding doesn't affect the width */
-// }
-
-// /* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
-// .wrap-text2 ::ng-deep .highlighted {
-//   background-color: #E6CCFF; /* Softer purple highlight */
-//   font-weight: 500; /* Slightly bold but not too heavy */
-//   color: #000000; /* Black text */
-// }
-
-// /* Ensure the table cell aligns properly */
-// mat-cell.wrap-text2 {
-//   display: table-cell;
-//   vertical-align: top; /* Align text to the top of the cell */
-// }
-
-// /* Custom tab label styling */
-// .custom-tab-label {
-//   font-weight: bold;
-//   cursor: pointer;
-//   color: #A100FF; /* Purple for tab labels */
-//   transition: color 0.3s, transform 0.2s;
-// }
-
-// .custom-tab-label:hover {
-//   color: #7A00CC; /* Darker purple on hover */
-//   transform: scale(1.05);
-// }
-
-// /* Additional styles for filter section */
-// .filter-header {
-//   display: flex;
-//   align-items: center;
-//   gap: 10px;
-//   padding: 10px;
-// }
-
-// .filter-options {
-//   display: flex;
-//   flex-wrap: wrap;
-//   padding: 10px;
-// }
-
-// .loading-spinner {
-//   display: flex;
-//   align-items: center;
-//   gap: 5px;
-//   padding: 10px;
-//   font-size: 14px;
-// }
-
-// /* Ensure mat-option styling */
-// mat-option {
-//   border-bottom: 1px solid #000000; /* Black border */
-// }
-
-// table.mat-table {
-//   width: 100%;
-//   position: relative;
-//   border-collapse: collapse;
-//   overflow-x: auto; /* Enable horizontal scrolling */
-//   display: block; /* Already present in your code */
-//   height: 500px; /* Already present in your code */
-//   overflow-y: auto; /* Already present in your code */
-//   overflow-x: auto;
-// }
-
-// .table-scroll-container {
-//   width: 100%;
-//   display: block;
-// }
-
-// /* Add a minimum width to table so that it overflows horizontally */
-// .full-width-table {
-//   min-width: 1200px; /* You can adjust this */
-//   width: max-content;
-// }
-
-// /* Optional: make scrollbar always visible on Windows/macOS */
-// .table-scroll-container::-webkit-scrollbar {
-//   height: 8px;
-// }
-
-// .table-scroll-container::-webkit-scrollbar-thumb {
-//   background-color: #A100FF; /* Purple scrollbar */
-//   border-radius: 10px;
-// }
-
-// .sticky-header {
-//   position: sticky !important;
-//   top: 0;
-//   background-color: white;
-//   z-index: 10;
-//   font-weight: bolder;
-//   padding: 8px;
-// }
-
-// .sticky-header-row {
-//   position: sticky !important;
-//   top: 0;
-//   background-color: white;
-//   z-index: 10;
-// }
-
-// th.mat-header-cell,
-// td.mat-cell {
-//   padding: 8px;
-//   border-bottom: 1px solid #A100FF; /* Purple border */
-// }
-
-// th.mat-header-cell {
-//   text-align: left;
-//   color: #000000; /* Black text */
-// }
-
-// .sticky-filter-row {
-//   position: sticky;
-//   top: 60px; 
-//   z-index: 900; 
-//   background-color: white;
-//   padding: 8px 0;
-// }
-
-// .no-results {
-//   font-size: 16px;
-//   color: #666;
-//   text-align: center;
-//   padding: 20px;
-// }
-
-// .no-data-message {
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 20px;
-//   color: #666;
-//   font-style: italic;
-//   min-height: 200px;
-// }
-
-// .no-data-message mat-icon {
-//   font-size: 48px;
-//   color: #A100FF; /* Purple icon */
-//   margin-bottom: 10px;
-// }
-
-// .mat-drawer-inner-container {
-//   width: 100%;
-//   height: 68%;
-// }
-
-// ::ng-deep .mat-drawer-side {
-//   box-shadow: none;
-//   border-right-style: none !important; 
-//   border-right-color: var(--mat-sidenav-container-divider-color);
-// }
-
-// ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
-//   justify-content: space-evenly;
-//   margin-left: -58px;
-// }
-
-// ::ng-deep .mat-mdc-tab-labels {
-//   margin-bottom: 13px;
-// }
-
-// :host ::ng-deep {
-//   .plaintiff {
-//     color: #A100FF !important; /* Purple for plaintiff */
-//   }
-//   .defendant {
-//     color: brown !important; /* Black for defendant */
-//   }
-// }
-
-
-
-
-// .carde {
-//   transition: transform 0.3s ease;
-//   line-height: 20px;
-//   font-size: 14px;
-//   font-weight: bolder;
-//   color: black; /* Default color */
-//   // box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-// }
-
-// .carde:hover {
-//   // transform: scale(1.05); /* 5% bahar nikalta hai */
-//   transform: translateY(-5px);
-// }
-
-
-
-
-
-
-
-
-// // ------------------------------
-
-
-// :root {
-//   --primary-color: #1976D2; /* Professional blue for primary elements */
-//   --accent-color: #90CAF9; /* Lighter blue for secondary elements */
-//   --text-color: #212121; /* Dark gray for text in light mode */
-//   --background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Subtle gray gradient for light mode */
-//   --content-bg: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Same gradient for content background */
-// }
-
-// .dark-mode {
-//   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient for dark mode */
-//   color: #ffffff;
-// }
-
-// /* Optional transition for smooth effect */
-// body {
-//   transition: background-color 0.3s ease, color 0.3s ease;
-// }
-
-// body.dark-mode {
-//   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient */
-//   color: #E0E0E0; /* Light gray text for dark mode */
-//   --background: linear-gradient(135deg, #212529, #343A40); /* Update variable for dark mode */
-//   --content-bg: linear-gradient(135deg, #212529, #343A40); /* Update content background for dark mode */
-//   --text-color: #E0E0E0; /* Light gray text in dark mode */
+//   background: linear-gradient(135deg, #1A3C6D, #2A4B8A); /* Deep navy blue gradient */
+//   color: #E0E0E0;
+//   --background: linear-gradient(135deg, #1A3C6D, #2A4B8A);
+//   --content-bg: linear-gradient(135deg, #1A3C6D, #2A4B8A);
+//   --text-color: #E0E0E0;
 // }
 
 // body, html {
@@ -442,523 +1356,87 @@
 // }
 
 // body.light-mode {
-//   background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Light mode gradient */
-//   color: #212121; /* Dark gray text */
+//   background: linear-gradient(135deg, #F9FBFF, #FFFFFF); /* Light mode gradient */
+//   color: #333333;
 // }
 
-// /* General layout for the drawer container */
+// /* Drawer container styling */
 // .drawer-container {
 //   margin: 0;
 //   padding: 0;
 //   height: auto;
 //   width: 100%;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Sidenav styles */
-// mat-sidenav {
-//   width: 23%;
-//   height: 100vh;
-//   background: var(--content-bg); /* Same gradient background as the rest of the UI */
-// }
-
-// .mat-drawer-inner-container {
-//   width: 100%;
-//   height: 68%;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// ::ng-deep .mat-drawer-side {
-//   box-shadow: none;
-//   border-right-style: none !important; 
-//   border-right-color: var(--mat-sidenav-container-divider-color);
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Ensure mat-expansion-panel and its children take the correct width */
-// mat-expansion-panel {
-//   width: 100%;
-//   box-sizing: border-box;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// mat-expansion-panel section,
-// mat-expansion-panel mat-form-field {
-//   width: 100%;
-//   box-sizing: border-box;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Style for scrollable radio group (used in Case Status, etc.) */
-// .scrollable-radio-group {
-//   max-height: 200px;
-//   width: 100%;
-//   overflow-y: auto;
-//   overflow-x: auto;
-//   scrollbar-width: none; /* Hide scrollbar for Firefox */
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// .scrollable-radio-group::-webkit-scrollbar {
-//   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
-// }
-
-// /* Year filter buttons styling */
-// .year-filter-buttons {
-//   display: flex;
-//   gap: 10px;
-//   margin: 0;
-// }
-
-// .year-filter-buttons button {
-//   padding: 12px 24px;
-//   background-color: #e3f2fd; /* Inactive light blue */
-//   border: 1px solid #1976d2;
-//   color: #212121;
-//   border-radius: 8px;
-//   font-weight: 500;
-//   font-size: 16px;
-//   cursor: pointer;
-//   transition: all 0.3s ease;
-//   box-shadow: 0 2px 6px rgba(25, 118, 210, 0.15);
-// }
-
-// .year-filter-buttons button:hover {
-//   background-color: #bbdefb; /* Slightly darker on hover */
-//   transform: translateY(-2px);
-//   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
-// }
-
-// .year-filter-buttons button:active {
-//   background-color: #90caf9;
-//   transform: scale(0.97);
-//   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
-// }
-
-// .year-filter-buttons button.active {
-//   background-color: #1976d2;
-//   color: white;
-//   border-color: #1976d2;
-//   box-shadow: 0 4px 10px rgba(25, 118, 210, 0.5);
-// }
-
-
-// /* Sticky filter row (year filter buttons) */
-// .sticky-filter-row {
-//   position: sticky;
-//   top: 70px; /* Adjust based on the height of the Quick Search bar */
-//   z-index: 999; /* Below Quick Search but above table headers */
-//   background: var(--content-bg); /* Consistent background */
-//   padding: 8px 0;
-// }
-
-// /* Ensure mat-sidenav-content can handle scrolling */
-// mat-sidenav-content {
-//   height: auto;
-//   background: var(--content-bg); /* Consistent background */
-//   margin: 0;
-//   padding: 0;
-//   overflow-y: auto; /* Allow scrolling if content overflows */
-// }
-
-// /* Ensure the table has a block display for scrolling */
-// mat-table {
-//   display: block;
-//   height: 500px;
-//   overflow-y: auto;
-//   overflow-x: auto;
-//   margin: 0;
-//   padding: 0 10px;
-//   width: 100%;
-//   scrollbar-width: none; /* Hide scrollbar for Firefox */
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// mat-table::-webkit-scrollbar {
-//   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
-// }
-
-// /* Ensure the header row is sticky */
-// mat-header-row {
-//   position: sticky;
-//   top: 0; /* Stick to the top of the table */
-//   z-index: 10; /* Ensure headers stay above table body */
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Style the header cells */
-// mat-header-cell {
-//   font-weight: bolder;
-//   position: sticky;
-//   top: 0;
-//   background: var(--content-bg); /* Consistent background */
-//   z-index: 10;
-//   padding: 8px 16px;
-//   color: var(--text-color); /* Consistent text color */
-// }
-
-// /* Ensure table rows and cells behave correctly */
-// mat-row {
-//   display: table-row;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// mat-cell {
-//   display: table-cell;
-//   font-weight: 500;
-//   padding: 8px 16px;
-//   color: var(--text-color); /* Consistent text color */
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Alternating row colors for better readability */
-// mat-row:nth-child(even) {
-//   background: #E8ECEF; /* Slightly darker shade of the gradient for even rows */
-// }
-
-// body.dark-mode mat-row:nth-child(even) {
-//   background: #343A40; /* Slightly lighter shade of the dark gradient */
-// }
-
-// /* Hover effect for all rows */
-// .mat-row:hover {
-//   background-color: #E3F2FD; /* Light blue on hover */
-//   cursor: pointer;
-//   transition: background-color 0.2s ease-in-out;
-// }
-
-// /* Specific style for Case Date column */
-// .mat-column-caseComplaintDate {
-//   font-weight: 500;
-//   color: var(--text-color); /* Consistent text color */
-// }
-
-// /* No-wrap class for columns */
-// .no-wrap {
-//   white-space: nowrap;
-//   overflow: hidden;
-//   text-overflow: ellipsis;
-//   width: 10%;
-// }
-
-// .wrap-text2 {
-//   width: 100px; /* Adjusted fixed width */
-//   white-space: normal; /* Allow text to wrap to the next line */
-//   overflow-wrap: break-word; /* Wrap at word boundaries when possible */
-//   line-height: 1.4; /* Improve spacing between wrapped lines */
-//   padding: 8px 12px; /* Add padding for better readability */
-//   box-sizing: border-box; /* Ensure padding doesn't affect the width */
-// }
-
-// /* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
-// .wrap-text2 ::ng-deep .highlighted {
-//   background-color: #E3F2FD; /* Light blue highlight */
-//   font-weight: 500; /* Slightly bold but not too heavy */
-//   color: var(--text-color); /* Consistent text color */
-// }
-
-// /* Ensure the table cell aligns properly */
-// mat-cell.wrap-text2 {
-//   display: table-cell;
-//   vertical-align: top; /* Align text to the top of the cell */
-// }
-
-// /* Custom tab label styling */
-// .custom-tab-label {
-//   font-weight: bold;
-//   cursor: pointer;
-//   color: #1976D2; /* Blue for tab labels */
-//   transition: color 0.3s, transform 0.2s;
-// }
-
-// .custom-tab-label:hover {
-//   color: #1565C0; /* Darker blue on hover */
-//   transform: scale(1.05);
-// }
-
-// /* Additional styles for filter section */
-// .filter-header {
-//   display: flex;
-//   align-items: center;
-//   gap: 10px;
-//   padding: 10px;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// .filter-options {
-//   display: flex;
-//   flex-wrap: wrap;
-//   padding: 10px;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// .loading-spinner {
-//   display: flex;
-//   align-items: center;
-//   gap: 5px;
-//   padding: 10px;
-//   font-size: 14px;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Ensure mat-option styling */
-// mat-option {
-//   border-bottom: 1px solid var(--accent-color); /* Light blue border */
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// table.mat-table {
-//   width: 100%;
-//   position: relative;
-//   border-collapse: collapse;
-//   overflow-x: auto; /* Enable horizontal scrolling */
-//   display: block;
-//   height: 500px;
-//   overflow-y: auto;
-//   overflow-x: auto;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// .table-scroll-container {
-//   width: 100%;
-//   display: block;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Add a minimum width to table so that it overflows horizontally */
-// .full-width-table {
-//   min-width: 1200px; /* You can adjust this */
-//   width: max-content;
-// }
-
-// /* Optional: make scrollbar always visible on Windows/macOS */
-// .table-scroll-container::-webkit-scrollbar {
-//   height: 8px;
-// }
-
-// .table-scroll-container::-webkit-scrollbar-thumb {
-//   background-color: #1976D2; /* Blue scrollbar */
-//   border-radius: 10px;
-// }
-
-// .sticky-header {
-//   position: sticky !important;
-//   top: 0;
-//   background: var(--content-bg); /* Consistent background */
-//   z-index: 10;
-//   font-weight: bolder;
-//   padding: 8px;
-// }
-
-// .sticky-header-row {
-//   position: sticky !important;
-//   top: 0;
-//   background: var(--content-bg); /* Consistent background */
-//   z-index: 10;
-// }
-
-// th.mat-header-cell,
-// td.mat-cell {
-//   padding: 8px;
-//   border-bottom: 1px solid #90CAF9; /* Light blue border */
-// }
-
-// th.mat-header-cell {
-//   text-align: left;
-//   color: var(--text-color); /* Consistent text color */
-// }
-
-// .sticky-filter-row {
-//   position: sticky;
-//   top: 60px; 
-//   z-index: 900; 
-//   background: var(--content-bg); /* Consistent background */
-//   padding: 8px 0;
-// }
-
-// .no-results {
-//   font-size: 16px;
-//   color: #666;
-//   text-align: center;
-//   padding: 20px;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// .no-data-message {
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   justify-content: center;
-//   padding: 20px;
-//   color: #666;
-//   font-style: italic;
-//   min-height: 200px;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// .no-data-message mat-icon {
-//   font-size: 48px;
-//   color: #1976D2; /* Blue icon */
-//   margin-bottom: 10px;
-// }
-
-// ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
-//   justify-content: space-evenly;
-//   margin-left: -58px;
-// }
-
-// ::ng-deep .mat-mdc-tab-labels {
-//   margin-bottom: 13px;
-// }
-
-// :host ::ng-deep {
-//   .plaintiff {
-//     color: #1976D2 !important; /* Blue for plaintiff */
-//   }
-//   .defendant {
-//     color: #D32F2F !important; /* Red for defendant */
-//   }
-// }
-
-// .carde {
-//   transition: transform 0.3s ease;
-//   line-height: 20px;
-//   font-size: 14px;
-//   font-weight: bolder;
-//   color: black; /* Default color */
-// }
-
-// .carde:hover {
-//   transform: translateY(-5px);
-// }
-// .active-title {
-//   color: #1976D2 !important; /* Purple when panel is expanded */
-// }
-
-
-
-// ::ng-deep .mat-drawer-inner-container {
-//   width: 100%;
-//   height: 68%;
-//   overflow: auto;
-//   -webkit-overflow-scrolling: touch;
-// }
-
-
-
-
-
-
-// :root {
-//   --primary-color: #1976D2; /* Professional blue for primary elements */
-//   --accent-color: #90CAF9; /* Lighter blue for secondary elements */
-//   --text-color: #212121; /* Dark gray for text in light mode */
-//   --background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Subtle gray gradient for light mode */
-//   --content-bg: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Same gradient for content background */
-// }
-
-// .dark-mode {
-//   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient for dark mode */
-//   color: #ffffff;
-// }
-
-// /* Optional transition for smooth effect */
-// body {
-//   transition: background-color 0.3s ease, color 0.3s ease;
-// }
-
-// body.dark-mode {
-//   background: linear-gradient(135deg, #212529, #343A40); /* Dark gradient */
-//   color: #E0E0E0; /* Light gray text for dark mode */
-//   --background: linear-gradient(135deg, #212529, #343A40); /* Update variable for dark mode */
-//   --content-bg: linear-gradient(135deg, #212529, #343A40); /* Update content background for dark mode */
-//   --text-color: #E0E0E0; /* Light gray text in dark mode */
-// }
-
-// body, html {
-//   background: var(--background);
-// }
-
-// mat-sidenav-content {
 //   background: var(--content-bg);
 // }
 
-// body.light-mode {
-//   background: linear-gradient(135deg, #F5F7FA, #E8ECEF); /* Light mode gradient */
-//   color: #212121; /* Dark gray text */
-// }
-
-// /* General layout for the drawer container */
-// .drawer-container {
-//   margin: 0;
-//   padding: 0;
-//   height: auto;
-//   width: 100%;
-//   background: var(--content-bg); /* Consistent background */
-// }
-
-// /* Sidenav styles */
+// /* Sidenav styles with elegant shadow */
 // mat-sidenav {
 //   width: 23%;
-//   height: 100vh;
-//   background: var(--content-bg); /* Same gradient background as the rest of the UI */
+//   height: 94vh;
+//   background: var(--content-bg);
+//   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 // }
 
-// .mat-drawer-inner-container {
-//   width: 100%;
-//   height: 69%; 
-//   background: var(--content-bg); /* Consistent background */
-//   overflow: auto;
-//   -webkit-overflow-scrolling: touch;
-// }
-// /* Use this in global styles.scss or component .scss */
+// // .mat-drawer-inner-container {
+// //   width: 100%;
+// //   height: 69%;
+// //   background: var(--content-bg);
+// //   overflow: auto;
+// //   -webkit-overflow-scrolling: touch;
+// // }
 
 // ::ng-deep .mat-drawer-inner-container {
 //   width: 100% !important;
 //   height: 69% !important;
-//   background: var(--content-bg); /* Optional: match your app theme */
+//   background: var(--content-bg);
 //   overflow: auto;
 //   -webkit-overflow-scrolling: touch;
 // }
 
-
-
 // ::ng-deep .mat-drawer-side {
 //   box-shadow: none;
 //   border-right-style: none !important;
-//   border-right-color: var(--mat-sidenav-container-divider-color);
-//   background: var(--content-bg); /* Consistent background */
+//   border-right-color: var(--accent-color); /* Gold border */
+//   background: var(--content-bg);
 // }
 
-// /* Ensure mat-expansion-panel and its children take the correct width */
+// /* Expansion panel styling */
 // mat-expansion-panel {
 //   width: 100%;
 //   box-sizing: border-box;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
+//   border-radius: 8px;
+//   margin-bottom: 10px;
+//   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+//   transition: box-shadow 0.3s ease;
+
+//   &:hover {
+//     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+//   }
 // }
 
 // mat-expansion-panel section,
 // mat-expansion-panel mat-form-field {
 //   width: 100%;
 //   box-sizing: border-box;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
-// /* Style for scrollable radio group (used in Case Status, etc.) */
+// /* Scrollable radio group styling */
 // .scrollable-radio-group {
 //   max-height: 200px;
 //   width: 100%;
 //   overflow-y: auto;
 //   overflow-x: auto;
-//   scrollbar-width: none; /* Hide scrollbar for Firefox */
-//   background: var(--content-bg); /* Consistent background */
+//   scrollbar-width: none;
+//   background: var(--content-bg);
 // }
 
 // .scrollable-radio-group::-webkit-scrollbar {
-//   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+//   display: none;
 // }
 
-// /* Year filter buttons styling */
+// /* Year filter buttons with gold accents */
 // .year-filter-buttons {
 //   display: flex;
 //   gap: 10px;
@@ -967,55 +1445,57 @@
 
 // .year-filter-buttons button {
 //   padding: 12px 24px;
-//   background-color: #e3f2fd; /* Inactive light blue */
-//   border: 1px solid #1976d2;
-//   color: #212121;
+//   background-color: #E6F0FA; /* Light blue */
+//   border: 1px solid #D4AF37; /* Gold border */
+//   color: #1A3C6D; /* Deep navy blue text */
 //   border-radius: 8px;
+//   font-family: "Roboto", sans-serif;
 //   font-weight: 500;
 //   font-size: 16px;
 //   cursor: pointer;
 //   transition: all 0.3s ease;
-//   box-shadow: 0 2px 6px rgba(25, 118, 210, 0.15);
+//   box-shadow: 0 2px 6px rgba(26, 60, 109, 0.15); /* Navy blue shadow */
 // }
 
 // .year-filter-buttons button:hover {
-//   background-color: #bbdefb; /* Slightly darker on hover */
+//   background-color: #D9E8FF; /* Slightly darker blue */
 //   transform: translateY(-2px);
-//   box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+//   box-shadow: 0 4px 12px rgba(26, 60, 109, 0.3);
 // }
 
 // .year-filter-buttons button:active {
-//   background-color: #90caf9;
+//   background-color: #D4AF37; /* Gold on click */
 //   transform: scale(0.97);
 //   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 // }
 
 // .year-filter-buttons button.active {
-//   background-color: #1976d2;
-//   color: white;
-//   border-color: #1976d2;
-//   box-shadow: 0 4px 10px rgba(25, 118, 210, 0.5);
+//   background: linear-gradient(90deg, #D4AF37, #B8972E); /* Gold gradient */
+//   color: #FFFFFF;
+//   border-color: #D4AF37;
+//   box-shadow: 0 4px 10px rgba(212, 175, 55, 0.5);
 // }
 
-// /* Sticky filter row (year filter buttons) */
+// /* Sticky filter row */
 // .sticky-filter-row {
 //   position: sticky;
-//   top: 70px; /* Adjust based on the height of the Quick Search bar */
-//   z-index: 999; /* Below Quick Search but above table headers */
-//   background: var(--content-bg); /* Consistent background */
+//   top: 70px;
+//   z-index: 999;
+//   background: var(--content-bg);
 //   padding: 8px 0;
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 // }
 
-// /* Ensure mat-sidenav-content can handle scrolling */
+// /* Sidenav content */
 // mat-sidenav-content {
 //   height: auto;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 //   margin: 0;
 //   padding: 0;
-//   overflow-y: auto; /* Allow scrolling if content overflows */
+//   overflow-y: auto;
 // }
 
-// /* Ensure the table has a block display for scrolling */
+// /* Table styling */
 // mat-table {
 //   display: block;
 //   height: 500px;
@@ -1024,67 +1504,71 @@
 //   margin: 0;
 //   padding: 0 10px;
 //   width: 100%;
-//   scrollbar-width: none; /* Hide scrollbar for Firefox */
-//   background: var(--content-bg); /* Consistent background */
+//   scrollbar-width: none;
+//   background: var(--content-bg);
 // }
 
 // mat-table::-webkit-scrollbar {
-//   display: none; /* Hide scrollbar for Chrome, Safari, Edge */
+//   display: none;
 // }
 
-// /* Ensure the header row is sticky */
+// /* Sticky header row */
 // mat-header-row {
 //   position: sticky;
-//   top: 0; /* Stick to the top of the table */
-//   z-index: 10; /* Ensure headers stay above table body */
-//   background: var(--content-bg); /* Consistent background */
+//   top: 0;
+//   z-index: 10;
+//   background: var(--content-bg);
 // }
 
-// /* Style the header cells */
+// /* Header cells with navy blue text */
 // mat-header-cell {
-//   font-weight: bolder;
+//   font-family: "Roboto", sans-serif;
+//   font-weight: 700;
 //   position: sticky;
 //   top: 0;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 //   z-index: 10;
-//   padding: 8px 16px;
-//   color: var(--text-color); /* Consistent text color */
+//   padding: 10px 16px;
+//   color: #1A3C6D; /* Deep navy blue */
+//   border-bottom: 2px solid #D4AF37; /* Gold border */
 // }
 
-// /* Ensure table rows and cells behave correctly */
+// /* Table rows and cells */
 // mat-row {
 //   display: table-row;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
 // mat-cell {
 //   display: table-cell;
+//   font-family: "Roboto", sans-serif;
 //   font-weight: 500;
-//   padding: 8px 16px;
-//   color: var(--text-color); /* Consistent text color */
-//   background: var(--content-bg); /* Consistent background */
+//   padding: 10px 16px;
+//   color: #333333;
+//   background: var(--content-bg);
+//   border-bottom: 1px solid #D4AF37; /* Gold border */
 // }
 
-// /* Alternating row colors for better readability */
+// /* Alternating row colors */
 // mat-row:nth-child(even) {
-//   background: #E8ECEF; /* Slightly darker shade of the gradient for even rows */
+//   background: #E6F0FA; /* Light blue for even rows */
 // }
 
 // body.dark-mode mat-row:nth-child(even) {
-//   background: #343A40; /* Slightly lighter shade of the dark gradient */
+//   background: #2A4B8A; /* Slightly lighter navy for dark mode */
 // }
 
-// /* Hover effect for all rows */
+// /* Hover effect for rows */
 // .mat-row:hover {
-//   background-color: #E3F2FD; /* Light blue on hover */
+//   background-color: #D9E8FF; /* Slightly darker blue on hover */
 //   cursor: pointer;
 //   transition: background-color 0.2s ease-in-out;
 // }
 
-// /* Specific style for Case Date column */
+// /* Case Date column */
 // .mat-column-caseComplaintDate {
 //   font-weight: 500;
-//   color: var(--text-color); /* Consistent text color */
+//   color: #333333;
 // }
 
 // /* No-wrap class for columns */
@@ -1093,57 +1577,60 @@
 //   overflow: hidden;
 //   text-overflow: ellipsis;
 //   width: 10%;
+//   border-bottom: 2px solid #999;
 // }
 
 // .wrap-text2 {
-//   width: 100px; /* Adjusted fixed width */
-//   white-space: normal; /* Allow text to wrap to the next line */
-//   overflow-wrap: break-word; /* Wrap at word boundaries when possible */
-//   line-height: 1.4; /* Improve spacing between wrapped lines */
-//   padding: 8px 12px; /* Add padding for better readability */
-//   box-sizing: border-box; /* Ensure padding doesn't affect the width */
+//   width: 100px;
+//   white-space: normal;
+//   overflow-wrap: break-word;
+//   line-height: 1.4;
+//   padding: 8px 12px;
+//   box-sizing: border-box;
+//   border-bottom: 2px solid #999;
 // }
 
-// /* Optional: Style for highlighted text (if caseNameHighlight applies styles) */
 // .wrap-text2 ::ng-deep .highlighted {
-//   background-color: #E3F2FD; /* Light blue highlight */
-//   font-weight: 500; /* Slightly bold but not too heavy */
-//   color: var(--text-color); /* Consistent text color */
+//   background-color: #D9E8FF; /* Slightly darker blue highlight */
+//   font-weight: 500;
+//   color: #333333;
+//   border-bottom: 2px solid #999;
 // }
 
-// /* Ensure the table cell aligns properly */
 // mat-cell.wrap-text2 {
 //   display: table-cell;
-//   vertical-align: top; /* Align text to the top of the cell */
+//   vertical-align: top;
 // }
 
 // /* Custom tab label styling */
 // .custom-tab-label {
-//   font-weight: bold;
+//   font-family: "Roboto", sans-serif; /* Elegant font */
+//   font-weight: 700;
 //   cursor: pointer;
-//   color: #1976D2; /* Blue for tab labels */
+//   color: #1A3C6D; /* Deep navy blue */
 //   transition: color 0.3s, transform 0.2s;
+
+//   &:hover {
+//     color: #D4AF37; /* Gold on hover */
+//     transform: scale(1.05);
+//   }
 // }
 
-// .custom-tab-label:hover {
-//   color: #1565C0; /* Darker blue on hover */
-//   transform: scale(1.05);
-// }
-
-// /* Additional styles for filter section */
+// /* Filter section styling */
 // .filter-header {
 //   display: flex;
 //   align-items: center;
 //   gap: 10px;
 //   padding: 10px;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
+//   border-bottom: 1px solid #D4AF37; /* Gold border */
 // }
 
 // .filter-options {
 //   display: flex;
 //   flex-wrap: wrap;
 //   padding: 10px;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
 // .loading-spinner {
@@ -1152,98 +1639,91 @@
 //   gap: 5px;
 //   padding: 10px;
 //   font-size: 14px;
-//   background: var(--content-bg); /* Consistent background */
+//   color: #1A3C6D; /* Deep navy blue */
+//   background: var(--content-bg);
 // }
 
-// /* Ensure mat-option styling */
+// /* Mat-option styling */
 // mat-option {
-//   border-bottom: 1px solid var(--accent-color); /* Light blue border */
-//   background: var(--content-bg); /* Consistent background */
+//   border-bottom: 1px solid #D4AF37; /* Gold border */
+//   background: var(--content-bg);
 // }
 
 // table.mat-table {
 //   width: 100%;
 //   position: relative;
 //   border-collapse: collapse;
-//   overflow-x: auto; /* Enable horizontal scrolling */
+//   overflow-x: auto;
 //   display: block;
 //   height: 500px;
 //   overflow-y: auto;
 //   overflow-x: auto;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
 // .table-scroll-container {
 //   width: 100%;
 //   display: block;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
-// /* Add a minimum width to table so that it overflows horizontally */
 // .full-width-table {
-//   min-width: 1200px; /* You can adjust this */
+//   min-width: 1200px;
 //   width: max-content;
 // }
 
-// /* Optional: make scrollbar always visible on Windows/macOS */
 // .table-scroll-container::-webkit-scrollbar {
 //   height: 8px;
 // }
 
 // .table-scroll-container::-webkit-scrollbar-thumb {
-//   background-color: #1976D2; /* Blue scrollbar */
+//   background-color: #D4AF37; /* Gold scrollbar */
 //   border-radius: 10px;
 // }
 
-// .sticky-header {
+// .sticky-header,
+// .mat-header-row {
 //   position: sticky !important;
 //   top: 0;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 //   z-index: 10;
-//   font-weight: bolder;
+//   font-weight: 700;
 //   padding: 8px;
-// }
-// .sticky-header, .mat-header-row {
-//   background-color: white !important;
-//   z-index: 2;
-// }
-
-// .sticky-header-row {
-//   background-color: white !important;
-//   z-index: 2;
-//   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-// }
-
-
-// /* Optional: add subtle bottom border */
-// .mat-header-row th {
-//   border-bottom: 1px solid #ccc;
+//   background-color: #FFFFFF !important;
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 // }
 
 // .sticky-header-row {
 //   position: sticky !important;
 //   top: 0;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 //   z-index: 10;
+//   background-color: #FFFFFF !important;
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+// }
+
+// .mat-header-row th {
+//   border-bottom: 2px solid #D4AF37; /* Gold border */
 // }
 
 // th.mat-header-cell,
 // td.mat-cell {
 //   padding: 8px;
-//   border-bottom: 1px solid #90CAF9; /* Light blue border */
+//   border-bottom: 1px solid #D4AF37; /* Gold border */
 // }
 
 // th.mat-header-cell {
 //   text-align: left;
-//   color: var(--text-color); /* Consistent text color */
+//   color: #1A3C6D; /* Deep navy blue */
 // }
 
 // .no-results {
+//   font-family: "Roboto", sans-serif;
 //   font-size: 16px;
 //   color: #666;
 //   text-align: center;
 //   padding: 20px;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
 // .no-data-message {
@@ -1255,12 +1735,12 @@
 //   color: #666;
 //   font-style: italic;
 //   min-height: 200px;
-//   background: var(--content-bg); /* Consistent background */
+//   background: var(--content-bg);
 // }
 
 // .no-data-message mat-icon {
 //   font-size: 48px;
-//   color: #1976D2; /* Blue icon */
+//   color: #1A3C6D; /* Deep navy blue icon */
 //   margin-bottom: 10px;
 // }
 
@@ -1275,7 +1755,7 @@
 
 // :host ::ng-deep {
 //   .plaintiff {
-//     color: #1976D2 !important; /* Blue for plaintiff */
+//     color: #1A3C6D !important; /* Deep navy blue for plaintiff */
 //   }
 //   .defendant {
 //     color: #D32F2F !important; /* Red for defendant */
@@ -1286,8 +1766,8 @@
 //   transition: transform 0.3s ease;
 //   line-height: 20px;
 //   font-size: 14px;
-//   font-weight: bolder;
-//   color: black; /* Default color */
+//   font-weight: 700;
+//   color: #333333;
 // }
 
 // .carde:hover {
@@ -1295,56 +1775,75 @@
 // }
 
 // .active-title {
-//   color: #1976D2 !important; /* Blue when panel is expanded */
+//   color: #D4AF37 !important; /* Gold when panel is expanded */
 // }
 
-
-// /* Light gray and white alternate rows */
+// /* Alternating row colors */
 // .even-row {
-//   background-color: lightgrey;  /* dark grey */
+//   background-color: #E6F0FA; /* Light blue */
 // }
 
 // .odd-row {
-//   background-color: white;  /* lightgrey */
+//   background-color: #FFFFFF; /* White */
 // }
 
-// /* Optional: Hover effect for rows */
 // tr.mat-row:hover {
-//   background-color: #e0e0e0;
+//   background-color: #D9E8FF; /* Slightly darker blue on hover */
 //   transition: background-color 0.2s ease;
 // }
 
+// ::ng-deep mat-expansion-panel {
+//   box-shadow: none !important;
+//   // border: none !important;
+//   border-bottom: 1px solid black !important;
+// }
+
+// ::ng-deep mat-expansion-panel:not(:last-of-type) {
+//   margin-bottom: 0px !important;
+//   border-bottom: none !important;
+// }
+
+// /* Remove the thin line below the header */
+// ::ng-deep mat-expansion-panel-header {
+//   border-bottom: none !important;
+//   box-shadow: none !important;
+// }
+
+// /* Also remove any default elevation */
+// ::ng-deep .mat-expansion-panel {
+//   box-shadow: none !important;
+// }
 
 
 
 
-
+@import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
 
 :root {
-  --primary-color: #1A3C6D; /* Deep navy blue for primary elements */
-  --accent-color: #D4AF37; /* Gold for secondary elements and accents */
-  --text-color: #333333; /* Dark gray for text in light mode */
-  --background: linear-gradient(135deg, #F9FBFF, #FFFFFF); /* Subtle light blue to white gradient */
-  --content-bg: linear-gradient(135deg, #F9FBFF, #FFFFFF); /* Same gradient for content */
+  --primary-color: #800080; /* Deep purple for primary elements */
+  --accent-color: #FFFFFF; /* White for secondary elements and accents */
+  --text-color: #000000; /* Black for text in light mode */
+  --background: linear-gradient(135deg, #FFFFFF, #E6E6FA); /* White to light purple gradient */
+  --content-bg: #FFFFFF; /* White background for content */
 }
 
 .dark-mode {
-  background: linear-gradient(135deg, #1A3C6D, #2A4B8A); /* Deep navy blue gradient for dark mode */
-  color: #E0E0E0; /* Light gray text */
+  background: linear-gradient(135deg, #000000, #2A0033); /* Black to dark purple gradient for dark mode */
+  color: #FFFFFF; /* White text */
 }
 
 /* Smooth transition for theme changes */
 body {
   transition: background-color 0.3s ease, color 0.3s ease;
-  font-family: "Roboto", sans-serif; /* Clean, modern font */
+  font-family: "Tenor Sans", sans-serif; /* Global Tenor Sans font */
 }
 
 body.dark-mode {
-  background: linear-gradient(135deg, #1A3C6D, #2A4B8A); /* Deep navy blue gradient */
-  color: #E0E0E0;
-  --background: linear-gradient(135deg, #1A3C6D, #2A4B8A);
-  --content-bg: linear-gradient(135deg, #1A3C6D, #2A4B8A);
-  --text-color: #E0E0E0;
+  background: linear-gradient(135deg, #000000, #2A0033); /* Black to dark purple gradient */
+  color: #FFFFFF;
+  --background: linear-gradient(135deg, #000000, #2A0033);
+  --content-bg: #2A0033; /* Dark purple background for content in dark mode */
+  --text-color: #FFFFFF;
 }
 
 body, html {
@@ -1356,8 +1855,8 @@ mat-sidenav-content {
 }
 
 body.light-mode {
-  background: linear-gradient(135deg, #F9FBFF, #FFFFFF); /* Light mode gradient */
-  color: #333333;
+  background: linear-gradient(135deg, #FFFFFF, #E6E6FA); /* White to light purple gradient */
+  color: #000000;
 }
 
 /* Drawer container styling */
@@ -1377,14 +1876,6 @@ mat-sidenav {
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-// .mat-drawer-inner-container {
-//   width: 100%;
-//   height: 69%;
-//   background: var(--content-bg);
-//   overflow: auto;
-//   -webkit-overflow-scrolling: touch;
-// }
-
 ::ng-deep .mat-drawer-inner-container {
   width: 100% !important;
   height: 69% !important;
@@ -1396,7 +1887,7 @@ mat-sidenav {
 ::ng-deep .mat-drawer-side {
   box-shadow: none;
   border-right-style: none !important;
-  border-right-color: var(--accent-color); /* Gold border */
+  border-right-color: var(--accent-color); /* White border */
   background: var(--content-bg);
 }
 
@@ -1445,35 +1936,35 @@ mat-expansion-panel mat-form-field {
 
 .year-filter-buttons button {
   padding: 12px 24px;
-  background-color: #E6F0FA; /* Light blue */
-  border: 1px solid #D4AF37; /* Gold border */
-  color: #1A3C6D; /* Deep navy blue text */
+  background-color: #E6E6FA; /* Light purple */
+  border: 1px solid #800080; /* Deep purple border */
+  color: #000000; /* Black text */
   border-radius: 8px;
-  font-family: "Roboto", sans-serif;
+  font-family: "Tenor Sans", sans-serif; /* Tenor Sans for buttons */
   font-weight: 500;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 6px rgba(26, 60, 109, 0.15); /* Navy blue shadow */
+  box-shadow: 0 2px 6px rgba(128, 0, 128, 0.15); /* Purple shadow */
 }
 
 .year-filter-buttons button:hover {
-  background-color: #D9E8FF; /* Slightly darker blue */
+  background-color: #D8BFD8; /* Thistle (lighter purple) */
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(26, 60, 109, 0.3);
+  box-shadow: 0 4px 12px rgba(128, 0, 128, 0.3);
 }
 
 .year-filter-buttons button:active {
-  background-color: #D4AF37; /* Gold on click */
+  background-color: #800080; /* Deep purple on click */
   transform: scale(0.97);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .year-filter-buttons button.active {
-  background: linear-gradient(90deg, #D4AF37, #B8972E); /* Gold gradient */
-  color: #FFFFFF;
-  border-color: #D4AF37;
-  box-shadow: 0 4px 10px rgba(212, 175, 55, 0.5);
+  background: linear-gradient(90deg, #800080, #4B0082); /* Deep purple to darker purple gradient */
+  color: #FFFFFF; /* White text */
+  border-color: #800080;
+  box-shadow: 0 4px 10px rgba(128, 0, 128, 0.5);
 }
 
 /* Sticky filter row */
@@ -1522,15 +2013,15 @@ mat-header-row {
 
 /* Header cells with navy blue text */
 mat-header-cell {
-  font-family: "Roboto", sans-serif;
+  font-family: "Tenor Sans", sans-serif; /* Tenor Sans for headers */
   font-weight: 700;
   position: sticky;
   top: 0;
   background: var(--content-bg);
   z-index: 10;
   padding: 10px 16px;
-  color: #1A3C6D; /* Deep navy blue */
-  border-bottom: 2px solid #D4AF37; /* Gold border */
+  color: #800080; /* Deep purple */
+  border-bottom: 2px solid #800080; /* Deep purple border */
 }
 
 /* Table rows and cells */
@@ -1541,26 +2032,26 @@ mat-row {
 
 mat-cell {
   display: table-cell;
-  font-family: "Roboto", sans-serif;
+  font-family: "Tenor Sans", sans-serif; /* Tenor Sans for cells */
   font-weight: 500;
   padding: 10px 16px;
-  color: #333333;
+  color: #000000; /* Black text */
   background: var(--content-bg);
-  border-bottom: 1px solid #D4AF37; /* Gold border */
+  border-bottom: 1px solid #800080; /* Deep purple border */
 }
 
 /* Alternating row colors */
 mat-row:nth-child(even) {
-  background: #E6F0FA; /* Light blue for even rows */
+  background: #E6E6FA; /* Light purple for even rows */
 }
 
 body.dark-mode mat-row:nth-child(even) {
-  background: #2A4B8A; /* Slightly lighter navy for dark mode */
+  background: #2A0033; /* Slightly lighter dark purple for dark mode */
 }
 
 /* Hover effect for rows */
 .mat-row:hover {
-  background-color: #D9E8FF; /* Slightly darker blue on hover */
+  background-color: #E6E6FA; /* Light purple on hover */
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
 }
@@ -1568,7 +2059,7 @@ body.dark-mode mat-row:nth-child(even) {
 /* Case Date column */
 .mat-column-caseComplaintDate {
   font-weight: 500;
-  color: #333333;
+  color: #000000; /* Black text */
 }
 
 /* No-wrap class for columns */
@@ -1577,6 +2068,7 @@ body.dark-mode mat-row:nth-child(even) {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 10%;
+  border-bottom: 2px solid #999;
 }
 
 .wrap-text2 {
@@ -1586,12 +2078,14 @@ body.dark-mode mat-row:nth-child(even) {
   line-height: 1.4;
   padding: 8px 12px;
   box-sizing: border-box;
+  border-bottom: 2px solid #999;
 }
 
 .wrap-text2 ::ng-deep .highlighted {
-  background-color: #D9E8FF; /* Slightly darker blue highlight */
+  background-color: #D8BFD8; /* Thistle highlight */
   font-weight: 500;
-  color: #333333;
+  color: #000000; /* Black text */
+  border-bottom: 2px solid #999;
 }
 
 mat-cell.wrap-text2 {
@@ -1601,14 +2095,14 @@ mat-cell.wrap-text2 {
 
 /* Custom tab label styling */
 .custom-tab-label {
-  font-family: "Roboto", sans-serif; /* Elegant font */
+  font-family: "Tenor Sans", sans-serif; /* Tenor Sans for tab labels */
   font-weight: 700;
   cursor: pointer;
-  color: #1A3C6D; /* Deep navy blue */
+  color: #800080; /* Deep purple */
   transition: color 0.3s, transform 0.2s;
 
   &:hover {
-    color: #D4AF37; /* Gold on hover */
+    color: #4B0082; /* Darker purple on hover */
     transform: scale(1.05);
   }
 }
@@ -1620,7 +2114,7 @@ mat-cell.wrap-text2 {
   gap: 10px;
   padding: 10px;
   background: var(--content-bg);
-  border-bottom: 1px solid #D4AF37; /* Gold border */
+  border-bottom: 1px solid #800080; /* Deep purple border */
 }
 
 .filter-options {
@@ -1636,13 +2130,13 @@ mat-cell.wrap-text2 {
   gap: 5px;
   padding: 10px;
   font-size: 14px;
-  color: #1A3C6D; /* Deep navy blue */
+  color: #800080; /* Deep purple */
   background: var(--content-bg);
 }
 
 /* Mat-option styling */
 mat-option {
-  border-bottom: 1px solid #D4AF37; /* Gold border */
+  border-bottom: 1px solid #800080; /* Deep purple border */
   background: var(--content-bg);
 }
 
@@ -1664,17 +2158,12 @@ table.mat-table {
   background: var(--content-bg);
 }
 
-.full-width-table {
-  min-width: 1200px;
-  width: max-content;
-}
-
 .table-scroll-container::-webkit-scrollbar {
   height: 8px;
 }
 
 .table-scroll-container::-webkit-scrollbar-thumb {
-  background-color: #D4AF37; /* Gold scrollbar */
+  background-color: #800080; /* Deep purple scrollbar */
   border-radius: 10px;
 }
 
@@ -1700,22 +2189,22 @@ table.mat-table {
 }
 
 .mat-header-row th {
-  border-bottom: 2px solid #D4AF37; /* Gold border */
+  border-bottom: 2px solid #800080; /* Deep purple border */
 }
 
 th.mat-header-cell,
 td.mat-cell {
   padding: 8px;
-  border-bottom: 1px solid #D4AF37; /* Gold border */
+  border-bottom: 1px solid #800080; /* Deep purple border */
 }
 
 th.mat-header-cell {
   text-align: left;
-  color: #1A3C6D; /* Deep navy blue */
+  color: #800080; /* Deep purple */
 }
 
 .no-results {
-  font-family: "Roboto", sans-serif;
+  font-family: "Tenor Sans", sans-serif; /* Tenor Sans for no-results */
   font-size: 16px;
   color: #666;
   text-align: center;
@@ -1737,7 +2226,7 @@ th.mat-header-cell {
 
 .no-data-message mat-icon {
   font-size: 48px;
-  color: #1A3C6D; /* Deep navy blue icon */
+  color: #800080; /* Deep purple icon */
   margin-bottom: 10px;
 }
 
@@ -1752,7 +2241,7 @@ th.mat-header-cell {
 
 :host ::ng-deep {
   .plaintiff {
-    color: #1A3C6D !important; /* Deep navy blue for plaintiff */
+    color: #800080 !important; /* Deep purple for plaintiff */
   }
   .defendant {
     color: #D32F2F !important; /* Red for defendant */
@@ -1764,7 +2253,8 @@ th.mat-header-cell {
   line-height: 20px;
   font-size: 14px;
   font-weight: 700;
-  color: #333333;
+  color: #000000; /* Black text */
+  font-family: "Tenor Sans", sans-serif; /* Tenor Sans for carde */
 }
 
 .carde:hover {
@@ -1772,12 +2262,12 @@ th.mat-header-cell {
 }
 
 .active-title {
-  color: #D4AF37 !important; /* Gold when panel is expanded */
+  color: #800080 !important; /* Deep purple when panel is expanded */
 }
 
 /* Alternating row colors */
 .even-row {
-  background-color: #E6F0FA; /* Light blue */
+  background-color: #E6E6FA; /* Light purple */
 }
 
 .odd-row {
@@ -1791,7 +2281,6 @@ tr.mat-row:hover {
 
 ::ng-deep mat-expansion-panel {
   box-shadow: none !important;
-  // border: none !important;
   border-bottom: 1px solid black !important;
 }
 

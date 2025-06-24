@@ -112,8 +112,8 @@ export class AuthService {
       this.userSubject.next(user);
     });
   }
-  private baseUrl = 'http://18.220.232.127'; // Base API URL
-  // private baseUrl = 'http://127.0.0.1:8000';
+  // private baseUrl = 'http://18.220.232.127'; // Base API URL
+  private baseUrl = 'http://127.0.0.1:8000';
   // Get the current user as an Observable
   getUserState(): Observable<User | null> {
     return this.userSubject.asObservable();
@@ -775,10 +775,18 @@ export class AuthService {
     const endpoint = `${this.baseUrl}/api/register/`;
     return this.http
       .post<any>(endpoint, payload, {
-        headers: { 'Skip-Auth-Interceptor': 'true' }, // Custom header to signal interceptor to skip
+        headers: { 'Skip-Auth-Interceptor': 'true' },
       })
       .pipe(
-        tap(() => this.router.navigate(['/login'])),
+        tap((response) => {
+          if (response?.access) {
+            localStorage.setItem('access', response.access);
+            localStorage.setItem('refresh', response.refresh);
+            this.router.navigate(['/']); // Only go inside the app when token is available
+          } else {
+            console.error('Token missing in registration response');
+          }
+        }),
         catchError((error: HttpErrorResponse) => {
           console.error('Registration failed', error);
           return of(null);

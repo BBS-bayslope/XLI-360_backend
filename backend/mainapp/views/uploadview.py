@@ -576,7 +576,6 @@ from io import BytesIO
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-
 # from .sync_module import sync_raw_to_case
 
 from mainapp.models import RawData, Case, Patent, CasePatent 

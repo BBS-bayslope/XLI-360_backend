@@ -8,6 +8,8 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
+import dayjs from 'dayjs';
+
 import { DarkModeService } from 'angular-dark-mode';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -74,12 +76,14 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { CaseNameHighlightPipe } from '../../../case-name-highlight.pipe';
 import { ReportsComponent } from './reports/reports.component';
+import { log } from 'console';
 
 @Component({
   selector: 'app-main-page',
   standalone: true,
   imports: [
-    // AngularDarkModeModule,
+    MatProgressSpinnerModule,
+
     ReportsComponent,
     MatIconModule,
     MatTooltipModule,
@@ -121,6 +125,7 @@ import { ReportsComponent } from './reports/reports.component';
     MatCardModule,
     MatProgressSpinnerModule,
     AnalyticsComponent,
+    // dayjs,
 
     // AnalyticsComponent,
   ],
@@ -220,6 +225,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    console.log("fetchdata",this.fetchData)
     this.darkModeService.darkMode$.subscribe((isDarkMode) => {
       if (isDarkMode) {
         document.body.classList.add('dark-mode');
@@ -323,6 +329,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       delete this.payload.year; // Remove the year property when "All" is selected
     }
+    console.log('Payload:', this.payload); // ✅ CHECK THIS
     this.fetchData();
   }
 
@@ -337,7 +344,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
           ...item,
           case_no: item.case_no || item.caseNumber || '',
           case_name: item.case_name || item.caseName || '',
+          similar_cases: item.similar_cases || [],
         }));
+
+        if (this.payload.year) {
+          this.tabledata = this.tabledata.filter((item) => {
+            const year = dayjs(item.complaint_date).year().toString();
+            return year === this.payload.year;
+          });
+        }
 
         // Check if any search filter was applied
         const searchValue = (
