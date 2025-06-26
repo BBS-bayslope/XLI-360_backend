@@ -53,7 +53,8 @@ export class ApiService {
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
   selectedCaseDocId: any;
-
+/////////////////////////////////////////////////
+////////////////
   private selectedCaseSubject = new BehaviorSubject<any>(null);
   selectedCase$ = this.selectedCaseSubject.asObservable();
 
