@@ -66,7 +66,8 @@
       <br />
 
       <!-- Litigation Venues & Judicial Authorities -->
-      <mat-expansion-panel #litigationPanel="matExpansionPanel">
+      <div class="panel-wrapper">
+      <mat-expansion-panel #litigationPanel="matExpansionPanel" >
         <mat-expansion-panel-header>
           <mat-panel-title class="carde"
           [ngClass]="{ 'active-title': litigationPanel.expanded }"
@@ -91,9 +92,12 @@
           <mat-spinner color="accent" diameter="15"></mat-spinner>
           <span style="font-size: 14px">fetching latest venues..</span>
         </div>
+        <!-- <hr style="border: 2px solid black; margin: 10px 0;"> Line added here -->
       </mat-expansion-panel>
+      </div>
 
       <!-- Case Status -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #casePanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casePanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Case Status </mat-panel-title>
@@ -108,8 +112,10 @@
           </mat-radio-group>
         </div>
       </mat-expansion-panel>
+      </div>
 
       <!-- Case Number -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #casenumberPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casenumberPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Case Number </mat-panel-title>
@@ -133,8 +139,11 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
+
 
       <!-- Case History -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #casehistoryPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casehistoryPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Case History </mat-panel-title>
@@ -145,8 +154,10 @@
           <input matSliderThumb [(ngModel)]="valueSlider" #slider (input)="onYearSliderChange(valueSlider)" />
         </mat-slider>
       </mat-expansion-panel>
+      </div>
 
       <!-- Case Filed Date -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #casefilePanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casefilePanel.expanded }"  style="font-size: 14px; font-weight: bolder;">Case Filed Date</mat-panel-title>
@@ -162,8 +173,10 @@
           <mat-date-range-picker #filedDatePicker></mat-date-range-picker>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
 
       <!-- Case Close Date -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #caseclosePanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': caseclosePanel.expanded }" style="font-size: 14px; font-weight: bolder;">Case Close Date</mat-panel-title>
@@ -179,8 +192,10 @@
           <mat-date-range-picker #closedDatePicker></mat-date-range-picker>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
 
       <!-- Plaintiff -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #plaintiffPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': plaintiffPanel.expanded }"
@@ -205,8 +220,10 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
 
       <!-- Defendant -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #defendantPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde"
@@ -232,8 +249,10 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
 
       <!-- Industry -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #industryPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': industryPanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Industry </mat-panel-title>
@@ -257,8 +276,10 @@
           </div>
         </section>
       </mat-expansion-panel>
+      </div>
 
       <!-- Tech Category -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #techcategoryPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': techcategoryPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Tech Category </mat-panel-title>
@@ -282,8 +303,10 @@
           </div>
         </section>
       </mat-expansion-panel>
+      </div>
 
       <!-- Technology Keywords -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #technologykeyPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': technologykeyPanel.expanded }" style="font-size: 14px; font-weight: bolder;">Technology Keywords</mat-panel-title>
@@ -309,8 +332,10 @@
           </div>
         </div>
       </mat-expansion-panel>
+      </div>
 
       <!-- Court Name -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #courtnamePanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="wrap-text2"  [ngClass]="{ 'active-title': courtnamePanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Court Name </mat-panel-title>
@@ -335,8 +360,10 @@
           </div>
         </section>
       </mat-expansion-panel>
+      </div>
 
       <!-- Acquisition Type -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #acquisitionPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': acquisitionPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Acquisition Type </mat-panel-title>
@@ -348,8 +375,10 @@
           </ng-container>
         </mat-radio-group>
       </mat-expansion-panel>
+      </div>
 
       <!-- Patent Type -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #patentPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': patentPanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Patent Type </mat-panel-title>
@@ -361,8 +390,10 @@
           </ng-container>
         </mat-radio-group>
       </mat-expansion-panel>
+      </div>
 
       <!-- Patent No. -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #patentnumPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': patentnumPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Patent No. </mat-panel-title>
@@ -387,8 +418,10 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
 
       <!-- Cause of Action -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #causeofactionPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': causeofactionPanel.expanded }"  style="font-size: 14px; font-weight: bolder;">Cause of Action</mat-panel-title>
@@ -412,8 +445,10 @@
           </mat-autocomplete>
         </mat-form-field>
       </mat-expansion-panel>
+      </div>
 
       <!-- Standard Essential Patent -->
+      <div class="panel-wrapper">
       <mat-expansion-panel  #standardessentialPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': standardessentialPanel.expanded }" style="font-size: 14px; font-weight: bolder;">Standard Essential Patent</mat-panel-title>
@@ -425,8 +460,10 @@
           </ng-container>
         </mat-radio-group>
       </mat-expansion-panel>
+      </div>
 
       <!-- Semiconductor Patent -->
+      <div class="panel-wrapper">
       <mat-expansion-panel #semiconductorpatentPanel="matExpansionPanel">
         <mat-expansion-panel-header>
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': semiconductorpatentPanel.expanded }" style="font-size: 14px; font-weight: bolder;">Semiconductor Patent</mat-panel-title>
@@ -438,6 +475,7 @@
           </ng-container>
         </mat-radio-group>
       </mat-expansion-panel>
+      </div>
     </mat-accordion>
   </mat-sidenav>
 
@@ -643,7 +681,7 @@
           class="mat-elevation-z8"
           style="
             display: block;
-            height: 40.44vh;
+            height: 38.44vh;
             overflow-y: auto;
             overflow-x:scroll;
             margin: 0;
@@ -779,7 +817,7 @@
         </table>
         </div>
 
-        <div *ngIf="!loader && tabledata.length === 0" style="
+        <!-- <div *ngIf="!loader && tabledata.length === 0" style="
         height: 60vh;
         width: 100%;
         margin-bottom: 600px;
@@ -789,7 +827,7 @@
         justify-content: center;
     " class="no-results">
       {{ searchInputText ? 'No results found for "' + searchInputText + '"' : 'No result to display' }}
-    </div>
+    </div> -->
 
           <mat-paginator [pageSize]="20" showFirstLastButtons [length]="totalCount"></mat-paginator>
         </mat-tab>

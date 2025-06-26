@@ -1,0 +1,64 @@
+<!-- <div class="chat-container container mt-5">
+    <div class="card shadow-sm">
+      <div class="card-header">
+        <h2 class="text-center mb-0">XLi Chatbot</h2>
+        <div class="provider-select">
+          <label for="provider">Select AI Provider:</label>
+          <select id="provider" [(ngModel)]="provider" class="form-select form-select-sm">
+            <option value="openrouter">OpenRouter (DeepSeek)</option>
+            <option value="openai">OpenAI (GPT-3.5)</option>
+          </select>
+        </div>
+      </div>
+      <div class="chat-window card-body">
+        <div *ngFor="let msg of messages" [ngClass]="{'user-message': msg.sender === 'You', 'bot-message': msg.sender === 'XLi Chatbox'}">
+          <p><strong>{{ msg.sender }}:</strong> <span [innerHTML]="msg.text | markdown"></span></p>
+        </div>
+        <div *ngIf="isLoading" class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input card-footer">
+        <form (ngSubmit)="sendMessage()" class="d-flex gap-2">
+          <input [(ngModel)]="userInput" name="userInput" (keydown.enter)="sendMessage()" placeholder="Type your message..." class="form-control" required />
+          <button type="submit" class="btn btn-success">Send</button>
+        </form>
+      </div>
+    </div>
+  </div> -->
+
+
+  <!-- src/app/aimodel/aimodel.component.html -->
+<!-- <div class="chat-container">
+  <div class="chat-window">
+    <div *ngFor="let message of messages" class="message" [ngClass]="{'user-message': message.sender === 'You', 'bot-message': message.sender === 'XLi Chatbox'}">
+      <strong>{{ message.sender }}:</strong>
+      <markdown [data]="message.text"></markdown>
+    </div>
+  </div>
+  <div class="input-container">
+    <input [(ngModel)]="userInput" placeholder="Type your message..." maxlength="1000" [disabled]="isLoading || !localStorage.getItem('access')" />
+    <button (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">Send</button>
+    <span *ngIf="isLoading">Loading...</span>
+  </div>
+</div> -->
+
+
+
+
+<!-- src/app/aimodel/aimodel.component.html -->
+<div class="chat-container">
+  <div class="chat-window">
+    <div *ngFor="let message of messages" class="message" [ngClass]="{'user-message': message.sender === 'You', 'bot-message': message.sender === 'XLi Chatbox'}">
+      <strong>{{ message.sender }}:</strong>
+      <markdown [data]="message.text"></markdown>
+    </div>
+  </div>
+  <div class="input-container">
+    <input [(ngModel)]="userInput" placeholder="Type your message..." maxlength="1000" [disabled]="isLoading || !isLoggedIn" />
+    <button (click)="sendMessage()" [disabled]="isLoading || !userInput.trim() || !isLoggedIn">Send</button>
+    <span *ngIf="isLoading">Loading...</span>
+  </div>
+</div>

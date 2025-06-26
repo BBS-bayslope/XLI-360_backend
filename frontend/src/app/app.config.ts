@@ -10,6 +10,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';  // En
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async'
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { provideHttpClient, HttpClientModule, withInterceptorsFromDi } from '@angular/common/http';
+import { MarkdownModule } from 'ngx-markdown';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }),
@@ -28,7 +29,7 @@ export const appConfig: ApplicationConfig = {
     provideFirestore(() => getFirestore()),  // Provides Firestore
     provideStorage(() => getStorage()), provideCharts(withDefaultRegisterables()),
     provideHttpClient(withInterceptorsFromDi()),
-
+provideHttpClient()
     ]
 };
   

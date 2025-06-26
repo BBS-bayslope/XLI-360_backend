@@ -47,8 +47,8 @@ interface Report {
   providedIn: 'root',
 })
 export class ApiService {
-  // private baseUrl = 'http://18.220.232.127'; // Base API URL
-  private baseUrl = 'http://127.0.0.1:8000';
+  private baseUrl = 'http://18.220.232.127'; // Base API URL
+  // private baseUrl = 'http://127.0.0.1:8000';
   private tokenKey: string = 'access'; // Key to store token in localStorage
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
@@ -500,4 +500,31 @@ export class ApiService {
       })
     );
   }
+
+  // src/app/services/api.service.ts (relevant excerpt)
+  chat(
+    message: string,
+    provider: 'openrouter' = 'openrouter'
+  ): Observable<{ response: string; model: string; timestamp: string | null }> {
+    const endpoint = `${this.baseUrl}/api/chat/`;
+    const headers = this.getAuthHeaders();
+    return this.http
+      .post<{ response: string; model: string; timestamp: string | null }>(
+        endpoint,
+        { message, provider },
+        { headers }
+      )
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 401) {
+            return this.handleUnauthorizedError().pipe(
+              switchMap(() => this.chat(message, provider)) // Retry after token refresh
+            );
+          }
+          return throwError(() => error);
+        })
+      );
+  }
 }
+
+

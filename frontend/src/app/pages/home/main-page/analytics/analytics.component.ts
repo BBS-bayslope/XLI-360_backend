@@ -42,6 +42,7 @@ import { StackedBarChartComponent } from '../../../charts/stackedBarChart.compon
 import { DoughnutChartComponent } from '../../../charts/doughtnutChart.component';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
+import { DonutChartComponent } from '../../../donut-chart/donut-chart.component';
 // import * as CanvasJS from 'canvasjs';
 // Ensure the plugin is registered
 Chart.register(ChartDataLabels, ...registerables);
@@ -56,6 +57,7 @@ interface ChartData1 {
   selector: 'app-analytics',
   standalone: true,
   imports: [
+    DonutChartComponent,
     BaseChartDirective,
     CommonModule,
     MatCardModule,
@@ -70,12 +72,14 @@ interface ChartData1 {
     DoughnutChartComponent,
     MatIcon,
     MatCheckboxModule,
-    MatMenuModule
+    MatMenuModule,
   ],
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.scss'],
 })
-export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked {
+export class AnalyticsComponent
+  implements OnInit, OnChanges, AfterViewInit, AfterViewChecked
+{
   @Input() filterDataForAnalytics: any[] = [];
   @Input() excelData: any[] = [];
   @ViewChild(BaseChartDirective) chart!: BaseChartDirective; // Access the chart instance
@@ -87,7 +91,10 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
   private api = inject(ApiService);
   private el = inject(ElementRef);
 
-  doughnutChartDataTotalCases: ChartData<'doughnut'> = { labels: [], datasets: [{ data: [] }] };
+  doughnutChartDataTotalCases: ChartData<'doughnut'> = {
+    labels: [],
+    datasets: [{ data: [] }],
+  };
   doughnutChartTypeTotalCases: 'doughnut' = 'doughnut';
   doughnutChartOptionsTotalCases: ChartOptions<'doughnut'> = {
     responsive: true,
@@ -120,19 +127,23 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
   barChartDataSuedCompanies: ChartData<'bar'> = { labels: [], datasets: [] };
   barChartOptions: ChartOptions<'bar'> = {
     responsive: true,
-    indexAxis: 'y', // 
+    indexAxis: 'y', //
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false },
-      tooltip: { enabled: true }
+      legend: { display: false }, // ❌ no "undefined"
+      tooltip: { enabled: true },
+      datalabels: {
+        display: false, // ✅ removes number inside bars
+      },
     },
+
     scales: {
       x: { beginAtZero: true },
-      y: { ticks: { font: { size: 12 } } }
-    }
+      y: { ticks: { font: { size: 12 }, color: '#000', padding: 5 } },
+    },
   };
   public chartOptions: any = null;
-  public charT: any= null; // Chart instance
+  public charT: any = null; // Chart instance
   public Statusdata: any[] = []; // DataPoints Array
   public plaintiffTypeData: any[] = []; // DataPoints Array
   public defendantTypeData: any[] = []; // DataPoints Array
@@ -140,9 +151,9 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
   public suedCompanies: any[] = []; // DataPoints Array
   public industryData: any[] = []; // DataPoints Array
   public casesByOc: any[] = []; // DataPoints Array
-  public overlappingLawFirms : any[]=[];
-  public overlappingParties : any[]=[];
-  public transferredCases : any[]=[];
+  public overlappingLawFirms: any[] = [];
+  public overlappingParties: any[] = [];
+  public transferredCases: any[] = [];
   loaderr: boolean = false;
   availableCharts = [
     { key: 'totalLitigation', label: 'Total Litigation Cases & Status' },
@@ -175,13 +186,17 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
       this.selectedCharts = JSON.parse(savedCharts);
     } else {
       // Default selection
-      this.selectedCharts = ['totalLitigation', 'plaintiffType', 'defendantType'];
+      this.selectedCharts = [
+        'totalLitigation',
+        'plaintiffType',
+        'defendantType',
+      ];
       this.saveSelectedCharts();
     }
     // console.dir(this.excelData);
-    this.fetchCaseStats()
-    this.fetchPlaintiffTypeStats()
-    this.fetchIndustryStats()
+    this.fetchCaseStats();
+    this.fetchPlaintiffTypeStats();
+    this.fetchIndustryStats();
     // this.getAllPlaintiff();
     // this.getAllDefendent();
     // // this.totalCasesDataArrays= [];
@@ -225,44 +240,63 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     //   this.cdRef.detectChanges();
     // }
   }
-  stackedBarPlot!: Bar
+  stackedBarPlot!: Bar;
   renderStackedBarChart() {
     if (!this.stackedBarPlot) {
       console.log(this.overlappingLawFirms);
-  
+
       // Transform API data into a format suitable for the stacked bar chart
-      const transformedData = this.overlappingLawFirms.flatMap(firm => [
-        { law_firm: firm.law_firm, type: 'Plaintiff Cases', value: firm.plaintiff_case_count },
-        { law_firm: firm.law_firm, type: 'Defendant Cases', value: firm.defendant_case_count }
-      ]);
-  
-      this.stackedBarPlot = new Bar(this.el.nativeElement.querySelector('#stacked-bar-chart-container'), {
-        data: transformedData,
-        isStack: true,  // Enable stacking
-        xField: 'value',  // X-axis is the number of cases
-        yField: 'law_firm',  // Y-axis is the law firm names
-        seriesField: 'type',  // Stack by Plaintiff & Defendant cases
-        legend: { layout: 'horizontal', position: 'bottom' },
-        label: {
-          position: 'middle',
-          layout: [
-            { type: 'interval-adjust-position' }, // Adjusts label position
-            { type: 'interval-hide-overlap' },   // Hides overlapping labels
-            { type: 'adjust-color' }             // Adjusts label color
-          ],
+      const transformedData = this.overlappingLawFirms.flatMap((firm) => [
+        {
+          law_firm: firm.law_firm,
+          type: 'Plaintiff Cases',
+          value: firm.plaintiff_case_count,
         },
-        interactions: [{ type: 'element-active' }],
-      });
+        {
+          law_firm: firm.law_firm,
+          type: 'Defendant Cases',
+          value: firm.defendant_case_count,
+        },
+      ]);
+
+      this.stackedBarPlot = new Bar(
+        this.el.nativeElement.querySelector('#stacked-bar-chart-container'),
+        {
+          data: transformedData,
+          isStack: true, // Enable stacking
+          xField: 'value', // X-axis is the number of cases
+          yField: 'law_firm', // Y-axis is the law firm names
+          seriesField: 'type', // Stack by Plaintiff & Defendant cases
+          legend: { layout: 'horizontal', position: 'bottom' },
+          label: {
+            position: 'middle',
+            layout: [
+              { type: 'interval-adjust-position' }, // Adjusts label position
+              { type: 'interval-hide-overlap' }, // Hides overlapping labels
+              { type: 'adjust-color' }, // Adjusts label color
+            ],
+          },
+          interactions: [{ type: 'element-active' }],
+        }
+      );
     } else {
       // Update chart data dynamically
-      const updatedData = this.overlappingLawFirms.flatMap(firm => [
-        { law_firm: firm.law_firm, type: 'Plaintiff Cases', value: firm.plaintiff_case_count },
-        { law_firm: firm.law_firm, type: 'Defendant Cases', value: firm.defendant_case_count }
+      const updatedData = this.overlappingLawFirms.flatMap((firm) => [
+        {
+          law_firm: firm.law_firm,
+          type: 'Plaintiff Cases',
+          value: firm.plaintiff_case_count,
+        },
+        {
+          law_firm: firm.law_firm,
+          type: 'Defendant Cases',
+          value: firm.defendant_case_count,
+        },
       ]);
-  
+
       this.stackedBarPlot.changeData(updatedData);
     }
-  
+
     this.stackedBarPlot.render();
   }
 
@@ -278,7 +312,7 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     //   colorField: 'region',
     //   radius: 0.7,
     //   label: {
-    //     type: 'spider', 
+    //     type: 'spider',
     //     labelHeight: 20,
     //     content: (data) => `${(data as ChartData1).region}: ${(data as ChartData1).qty}`,
     //   },
@@ -288,7 +322,6 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     //     position: 'bottom',
     //   },
     // });
-
     // piePlot.render();
   }
 
@@ -300,7 +333,6 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     // chart.render();
     // this.cdRef.detectChanges();
   }
-
 
   //MY CODE
 
@@ -327,150 +359,199 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     return colors;
   }
 
-  
-
   fetchCaseStats(): void {
     this.loaderr = true;
-    this.api.getCaseStats().subscribe((response: any) => {
-      if (response && response?.data) {
-        const caseStatusCounts = response.data?.case_status_counts;
-        this.overlappingLawFirms=response.data?.overlapping_law_firms.slice(0,25);
-        this.overlappingParties=response.data?.overlapping_parties.slice(0,10)
-        // this.renderStackedBarChart()
-        // Extract labels and data
-        this.Statusdata = Object.entries(caseStatusCounts).map(([region, qty]) => ({
-          region,
-          qty
-        }));
+    this.api.getCaseStats().subscribe(
+      (response: any) => {
+        if (response && response?.data) {
+          const caseStatusCounts = response.data?.case_status_counts;
+          this.overlappingLawFirms = response.data?.overlapping_law_firms.slice(
+            0,
+            25
+          );
+          this.overlappingParties = response.data?.overlapping_parties.slice(
+            0,
+            10
+          );
+          // this.renderStackedBarChart()
+          // Extract labels and data
+          this.Statusdata = Object.entries(caseStatusCounts).map(
+            ([region, qty]) => ({
+              region,
+              qty,
+            })
+          );
 
-        let total_tech_areas=response.data?.tech_area.slice(0,10)
-        const categories = total_tech_areas.map((item: any) => item.tech_category);
-        const caseCounts = total_tech_areas.map((item: any) => item.case_count);
-        this.barChartDataTechCategory.labels=response.data?.tech_area.slice(0,25).map((item: any) => item.tech_category)
-        this.barChartDataTechCategory.datasets[0].data=response.data?.tech_area.slice(0,25).map((item: any) => item.case_count)
-        this.barChartData = {
-          labels: categories,
-          datasets: [
-            {
-              // label: 'Number of Cases',
-              data: caseCounts,
-              backgroundColor: [
-                'rgba(13, 113, 199, 0.8)', // Adjust colors as needed
-              ],
-              borderColor: '#000',
-              borderWidth: 2,
-            }
-          ]
-        };
-        this.barChartDataSuedCompanies={
-          labels: response.data?.top_defendants.slice(0,10).map((item: any) => item.defendant),
-          datasets: [
-            {
-              // label: 'Number of Cases',
-              data: response.data?.top_defendants.slice(0,10).map((item: any) => item.case_count),
-              backgroundColor: [
-                'rgba(13, 105, 19, 0.8)', // Adjust colors as needed
-              ],
-              borderColor: '#000',
-              borderWidth: 2,
-            }
-          ]
-        };
-        
-        const defendants_n = response.data?.top_defendants.map((item: any) => item.defendant);
-        const defendants_cnt = response.data?.top_defendants.map((item: any) => item.case_count);
-        const plaintiff_n = response.data?.top_plaintiffs.map((item: any) => item.plaintiff);
-        const plaintiff_cnt = response.data?.top_plaintiffs.map((item: any) => item.case_count);
+          let total_tech_areas = response.data?.tech_area.slice(0, 10);
+          const categories = total_tech_areas.map(
+            (item: any) => item.tech_category
+          );
+          const caseCounts = total_tech_areas.map(
+            (item: any) => item.case_count
+          );
+          this.barChartDataTechCategory.labels = response.data?.tech_area
+            .slice(0, 25)
+            .map((item: any) => item.tech_category);
+          this.barChartDataTechCategory.datasets[0].data =
+            response.data?.tech_area
+              .slice(0, 25)
+              .map((item: any) => item.case_count);
+          this.barChartData = {
+            labels: categories,
+            datasets: [
+              {
+                // label: 'Number of Cases',
+                data: caseCounts,
+                backgroundColor: [
+                  'rgba(13, 113, 199, 0.8)', // Adjust colors as needed
+                ],
+                borderColor: '#000',
+                borderWidth: 2,
+              },
+            ],
+          };
+          this.barChartDataSuedCompanies = {
+            labels: response.data?.top_defendants
+              .slice(0, 10)
+              .map((item: any) =>
+                item.defendant.length > 30
+                  ? item.defendant.split(',')[0] + '...'
+                  : item.defendant
+              ),
+            datasets: [
+              {
+                data: response.data?.top_defendants
+                  .slice(0, 10)
+                  .map((item: any) => item.case_count),
+                backgroundColor: ['rgba(13, 105, 19, 0.8)'],
+                borderColor: '#000',
+                borderWidth: 2,
+              },
+            ],
+          };
+          
 
-        const defendants_fn = response.data?.top_defendant_law_firms.map((item: any) => item.defendant_law_firm);
-        const defendants_fcnt = response.data?.top_defendant_law_firms.map((item: any) => item.case_count);
-        const plaintiff_fn = response.data?.top_plaintiff_law_firms.map((item: any) => item.plaintiff_law_firm);
-        const plaintiff_fcnt = response.data?.top_plaintiff_law_firms.map((item: any) => item.case_count);
+          const defendants_n = response.data?.top_defendants.map(
+            (item: any) => item.defendant
+          );
+          const defendants_cnt = response.data?.top_defendants.map(
+            (item: any) => item.case_count
+          );
+          const plaintiff_n = response.data?.top_plaintiffs.map(
+            (item: any) => item.plaintiff
+          );
+          const plaintiff_cnt = response.data?.top_plaintiffs.map(
+            (item: any) => item.case_count
+          );
 
-        this.barChartDataTopDefandants.labels=defendants_n
-        this.barChartDataTopPlaintiffs.labels=plaintiff_n
-        this.barChartDataTopDefandants.datasets[0].data=defendants_cnt
-        this.barChartDataTopPlaintiffs.datasets[0].data=plaintiff_cnt
+          const defendants_fn = response.data?.top_defendant_law_firms.map(
+            (item: any) => item.defendant_law_firm
+          );
+          const defendants_fcnt = response.data?.top_defendant_law_firms.map(
+            (item: any) => item.case_count
+          );
+          const plaintiff_fn = response.data?.top_plaintiff_law_firms.map(
+            (item: any) => item.plaintiff_law_firm
+          );
+          const plaintiff_fcnt = response.data?.top_plaintiff_law_firms.map(
+            (item: any) => item.case_count
+          );
 
-        this.barChartDataTopDefandantFirm.labels=defendants_fn
-        this.barChartDataTopPlaintiffFirm.labels=plaintiff_fn
-        this.barChartDataTopDefandantFirm.datasets[0].data=defendants_fcnt
-        this.barChartDataTopPlaintiffFirm.datasets[0].data=plaintiff_fcnt
-      }
+          this.barChartDataTopDefandants.labels = defendants_n;
+          this.barChartDataTopPlaintiffs.labels = plaintiff_n;
+          this.barChartDataTopDefandants.datasets[0].data = defendants_cnt;
+          this.barChartDataTopPlaintiffs.datasets[0].data = plaintiff_cnt;
 
-      this.loaderr = false
-      this.cdRef.detectChanges();
-    },
+          this.barChartDataTopDefandantFirm.labels = defendants_fn;
+          this.barChartDataTopPlaintiffFirm.labels = plaintiff_fn;
+          this.barChartDataTopDefandantFirm.datasets[0].data = defendants_fcnt;
+          this.barChartDataTopPlaintiffFirm.datasets[0].data = plaintiff_fcnt;
+        }
+
+        this.loaderr = false;
+        this.cdRef.detectChanges();
+      },
       (error) => {
-        this.loaderr = false
+        this.loaderr = false;
         console.error('Error fetching data', error);
       }
-    )
+    );
   }
 
   fetchPlaintiffTypeStats(): void {
-    this.api.getPlaintiffTypeStats().subscribe((response: any) => {
-      if (response && response.data) {
-        // this.transferredCases=[{type:"OC-->NPE",value:response.data?.transferredCases}];
-        this.plaintiffTypeAndSizeChartData.labels = Object.keys(response.data?.plaintiff_type_counts);
-        this.plaintiffTypeAndSizeChartData.datasets[0].data = Object.values(response.data?.plaintiff_type_counts);
-        this.plaintiffTypeData=Object.entries(response.data?.plaintiff_type_counts).map(([region, qty]) => ({
-          region,
-          qty
-        }));
-        this.defendantTypeData=Object.entries(response.data?.defendant_type_counts).map(([region, qty]) => ({
-          region,
-          qty
-        }));
-        this.defendantTypeAndSizeChartData.labels = Object.keys(response.data?.defendant_type_counts);
-        this.defendantTypeAndSizeChartData.datasets[0].data =Object.values(response.data?.defendant_type_counts);
-        this.defendantTypeAndSizeChartData.datasets[0].backgroundColor= this.generateUniqueColors(Object.keys(response.data?.defendant_type_counts).length);
-        let defendant= response?.data?.defendant_type_counts["loc"];
-        let plaintiff= response.data?.plaintiff_type_counts["operating company"];
-        // console.log(defendant,plaintiff)
-        this.casesByOc=[
-          {region:'defendant',qty:defendant},
-          {region:'plaintiff',qty:plaintiff},
-        ]
-        // this.caseByOcChartData.labels = ['defendant','plaintiff'];
-        // this.caseByOcChartData.datasets[0].data = [defendant,plaintiff];
+    this.api.getPlaintiffTypeStats().subscribe(
+      (response: any) => {
+        if (response && response.data) {
+          // this.transferredCases=[{type:"OC-->NPE",value:response.data?.transferredCases}];
+          this.plaintiffTypeAndSizeChartData.labels = Object.keys(
+            response.data?.plaintiff_type_counts
+          );
+          this.plaintiffTypeAndSizeChartData.datasets[0].data = Object.values(
+            response.data?.plaintiff_type_counts
+          );
+          this.plaintiffTypeData = Object.entries(
+            response.data?.plaintiff_type_counts
+          ).map(([region, qty]) => ({
+            region,
+            qty,
+          }));
+          this.defendantTypeData = Object.entries(
+            response.data?.defendant_type_counts
+          ).map(([region, qty]) => ({
+            region,
+            qty,
+          }));
+          this.defendantTypeAndSizeChartData.labels = Object.keys(
+            response.data?.defendant_type_counts
+          );
+          this.defendantTypeAndSizeChartData.datasets[0].data = Object.values(
+            response.data?.defendant_type_counts
+          );
+          this.defendantTypeAndSizeChartData.datasets[0].backgroundColor =
+            this.generateUniqueColors(
+              Object.keys(response.data?.defendant_type_counts).length
+            );
+          let defendant = response?.data?.defendant_type_counts['loc'];
+          let plaintiff =
+            response.data?.plaintiff_type_counts['operating company'];
+          // console.log(defendant,plaintiff)
+          this.casesByOc = [
+            { region: 'defendant', qty: defendant },
+            { region: 'plaintiff', qty: plaintiff },
+          ];
+          // this.caseByOcChartData.labels = ['defendant','plaintiff'];
+          // this.caseByOcChartData.datasets[0].data = [defendant,plaintiff];
         }
-    },
-    (error) => {
-      this.loaderr = false
-      console.error('Error fetching data', error);
-    }
-    )
+      },
+      (error) => {
+        this.loaderr = false;
+        console.error('Error fetching data', error);
+      }
+    );
   }
 
   fetchIndustryStats(): void {
-    this.api.getIndustryStats().subscribe((response: any) => {
-      if (response && response.data) {
-        this.industryChartData.labels = Object.keys(response?.data);
-        this.industryChartData.datasets[0].data = Object.values(response?.data);
-        this.industryData=Object.entries(response?.data).map(([region, qty]) => ({
-          region,
-          qty
-        }));
-        
-    }
-    },
-    (error) => {
-      this.loaderr = false
-      console.error('Error fetching data', error);
-    }
-    )
+    this.api.getIndustryStats().subscribe(
+      (response: any) => {
+        if (response && response.data) {
+          this.industryChartData.labels = Object.keys(response?.data);
+          this.industryChartData.datasets[0].data = Object.values(
+            response?.data
+          );
+          this.industryData = Object.entries(response?.data).map(
+            ([region, qty]) => ({
+              region,
+              qty,
+            })
+          );
+        }
+      },
+      (error) => {
+        this.loaderr = false;
+        console.error('Error fetching data', error);
+      }
+    );
   }
-
-
-
-
-
-
-
-
-
-
 
   totalCasesDataArrays: any[] = [];
   calculateTotalCasesByStatus() {
@@ -607,14 +688,14 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     number[],
     string | string[]
   > = {
-      labels: [],
-      datasets: [
-        {
-          data: [],
-          label: 'Total Litigation Cases Filed by Plaintiff',
-        },
-      ],
-    };
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        label: 'Total Litigation Cases Filed by Plaintiff',
+      },
+    ],
+  };
   public plaintiffTypeAndSizeChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -692,7 +773,7 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     const countValuesPlaintiffTypeSize = this.uniquePlaintiffTypeAndSize.map(
       (plaintiffTypeAndSize) =>
         this.countsPlaintiffTypeAndSize[
-        this.normalizeType(plaintiffTypeAndSize)
+          this.normalizeType(plaintiffTypeAndSize)
         ] || 0
     );
 
@@ -721,14 +802,14 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     number[],
     string | string[]
   > = {
-      labels: [],
-      datasets: [
-        {
-          data: [],
-          label: 'Total Litigation Cases Filed by Defendant',
-        },
-      ],
-    };
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        label: 'Total Litigation Cases Filed by Defendant',
+      },
+    ],
+  };
   public defendantTypeAndSizeChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     maintainAspectRatio: false,
@@ -917,37 +998,48 @@ export class AnalyticsComponent implements OnInit, OnChanges, AfterViewInit, Aft
     maintainAspectRatio: false,
     scales: {
       x: {
-        beginAtZero: true, // Ensures the y-axis starts at 0
+        beginAtZero: true,
         ticks: {
-          color: '#000', // Dark color for X-axis labels
+          color: '#000',
           font: {
-            weight: 'bold', // Bold font
-            size: 14,       // Optional: control font size
+            weight: 'bold',
+            size: 12,
           },
+          maxRotation: 45,
+          minRotation: 30,
+        },
+        grid: {
+          display: false,
         },
       },
       y: {
         beginAtZero: true,
-        ticks:{
+        ticks: {
           color: '#000',
-          font:{
-weight:'bold',
-size:14,
-
-          }
-        }
+          font: {
+            weight: 'bold',
+            size: 14,
+          },
+          callback: (value) => value.toLocaleString(),
+        },
+        grid: {
+          color: '#eee',
+        },
       },
     },
     plugins: {
       legend: {
         display: false,
-        position: 'top',
       },
       tooltip: {
         enabled: true,
       },
+      datalabels: {
+        display: false, // ✅ This disables datalabels if plugin is still included
+      },
     },
   };
+
   public barChartTypeTopDefandants: 'bar' = 'bar';
   public barChartDataTopDefandants: ChartData<'bar'> = {
     labels: [],
@@ -975,7 +1067,6 @@ size:14,
             size: 14, // Font size
           },
         },
-
       },
       y: {
         beginAtZero: true,
@@ -1022,7 +1113,7 @@ size:14,
           color: '#000', // Dark color for X-axis labels
           font: {
             weight: 'bold', // Bold font
-            size: 14,       // Optional: control font size
+            size: 14, // Optional: control font size
           },
         },
       },
@@ -1032,7 +1123,7 @@ size:14,
           color: '#000', // Dark color for X-axis labels
           font: {
             weight: 'bold', // Bold font
-            size: 14,       // Optional: control font size
+            size: 14, // Optional: control font size
           },
         },
       },
@@ -1123,7 +1214,6 @@ size:14,
             size: 14, // Font size
           },
         },
-        
       },
       y: {
         beginAtZero: true,
@@ -1340,7 +1430,7 @@ size:14,
       this.uniqueTotalCaseOfPlaintiff.map(
         (plaintiffOrPetitioner) =>
           this.countsTotalCaseOfPlaintiff[
-          plaintiffOrPetitioner.toLowerCase()
+            plaintiffOrPetitioner.toLowerCase()
           ] || 0
       );
 
@@ -1505,7 +1595,7 @@ size:14,
           color: '#000', // Dark color for X-axis labels
           font: {
             weight: 'bold', // Bold font
-            size: 14,       // Optional: control font size
+            size: 14, // Optional: control font size
           },
         },
       },
@@ -1515,7 +1605,7 @@ size:14,
           color: '#000', // Dark color for X-axis labels
           font: {
             weight: 'bold', // Bold font
-            size: 14,       // Optional: control font size
+            size: 14, // Optional: control font size
           },
         },
       },
@@ -1630,14 +1720,14 @@ size:14,
     number[],
     string | string[]
   > = {
-      labels: [],
-      datasets: [
-        {
-          data: [], // Data will be updated dynamically
-          label: 'Most Sued Companies',
-        },
-      ],
-    };
+    labels: [],
+    datasets: [
+      {
+        data: [], // Data will be updated dynamically
+        label: 'Most Sued Companies',
+      },
+    ],
+  };
 
   public mostSuedCompaniesChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -1803,7 +1893,7 @@ size:14,
         value !== undefined &&
         value !== null &&
         self.findIndex((v) => JSON.stringify(v) === JSON.stringify(value)) ===
-        index
+          index
     );
   }
   // Unique plaintiffs and their counts
@@ -1943,8 +2033,8 @@ size:14,
       const defendants =
         typeof item.legalEntities?.defendant === 'string'
           ? item.legalEntities.defendant
-            .split(',')
-            .map((def: any) => def.trim().toLowerCase())
+              .split(',')
+              .map((def: any) => def.trim().toLowerCase())
           : [];
       defendants.forEach((defendant: any) => {
         if (this.countsDefendent.hasOwnProperty(defendant)) {
@@ -2106,16 +2196,16 @@ size:14,
     number[],
     string | string[]
   > = {
-      labels: [],
-      datasets: [
-        {
-          data: [],
-          label: 'Total Cases Transferred From OC To NPE',
-          backgroundColor: ['#FF6384', '#36A2EB'],
-          borderWidth: 1,
-        },
-      ],
-    };
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        label: 'Total Cases Transferred From OC To NPE',
+        backgroundColor: ['#FF6384', '#36A2EB'],
+        borderWidth: 1,
+      },
+    ],
+  };
   public casesTransferredFromOCToNPEChartOptions: ChartConfiguration['options'] =
     {
       responsive: true,

@@ -296,10 +296,11 @@ body.light-mode {
 header {
   background: linear-gradient(90deg, #000000 0%, #2A0033 100%); /* Black to dark purple gradient */
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow */
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 1000;
   padding: 10px 20px;
+  
 }
 
 /* Logo section styling */

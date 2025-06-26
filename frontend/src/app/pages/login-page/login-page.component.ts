@@ -36,31 +36,20 @@ export class LoginPageComponent {
   incorrectPassword: boolean = false;
   hide = signal(true);
 
-  constructor(
-    private authService: AuthService,
-    private apiService: ApiService,
-    private router: Router
-  ) {}
+  constructor(private authService: AuthService, private apiService: ApiService, private router: Router) {}
 
   login(): void {
     this.incorrectPassword = false;
-    this.authService
-      .login({ email: this.email, password: this.password })
-      .subscribe({
-        next: (user) => {
-          if (user && user.token) {
-            console.log('Logged in as:', user?.email);
-            this.router.navigate(['/']);
-          } else {
-            this.incorrectPassword = true;
-            console.error('Invalid login response');
-          }
-        },
-        error: (error) => {
-          this.incorrectPassword = true;
-          console.error('Login failed:', error);
-        },
-      });
+    this.authService.login({"email":this.email, "password":this.password}).subscribe({
+      next: (user) => {
+        console.log('Logged in as:', user?.email);
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        this.incorrectPassword = !this.incorrectPassword;
+        console.error('Login failed:', error);
+      },
+    });
   }
 
   clickEvent(event: MouseEvent) {

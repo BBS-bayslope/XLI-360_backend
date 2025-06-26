@@ -1,0 +1,12 @@
+.donut-chart-container {
+    width: 100%;
+    max-width: 600px; // 👈 shrink it for clarity
+    height: 400px;
+    margin: auto;
+  
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  }
+  

@@ -14,6 +14,7 @@ import { MainPageComponent } from './pages/home/main-page/main-page.component';
 import { CaseListComponent } from './pages/home/main-page/case-list/case-list.component';
 import { ReportsComponent } from './pages/home/main-page/reports/reports.component';
 import { AdminUploadComponent } from './pages/admin-upload/admin-upload.component';
+import { AimodelComponent } from './aimodel/aimodel.component';
 
 export const routes: Routes = [
   { path: 'adminds', component: AdminDashboardComponent },
@@ -49,4 +50,5 @@ export const routes: Routes = [
   // { path: '', redirectTo: 'login', pathMatch: 'full' },
   // {path:'',redirectTo:'login'}
   { path: 'admin-upload', component: AdminUploadComponent },
+  {path:'ai',component:AimodelComponent}
 ];

@@ -5,6 +5,7 @@ from .views.analytics import CaseStatisticsView, PlaintiffTypeCountView, Industr
 from .views.userView import RegisterView, LoginView, GoogleLoginView
 from rest_framework_simplejwt.views import TokenRefreshView
 from mainapp.views.views import ReportListView,ViewReportView
+from mainapp.views.views import ChatBotView
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -37,5 +38,6 @@ urlpatterns = [
 
 # urlpatterns = [
     path('upload-ui/', upload_report_view, name='upload_ui'),
+    path('chat/', ChatBotView.as_view(), name='xli-chatbox'),
 # ]
 ]
