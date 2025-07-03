@@ -2080,7 +2080,7 @@ body.dark-mode mat-row:nth-child(even) {
   white-space: normal;
   overflow-wrap: break-word;
   line-height: 1.4;
-  padding: 8px 12px;
+  // padding: 8px 12px;
   box-sizing: border-box;
   // border-bottom: 2px solid #999;
 }
@@ -2322,12 +2322,7 @@ tr.mat-row:hover {
 }
 
 ::ng-deep .mat-mdc-text-field-wrapper {
-  width: 29%;
-  z-index: 1000;
-  top: 10px;
-  height: 49px;
-  border-block-color: Black; /* Accenture purple */
-  margin-top: 7rem;
+  
 }
 
 :host ::ng-deep .mat-mdc-text-field-wrapper {
@@ -2335,6 +2330,12 @@ tr.mat-row:hover {
   z-index: 0;
   border: 1px solid Black; /* Accenture purple */
   margin-left: 19rem;
+  width: 29%;
+  z-index: 1000;
+  top: 10px;
+  height: 49px;
+  border-block-color: Black; /* Accenture purple */
+  margin-top: 7rem;
 }
 
 th, td {
