@@ -746,6 +746,8 @@ class FilterDataView(APIView):
                 {"error": f"Error fetching case statuses: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,   
             )       
+
+
 #  Call the function to start processing
 # split_and_process_bulk_with_threads()
 
@@ -983,11 +985,8 @@ def upload_report_view(request):
 
 
 
-
-
-
+import requests
 import logging
-from openai import OpenAI, AuthenticationError, RateLimitError, OpenAIError
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -997,7 +996,7 @@ logger = logging.getLogger(__name__)
 
 class ChatBotView(APIView):
     permission_classes = [IsAuthenticated]
-    OPENAI_MODEL = getattr(settings, 'OPENAI_MODEL', 'gpt-3.5-turbo')
+    OPENROUTER_MODEL = getattr(settings, 'OPENROUTER_MODEL', 'deepseek/deepseek-r1-0528:free')
 
     def post(self, request):
         user_message = request.data.get('message', '').strip()
@@ -1005,33 +1004,43 @@ class ChatBotView(APIView):
         if not user_message:
             return Response({'error': 'Message cannot be empty'}, status=400)
 
-        try:
-            if not settings.OPENAI_API_KEY:
-                return Response({'error': 'OpenAI API key is not configured'}, status=500)
+        api_key = settings.OPENAI_API_KEY  # ✅ This must be set in your settings/env
 
-            openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
-            response = openai_client.chat.completions.create(
-                model=self.OPENAI_MODEL,
-                messages=[{'role': 'user', 'content': user_message}],
-                max_tokens=150,
-                temperature=0.7
+        if not api_key:
+            return Response({'error': 'OpenRouter API key is not configured'}, status=500)
+
+        try:
+            headers = {
+                "Authorization": f"Bearer {api_key}",  # ✅ Fixed: Use the variable
+                "Content-Type": "application/json"
+            }
+
+            payload = {
+                "model": self.OPENROUTER_MODEL,
+                "messages": [
+                    {"role": "user", "content": user_message}
+                ]
+            }
+
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload
             )
-            logger.info(f"OpenAI response: {response}")
+
+            if response.status_code != 200:
+                logger.error(f"OpenRouter API error: {response.text}")
+                return Response({'error': 'OpenRouter API error', 'details': response.text}, status=500)
+
+            data = response.json()
+            content = data.get('choices', [{}])[0].get('message', {}).get('content', 'No response')
+
             return Response({
-                'response': response.choices[0].message.content,
-                'model': self.OPENAI_MODEL,
-                'timestamp': response.created
+                'response': content,
+                'model': self.OPENROUTER_MODEL,
+                'timestamp': data.get('created')
             })
 
-        except AuthenticationError as e:
-            logger.error(f"Authentication error: {str(e)}")
-            return Response({'error': 'Invalid API key'}, status=401)
-        except RateLimitError as e:
-            logger.error(f"Rate limit error: {str(e)}")
-            return Response({'error': 'Rate limit exceeded. Please try again later.'}, status=429)
-        except OpenAIError as e:
-            logger.error(f"OpenAI error: {str(e)}")
-            return Response({'error': f"OpenAI error: {str(e)}"}, status=500)
         except Exception as e:
-            logger.error(f"Unexpected error: {str(e)}")
+            logger.exception("Unexpected error:")
             return Response({'error': f"Unexpected error: {str(e)}"}, status=500)

@@ -1,64 +1,37 @@
-<!-- <div class="chat-container container mt-5">
-    <div class="card shadow-sm">
-      <div class="card-header">
-        <h2 class="text-center mb-0">XLi Chatbot</h2>
-        <div class="provider-select">
-          <label for="provider">Select AI Provider:</label>
-          <select id="provider" [(ngModel)]="provider" class="form-select form-select-sm">
-            <option value="openrouter">OpenRouter (DeepSeek)</option>
-            <option value="openai">OpenAI (GPT-3.5)</option>
-          </select>
-        </div>
-      </div>
-      <div class="chat-window card-body">
-        <div *ngFor="let msg of messages" [ngClass]="{'user-message': msg.sender === 'You', 'bot-message': msg.sender === 'XLi Chatbox'}">
-          <p><strong>{{ msg.sender }}:</strong> <span [innerHTML]="msg.text | markdown"></span></p>
-        </div>
-        <div *ngIf="isLoading" class="text-center">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+<div class="chat-wrapper container py-4">
+  <div class="card shadow-lg">
+    <div class="card-header d-flex justify-content-between align-items-center bg-dark text-white">
+      <h4 class="mb-0">🤖 XLi Chatbot</h4>
+      <select [(ngModel)]="provider" class="form-select form-select-sm w-auto">
+        <option value="openrouter">OpenRouter (DeepSeek)</option>
+        <option value="openai">OpenAI (GPT-3.5)</option>
+      </select>
+    </div>
+  
+    <div class="card-body chat-window">
+      <div *ngFor="let message of messages">
+        <div class="d-flex mb-3" [ngClass]="{'flex-row-reverse': message.sender === 'You'}">
+          <img [src]="message.sender === 'You' ? 'profile.png' : 'bot.png'" class="avatar me-2" />
+          <div class="message-bubble bg-light border p-3 rounded-4">
+            <strong>{{ message.sender }}</strong><br />
+            <span>{{ message.text }}</span> <!-- Display plain text -->
           </div>
         </div>
       </div>
-      <div class="chat-input card-footer">
-        <form (ngSubmit)="sendMessage()" class="d-flex gap-2">
-          <input [(ngModel)]="userInput" name="userInput" (keydown.enter)="sendMessage()" placeholder="Type your message..." class="form-control" required />
-          <button type="submit" class="btn btn-success">Send</button>
-        </form>
+      <div *ngIf="isLoading" class="d-flex mb-3">
+        <img src="bot.png" class="avatar me-2" />
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
       </div>
     </div>
-  </div> -->
-
-
-  <!-- src/app/aimodel/aimodel.component.html -->
-<!-- <div class="chat-container">
-  <div class="chat-window">
-    <div *ngFor="let message of messages" class="message" [ngClass]="{'user-message': message.sender === 'You', 'bot-message': message.sender === 'XLi Chatbox'}">
-      <strong>{{ message.sender }}:</strong>
-      <markdown [data]="message.text"></markdown>
+  
+    <div class="card-footer bg-light">
+      <form (ngSubmit)="sendMessage()" class="d-flex gap-2">
+        <input [(ngModel)]="userInput" name="userInput" class="form-control" placeholder="Type your message..." [disabled]="isLoading || !isLoggedIn" required />
+        <button class="btn btn-success" type="submit" [disabled]="isLoading || !userInput.trim() || !isLoggedIn">Send</button>
+      </form>
+      <div *ngIf="!isLoggedIn" class="text-danger mt-2">Please log in to use the chatbot.</div>
     </div>
-  </div>
-  <div class="input-container">
-    <input [(ngModel)]="userInput" placeholder="Type your message..." maxlength="1000" [disabled]="isLoading || !localStorage.getItem('access')" />
-    <button (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">Send</button>
-    <span *ngIf="isLoading">Loading...</span>
-  </div>
-</div> -->
-
-
-
-
-<!-- src/app/aimodel/aimodel.component.html -->
-<div class="chat-container">
-  <div class="chat-window">
-    <div *ngFor="let message of messages" class="message" [ngClass]="{'user-message': message.sender === 'You', 'bot-message': message.sender === 'XLi Chatbox'}">
-      <strong>{{ message.sender }}:</strong>
-      <markdown [data]="message.text"></markdown>
-    </div>
-  </div>
-  <div class="input-container">
-    <input [(ngModel)]="userInput" placeholder="Type your message..." maxlength="1000" [disabled]="isLoading || !isLoggedIn" />
-    <button (click)="sendMessage()" [disabled]="isLoading || !userInput.trim() || !isLoggedIn">Send</button>
-    <span *ngIf="isLoading">Loading...</span>
   </div>
 </div>

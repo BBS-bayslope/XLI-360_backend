@@ -1,23 +1,5 @@
-<div style="
-    display: grid;
-    grid-template-columns: 1.45fr 4fr 1fr;
-    grid-template-rows: 1fr;
-    padding: 20px;
-    padding-bottom: 10px;
-    position: sticky;
-    top: 0;
-    background-color: var(--content-bg); /* Use variable for background */
-    z-index: 1000;
-  ">
-  <div style="
-      grid-column: 2/3;
-      display: flex;
-      flex-direction: row;
-      justify-content: end;
-      gap: 15px;
-      align-items: flex-start;
-    ">
-    <mat-form-field appearance="outline" style="width: 100%">
+
+    <mat-form-field appearance="outline" style="width: 100% ;margin-top: -3vh;">
       <mat-label>Quick Search</mat-label>
       <input
         matInput
@@ -35,15 +17,15 @@
         <mat-icon>clear</mat-icon>
       </button>
     </mat-form-field>
-    <!-- Add the Dark Mode Toggle Button -->
-    <!-- <button mat-icon-button (click)="toggleDarkMode()" aria-label="Toggle dark mode">
-      <mat-icon *ngIf="(darkModeService.darkMode$ | async); else lightModeIcon">brightness_3</mat-icon>
-      <ng-template #lightModeIcon>
-        <mat-icon>wb_sunny</mat-icon>
-      </ng-template>
-    </button> -->
-  </div>
-</div>
+    <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row ">
+      <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
+        <button
+          [ngClass]="{ 'active': selectedYear === year }"
+          (click)="selectYear(year)">
+          {{ year === '' ? 'All' : year }}
+        </button>
+      </div>
+    </div>
 
 <mat-sidenav-container class="drawer-container">
   <mat-sidenav #drawer mode="side" opened>
@@ -60,7 +42,8 @@
           <span class="material-symbols-outlined">left_panel_close</span>
         </button>
         <span style="display: flex; align-items: center; gap: 8px; font-size: 16px;">
-          <h4 style="font-size: 18px; font-weight: bolder; white-space: nowrap;">All Filters</h4>
+          <h4 style="font-size: 16px; font-weight: bolder; white-space: nowrap; font-family: 'Tenorite','sans-serif';">All Filters</h4>
+
         </span>
       </span>
       <br />
@@ -482,15 +465,7 @@
   <mat-sidenav-content class="abc" style="height: auto; background-color: var(--content-bg); margin: 0; padding: 0; overflow: visible;">
     <div class="sticky-header">
       <!-- Year Filter Buttons -->
-      <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row">
-        <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
-          <button
-            [ngClass]="{ 'active': selectedYear === year }"
-            (click)="selectYear(year)">
-            {{ year === '' ? 'All' : year }}
-          </button>
-        </div>
-      </div>
+
     </div>
 
     <div class="filter-chips-container" style="
@@ -662,7 +637,7 @@
         style="width: 100%; height: auto">
         <mat-tab>
           <ng-template mat-tab-label>
-            <span class="custom-tab-label" style="font-weight: bolder; font-size:18px;">CaseList</span>
+            <span class="custom-tab-label" style="font-weight: bolder; font-size:16px;">CaseList</span>
           </ng-template>
           <div *ngIf="loader" style="
               display: flex;
@@ -681,7 +656,7 @@
           class="mat-elevation-z8"
           style="
             display: block;
-            height: 38.44vh;
+            height: 55.5vh;
             overflow-y: auto;
             overflow-x:scroll;
             margin: 0;
@@ -834,7 +809,7 @@
 
         <mat-tab>
           <ng-template mat-tab-label>
-            <span class="custom-tab-label" style="font-weight: bolder;font-size:18px;">Analytics</span>
+            <span class="custom-tab-label" style="font-weight: bolder;font-size:16px;">Analytics</span>
           </ng-template>
           <div>
             <app-analytics 
@@ -846,7 +821,7 @@
 
         <mat-tab>
           <ng-template mat-tab-label>
-            <span class="custom-tab-label" style="font-weight: bolder; font-size:18px;">Predictions & Recommendations</span>
+            <span class="custom-tab-label" style="font-weight: bolder; font-size:16px;">Predictions & Recommendations</span>
           </ng-template>
           <div style="height: 150vh; margin: 20px">
             Coming soon..
@@ -855,14 +830,14 @@
 
         <mat-tab>
           <ng-template mat-tab-label>
-            <span class="custom-tab-label" style="font-weight: bolder; font-size:18px;">Database</span>
+            <span class="custom-tab-label" style="font-weight: bolder; font-size:16px;">Database</span>
           </ng-template>
           <div style="height: 150vh; margin: 20px">Coming soon..</div>
         </mat-tab>
 
         <mat-tab>
           <ng-template mat-tab-label>
-            <span class="custom-tab-label" style="font-weight: bolder; font-size:18px;">Reports</span>
+            <span class="custom-tab-label" style="font-weight: bolder; font-size:16px;">Reports</span>
           </ng-template>
           <div>
             <app-reports></app-reports>
@@ -873,3 +848,4 @@
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>
+

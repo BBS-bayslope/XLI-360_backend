@@ -568,31 +568,311 @@ def create_stored_procedure():
 # from concurrent.futures import ThreadPoolExecutor, as_completed
 # from django.db import transaction, connection
 # from .models import RawData
+# import logging
+# import time
+# import openpyxl
+# from io import BytesIO
+
+# # Configure logging
+# logging.basicConfig(level=logging.INFO)
+
+# # from .sync_module import sync_raw_to_case
+
+# from mainapp.models import RawData, Case, Patent, CasePatent 
+# logger = logging.getLogger(__name__)
+
+# class FileUploadViewNew(APIView):
+#     parser_classes = (MultiPartParser, FormParser)
+#     permission_classes = []
+
+#     def safe_str(self, value, field_name):
+#         try:
+#             if value is None:
+#                 return ''
+#             return str(value).upper()
+#         except AttributeError as e:
+#             logger.error(f"Failed to convert {field_name} to upper: {str(e)}. Value: {value}")
+#             return str(value) if value is not None else ''
+
+#     def process_chunk(self, rows):
+#         records = []
+#         required_columns = [
+#             'Case Number', 'Case Name', 'Case Status', 'Court Names',
+#             'Litigation Venues & Judicial Authorities', 'Related/Originating Cases',
+#             'Cause of Action', 'Accused Product', 'Judge', 'Number of Infringed Claims',
+#             '3rd Party Funding Involved', 'Case Strength Level', 'Recent Action',
+#             'Winning Amount', 'Winning Party', 'Other Possible Infringer', 'List of Prior Art',
+#             'Patent No', 'Type of Patent', 'Title', 'Original Assignee',
+#             'Current Assignee', 'Single Patent or Family Involved?',
+#             'Standard Essential Patent', 'Semiconductor Patent', 'Tech Centre',
+#             'Art Unit', 'Acquired Patent or Organic patent?', 'Assignee Timeline',
+#             'Industry', 'Technology Keywords', 'Tech Category', 'Reason of Allowance',
+#             'Plaintiff/Petitioner', 'Number of Plaintiff/petitioners', 'Plaintiff Type', 'Plaintiff Size', 'Defendant',
+#             'Stage', 'Chances of Winning', 'Case Complaint Date'
+#         ]
+
+#         for row in rows:
+#             try:
+#                 if not all(row.get(col) for col in ['Case Number', 'Case Name', 'Patent No']):
+#                     logger.warning(f"Skipping row with missing key fields: {row}")
+#                     continue
+
+#                 missing_columns = [col for col in required_columns if col not in row]
+#                 if missing_columns:
+#                     raise KeyError(f"Missing columns: {', '.join(missing_columns)}")
+
+#                 is_valid = all([
+#                     row.get('Case Number'), row.get('Case Complaint Date'),
+#                     row.get('Case Name'), row.get('Patent No'),
+#                     row.get('Plaintiff/Petitioner'), row.get('Defendant')
+#                 ])
+
+#                 # Format dates
+#                 def parse_date(val): return pd.to_datetime(val, errors='coerce').strftime('%Y-%m-%d') if pd.notnull(
+#                     pd.to_datetime(val, errors='coerce')) else None
+
+#                 raw_data_instance = RawData(
+#                     case_no=self.safe_str(row.get('Case Number', ''), 'Case Number'),
+#                     complaint_date=parse_date(row.get('Case Complaint Date')),
+#                     case_name=self.safe_str(row.get('Case Name', ''), 'Case Name'),
+#                     case_status=self.safe_str(row.get('Case Status', ''), 'Case Status'),
+#                     court_name=self.safe_str(row.get('Court Names', ''), 'Court Names'),
+#                     litigation_venues=self.safe_str(row.get('Litigation Venues & Judicial Authorities', ''), 'Litigation Venues'),
+#                     related_cases=str(row.get('Related/Originating Cases', '')),
+#                     case_closed_date=parse_date(row.get('Case Closed Date')),
+#                     cause_of_action=self.safe_str(row.get('Cause of Action', ''), 'Cause of Action'),
+#                     accused_product=self.safe_str(row.get('Accused Product', ''), 'Accused Product'),
+#                     assigned_judge=str(row.get('Judge', '')),
+#                     number_of_infringed_claims=int(row.get('Number of Infringed Claims') or 0),
+#                     third_party_funding_involved=self.safe_str(row.get('3rd Party Funding Involved', ''), 'Funding'),
+#                     case_strength_level=self.safe_str(row.get('Case Strength Level', ''), 'Strength'),
+#                     recent_action=str(row.get('Recent Action', '')),
+#                     winning_amount=str(row.get('Winning Amount', '')),
+#                     winning_party=str(row.get('Winning Party', '')),
+#                     other_possible_infringer=str(row.get('Other Possible Infringer', '')),
+#                     list_of_prior_art=str(row.get('List of Prior Art', '')),
+#                     patent_no=self.safe_str(row.get('Patent No', ''), 'Patent No'),
+#                     patent_type=str(row.get('Type of Patent', '')),
+#                     patent_title=str(row.get('Title', '')),
+#                     original_assignee=str(row.get('Original Assignee', '')),
+#                     current_assignee=str(row.get('Current Assignee', '')),
+#                     issue_date=parse_date(row.get('Patent Issued Date')),
+#                     expiry_date=parse_date(row.get('Patent Expiry Date')),
+#                     single_or_multiple=self.safe_str(row.get('Single Patent or Family Involved?', ''), 'Single/Family'),
+#                     standard_patent=self.safe_str(row.get('Standard Essential Patent', ''), 'Standard'),
+#                     semiconductor_patent=self.safe_str(row.get('Semiconductor Patent', ''), 'Semiconductor'),
+#                     tech_center=self.safe_str(row.get('Tech Centre', ''), 'Tech Centre'),
+#                     art_unit=self.safe_str(row.get('Art Unit', ''), 'Art Unit'),
+#                     acquisition_type=str(row.get('Acquired Patent or Organic patent?', '')),
+#                     industry=self.safe_str(row.get('Industry', ''), 'Industry'),
+#                     technology_keywords=str(row.get('Technology Keywords', '')),
+#                     tech_category=self.safe_str(row.get('Tech Category', ''), 'Tech Category'),
+#                     reason_of_allowance=str(row.get('Reason of Allowance', '')),
+#                     plaintiff=str(row.get('Plaintiff/Petitioner', '')),
+#                     plaintiff_type=self.safe_str(row.get('Plaintiff Type', ''), 'Plaintiff Type'),
+#                     plaintiff_size=self.safe_str(row.get('Plaintiff Size', ''), 'Plaintiff Size'),
+#                     defendant=str(row.get('Defendant', '')),
+#                     stage=str(row.get('Stage', '')),
+#                     chances_of_winning=str(row.get('Chances of Winning', '')),
+#                     is_valid=is_valid
+#                 )
+#                 records.append(raw_data_instance)
+#             except Exception as e:
+#                 logger.error(f"Error processing row: {str(e)}. Row data: {row}")
+#         return records
+
+#     # def sync_raw_to_case(self):
+#     #     logger.info(f"Total RawData valid rows: {RawData.objects.filter(is_valid=True).count()}")
+#     #     logger.info(f"Total unsynced rows: {RawData.objects.filter(is_valid=True, is_synced=False).count()}")
+
+#     #     valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)  
+#     #     for r in valid_raws:
+#     #         case_obj, _ = Case.objects.get_or_create(
+#     #             case_no=r.case_no,
+#     #             defaults={
+#     #                 'complaint_date': r.complaint_date,
+#     #                 'case_name': r.case_name,
+#     #                 'case_status': r.case_status,
+#     #                 'court_name': r.court_name,
+#     #                 'litigation_venues': r.litigation_venues,
+#     #             }
+#     #         )
+#     #         patent_obj, _ = Patent.objects.get_or_create(
+#     #             patent_no=r.patent_no,
+#     #             defaults={
+#     #                 'patent_title': r.patent_title,
+#     #                 'tech_category': r.tech_category
+#     #             }
+#     #         )
+#     #         CasePatent.objects.get_or_create(case=case_obj, patent=patent_obj)
+#     #         r.is_synced = True
+#     #         # r.save(update_fields=["is_synced"])
+#     #         # logger.info(f"Synced case {r.case_no} and patent {r.patent_no}")
+#     #         batch.append(r)
+
+#     # # ✅ Efficiently update all at once
+#     # RawData.objects.bulk_update(batch, ['is_synced'], batch_size=1000)
+#     # logger.info(f"Bulk updated {len(batch)} records as synced.")
+
+# # from django.db import transaction
+
+#     def sync_raw_to_case(self):
+#         logger.info("Syncing RawData → Case/Patent/CasePatent...")
+
+#         valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)[:1000]
+#         logger.info(f"Total valid unsynced rows: {valid_raws.count()}")
+
+#         batch_to_update = []
+
+#         with transaction.atomic():
+#             for r in valid_raws.iterator(chunk_size=1000):  # Efficient memory usage
+#                 try:
+#                     # Create or get Case
+#                     case_obj, _ = Case.objects.get_or_create(
+#                         case_no=r.case_no,
+#                         defaults={
+#                             'complaint_date': r.complaint_date,
+#                             'case_name': r.case_name,
+#                             'case_status': r.case_status,
+#                             'court_name': r.court_name,
+#                             'litigation_venues': r.litigation_venues,
+#                         }
+#                     )
+
+#                     # Create or get Patent
+#                     patent_obj, _ = Patent.objects.get_or_create(
+#                         patent_no=r.patent_no,
+#                         defaults={
+#                             'patent_title': r.patent_title,
+#                             'tech_category': r.tech_category
+#                         }
+#                     )
+
+#                     # Create CasePatent relation if not exists
+#                     CasePatent.objects.get_or_create(case=case_obj, patent=patent_obj)
+
+#                     r.is_synced = True
+#                     batch_to_update.append(r)
+
+#                     # Bulk update in chunks of 1000
+#                     if len(batch_to_update) >= 1000:
+#                         RawData.objects.bulk_update(batch_to_update, ['is_synced'])
+#                         logger.info(f"Updated {len(batch_to_update)} records as synced.")
+#                         batch_to_update.clear()
+
+#                 except Exception as e:
+#                     logger.error(f"Error syncing RawData ID {r.id}: {str(e)}")
+
+#         # Update any remaining records
+#             if batch_to_update:
+#                 RawData.objects.bulk_update(batch_to_update, ['is_synced'])
+#                 logger.info(f"Final update: {len(batch_to_update)} records synced.")
+
+#         logger.info("RawData sync completed.")
+
+
+#     def post(self, request):
+#         file = request.FILES.get('file')
+#         if not file:
+#             return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         try:
+#             chunk_size = 200
+#             start_time = time.time()
+#             logger.info("Starting file processing")
+
+#             file_content = BytesIO(file.read())
+#             workbook = openpyxl.load_workbook(file_content, read_only=True, data_only=True)
+#             sheet_name = workbook.sheetnames[0]
+#             sheet = workbook[sheet_name]
+#             # row_count = sum(1 for _ in sheet.iter_rows(min_row=2))
+#             row_count = sheet.max_row - 1 if sheet.max_row else 0
+#             # row_count = sheet.max_row - 1
+#             print("Total data rows:", row_count)
+
+#             def read_sheet_in_chunks(sheet_name, chunksize):
+#                 sheet = workbook[sheet_name]
+#                 headers = [cell.value for cell in next(sheet.iter_rows())]
+#                 rows = []
+#                 for row in sheet.iter_rows(min_row=2, values_only=True):
+#                     row_dict = dict(zip(headers, row))
+#                     rows.append(row_dict)
+#                     if len(rows) >= chunksize:
+#                         yield rows
+#                         rows = []
+#                 if rows:
+#                     yield rows
+
+#             raw_data_records = []
+#             total_rows_processed = 0
+#             for chunk in read_sheet_in_chunks(sheet_name, chunk_size):
+#                 with ThreadPoolExecutor(max_workers=1) as executor:
+#                     futures = [executor.submit(self.process_chunk, chunk)]
+#                     for future in as_completed(futures):
+#                         raw_data_records.extend(future.result())
+#                 total_rows_processed += len(chunk)
+
+#             logger.info("Inserting into RawData table...")
+#             with transaction.atomic():
+#                 RawData.objects.bulk_create(raw_data_records, batch_size=200)
+#                 with connection.cursor() as cursor:
+#                     cursor.execute("SELECT process_raw_data()")  # optional stored proc
+
+#             logger.info("Syncing RawData → Case/Patent/CasePatent...")
+#             self.sync_raw_to_case()
+
+#             workbook.close()
+#             total_time = time.time() - start_time
+#             return Response({
+#                 'message': f'Upload complete. {total_rows_processed} rows processed.',
+#                 'duration': f"{total_time:.2f} seconds"
+#             }, status=status.HTTP_200_OK)
+
+#         except Exception as e:
+#             logger.error(f"Upload failed: {str(e)}")
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+from django.db import transaction, connection
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
+import pandas as pd
+import time 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
-import time
-import openpyxl
-from io import BytesIO
+from mainapp.models import RawData, Case, Patent, CasePatent, CaseDetails
+from django.db.models import Q
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-
-# from .sync_module import sync_raw_to_case
-
-from mainapp.models import RawData, Case, Patent, CasePatent 
 logger = logging.getLogger(__name__)
 
 class FileUploadViewNew(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    permission_classes = []
+    permission_classes = []  # Add IsAuthenticated in production
 
     def safe_str(self, value, field_name):
         try:
-            if value is None:
+            if value is None or str(value).lower() == 'nan':
                 return ''
-            return str(value).upper()
-        except AttributeError as e:
-            logger.error(f"Failed to convert {field_name} to upper: {str(e)}. Value: {value}")
-            return str(value) if value is not None else ''
+            # Clean duplicates in plaintiff
+            if field_name == 'Plaintiff/Petitioner':
+                value = str(value).split('vectair systems')[0].strip()
+            return str(value).upper() if field_name in ['Case Number', 'Patent No', 'Case Status'] else str(value).strip().lower()
+        except Exception as e:
+            logger.error(f"Failed to convert {field_name}: {str(e)}. Value: {value}")
+            return str(value).strip().lower() if value is not None else ''
+
+    def safe_int(self, value, default=0):
+        try:
+            if pd.isnull(value):
+                return default
+            return int(float(value))
+        except Exception as e:
+            logger.warning(f"Could not convert value to int: {value}. Error: {e}")
+            return default
 
     def process_chunk(self, rows):
         records = []
@@ -613,163 +893,180 @@ class FileUploadViewNew(APIView):
 
         for row in rows:
             try:
-                if not all(row.get(col) for col in ['Case Number', 'Case Name', 'Patent No']):
-                    logger.warning(f"Skipping row with missing key fields: {row}")
-                    continue
-
+                # Check for missing columns
                 missing_columns = [col for col in required_columns if col not in row]
                 if missing_columns:
-                    raise KeyError(f"Missing columns: {', '.join(missing_columns)}")
+                    logger.warning(f"Missing columns: {', '.join(missing_columns)}")
+                    continue
 
+                # Validate key fields
                 is_valid = all([
                     row.get('Case Number'), row.get('Case Complaint Date'),
                     row.get('Case Name'), row.get('Patent No'),
                     row.get('Plaintiff/Petitioner'), row.get('Defendant')
                 ])
+                if not is_valid:
+                    logger.warning(f"Skipping row with missing key fields: {row}")
+                    continue
 
-                # Format dates
-                def parse_date(val): return pd.to_datetime(val, errors='coerce').strftime('%Y-%m-%d') if pd.notnull(
-                    pd.to_datetime(val, errors='coerce')) else None
+                def parse_date(val):
+                    try:
+                        dt = pd.to_datetime(val, errors='coerce')
+                        return dt.strftime('%Y-%m-%d') if pd.notnull(dt) else None
+                    except:
+                        return None
 
                 raw_data_instance = RawData(
-                    case_no=self.safe_str(row.get('Case Number', ''), 'Case Number'),
+                    case_no=self.safe_str(row.get('Case Number'), 'Case Number'),
                     complaint_date=parse_date(row.get('Case Complaint Date')),
-                    case_name=self.safe_str(row.get('Case Name', ''), 'Case Name'),
-                    case_status=self.safe_str(row.get('Case Status', ''), 'Case Status'),
-                    court_name=self.safe_str(row.get('Court Names', ''), 'Court Names'),
-                    litigation_venues=self.safe_str(row.get('Litigation Venues & Judicial Authorities', ''), 'Litigation Venues'),
+                    case_name=self.safe_str(row.get('Case Name'), 'Case Name'),
+                    case_status=self.safe_str(row.get('Case Status'), 'Case Status'),
+                    court_name=self.safe_str(row.get('Court Names'), 'Court Names'),
+                    litigation_venues=self.safe_str(row.get('Litigation Venues & Judicial Authorities'), 'Litigation Venues'),
                     related_cases=str(row.get('Related/Originating Cases', '')),
                     case_closed_date=parse_date(row.get('Case Closed Date')),
-                    cause_of_action=self.safe_str(row.get('Cause of Action', ''), 'Cause of Action'),
-                    accused_product=self.safe_str(row.get('Accused Product', ''), 'Accused Product'),
-                    assigned_judge=str(row.get('Judge', '')),
-                    number_of_infringed_claims=int(row.get('Number of Infringed Claims') or 0),
-                    third_party_funding_involved=self.safe_str(row.get('3rd Party Funding Involved', ''), 'Funding'),
-                    case_strength_level=self.safe_str(row.get('Case Strength Level', ''), 'Strength'),
-                    recent_action=str(row.get('Recent Action', '')),
-                    winning_amount=str(row.get('Winning Amount', '')),
-                    winning_party=str(row.get('Winning Party', '')),
-                    other_possible_infringer=str(row.get('Other Possible Infringer', '')),
-                    list_of_prior_art=str(row.get('List of Prior Art', '')),
-                    patent_no=self.safe_str(row.get('Patent No', ''), 'Patent No'),
-                    patent_type=str(row.get('Type of Patent', '')),
-                    patent_title=str(row.get('Title', '')),
-                    original_assignee=str(row.get('Original Assignee', '')),
-                    current_assignee=str(row.get('Current Assignee', '')),
+                    cause_of_action=self.safe_str(row.get('Cause of Action'), 'Cause of Action'),
+                    accused_product=self.safe_str(row.get('Accused Product'), 'Accused Product'),
+                    assigned_judge=self.safe_str(row.get('Judge'), 'Judge'),
+                    number_of_infringed_claims=self.safe_int(row.get('Number of Infringed Claims')),
+                    third_party_funding_involved=self.safe_str(row.get('3rd Party Funding Involved'), 'Funding'),
+                    case_strength_level=self.safe_str(row.get('Case Strength Level'), 'Strength'),
+                    recent_action=self.safe_str(row.get('Recent Action'), 'Recent Action'),
+                    winning_amount=self.safe_str(row.get('Winning Amount'), 'Winning Amount'),
+                    winning_party=self.safe_str(row.get('Winning Party'), 'Winning Party'),
+                    other_possible_infringer=self.safe_str(row.get('Other Possible Infringer'), 'Infringer'),
+                    list_of_prior_art=self.safe_str(row.get('List of Prior Art'), 'Prior Art'),
+                    patent_no=self.safe_str(row.get('Patent No'), 'Patent No'),
+                    patent_type=self.safe_str(row.get('Type of Patent'), 'Patent Type'),
+                    patent_title=self.safe_str(row.get('Title'), 'Title'),
+                    original_assignee=self.safe_str(row.get('Original Assignee'), 'Original Assignee'),
+                    current_assignee=self.safe_str(row.get('Current Assignee'), 'Current Assignee'),
                     issue_date=parse_date(row.get('Patent Issued Date')),
                     expiry_date=parse_date(row.get('Patent Expiry Date')),
-                    single_or_multiple=self.safe_str(row.get('Single Patent or Family Involved?', ''), 'Single/Family'),
-                    standard_patent=self.safe_str(row.get('Standard Essential Patent', ''), 'Standard'),
-                    semiconductor_patent=self.safe_str(row.get('Semiconductor Patent', ''), 'Semiconductor'),
-                    tech_center=self.safe_str(row.get('Tech Centre', ''), 'Tech Centre'),
-                    art_unit=self.safe_str(row.get('Art Unit', ''), 'Art Unit'),
-                    acquisition_type=str(row.get('Acquired Patent or Organic patent?', '')),
-                    industry=self.safe_str(row.get('Industry', ''), 'Industry'),
-                    technology_keywords=str(row.get('Technology Keywords', '')),
-                    tech_category=self.safe_str(row.get('Tech Category', ''), 'Tech Category'),
-                    reason_of_allowance=str(row.get('Reason of Allowance', '')),
-                    plaintiff=str(row.get('Plaintiff/Petitioner', '')),
-                    plaintiff_type=self.safe_str(row.get('Plaintiff Type', ''), 'Plaintiff Type'),
-                    plaintiff_size=self.safe_str(row.get('Plaintiff Size', ''), 'Plaintiff Size'),
-                    defendant=str(row.get('Defendant', '')),
-                    stage=str(row.get('Stage', '')),
-                    chances_of_winning=str(row.get('Chances of Winning', '')),
+                    single_or_multiple=self.safe_str(row.get('Single Patent or Family Involved?'), 'Single/Family'),
+                    standard_patent=self.safe_str(row.get('Standard Essential Patent'), 'Standard Patent'),
+                    semiconductor_patent=self.safe_str(row.get('Semiconductor Patent'), 'Semiconductor Patent'),
+                    tech_center=self.safe_str(row.get('Tech Centre'), 'Tech Centre'),
+                    art_unit=self.safe_str(row.get('Art Unit'), 'Art Unit'),
+                    acquisition_type=self.safe_str(row.get('Acquired Patent or Organic patent?'), 'Acquisition Type'),
+                    assignee_timeline=self.safe_str(row.get('Assignee Timeline'), 'Assignee Timeline'),
+                    industry=self.safe_str(row.get('Industry'), 'Industry'),
+                    technology_keywords=self.safe_str(row.get('Technology Keywords'), 'Keywords'),
+                    tech_category=self.safe_str(row.get('Tech Category'), 'Tech Category'),
+                    reason_of_allowance=self.safe_str(row.get('Reason of Allowance'), 'Reason of Allowance'),
+                    plaintiff=self.safe_str(row.get('Plaintiff/Petitioner'), 'Plaintiff/Petitioner'),
+                    plaintiff_type_and_size=self.safe_str(row.get('Plaintiff Type'), '') + ' ' + self.safe_str(row.get('Plaintiff Size'), ''),
+                    defendant=self.safe_str(row.get('Defendant'), 'Defendant'),
+                    defendent_type_and_size=self.safe_str(row.get('Defendant Type', ''), '') + ' ' + self.safe_str(row.get('Defendant Size', ''), ''),
+                    stage=self.safe_str(row.get('Stage'), 'Stage'),
+                    chances_of_winning=self.safe_str(row.get('Chances of Winning'), 'Chances'),
                     is_valid=is_valid
                 )
                 records.append(raw_data_instance)
             except Exception as e:
                 logger.error(f"Error processing row: {str(e)}. Row data: {row}")
+                continue
         return records
 
-    # def sync_raw_to_case(self):
-    #     logger.info(f"Total RawData valid rows: {RawData.objects.filter(is_valid=True).count()}")
-    #     logger.info(f"Total unsynced rows: {RawData.objects.filter(is_valid=True, is_synced=False).count()}")
+    def sync_all_data(self):
+        logger.info("Starting sync: RawData → Case/Patent/CasePatent/CaseDetails...")
+        valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)
+        logger.info(f"Found {valid_raws.count()} valid unsynced rows")
 
-    #     valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)  
-    #     for r in valid_raws:
-    #         case_obj, _ = Case.objects.get_or_create(
-    #             case_no=r.case_no,
-    #             defaults={
-    #                 'complaint_date': r.complaint_date,
-    #                 'case_name': r.case_name,
-    #                 'case_status': r.case_status,
-    #                 'court_name': r.court_name,
-    #                 'litigation_venues': r.litigation_venues,
-    #             }
-    #         )
-    #         patent_obj, _ = Patent.objects.get_or_create(
-    #             patent_no=r.patent_no,
-    #             defaults={
-    #                 'patent_title': r.patent_title,
-    #                 'tech_category': r.tech_category
-    #             }
-    #         )
-    #         CasePatent.objects.get_or_create(case=case_obj, patent=patent_obj)
-    #         r.is_synced = True
-    #         # r.save(update_fields=["is_synced"])
-    #         # logger.info(f"Synced case {r.case_no} and patent {r.patent_no}")
-    #         batch.append(r)
-
-    # # ✅ Efficiently update all at once
-    # RawData.objects.bulk_update(batch, ['is_synced'], batch_size=1000)
-    # logger.info(f"Bulk updated {len(batch)} records as synced.")
-
-# from django.db import transaction
-
-    def sync_raw_to_case(self):
-        logger.info("Syncing RawData → Case/Patent/CasePatent...")
-
-        valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)[:1000]
-        logger.info(f"Total valid unsynced rows: {valid_raws.count()}")
-
+        case_patent_to_create = []
+        case_details_to_create = []
         batch_to_update = []
 
         with transaction.atomic():
-            for r in valid_raws.iterator(chunk_size=1000):  # Efficient memory usage
+            for raw_data in valid_raws.iterator(chunk_size=50):
                 try:
-                    # Create or get Case
+                    # Sync Case
                     case_obj, _ = Case.objects.get_or_create(
-                        case_no=r.case_no,
+                        case_no=raw_data.case_no.strip(),
                         defaults={
-                            'complaint_date': r.complaint_date,
-                            'case_name': r.case_name,
-                            'case_status': r.case_status,
-                            'court_name': r.court_name,
-                            'litigation_venues': r.litigation_venues,
+                            'complaint_date': raw_data.complaint_date,
+                            'case_name': raw_data.case_name,
+                            'case_status': raw_data.case_status,
+                            'court_name': raw_data.court_name,
+                            'litigation_venues': raw_data.litigation_venues,
                         }
                     )
 
-                    # Create or get Patent
-                    patent_obj, _ = Patent.objects.get_or_create(
-                        patent_no=r.patent_no,
-                        defaults={
-                            'patent_title': r.patent_title,
-                            'tech_category': r.tech_category
-                        }
-                    )
+                    # Sync Patent (Handle comma-separated patent_no)
+                    if raw_data.patent_no and raw_data.patent_no not in ['0', '00:00:00', 'REDACTED', '']:
+                        patent_nos = [p.strip() for p in raw_data.patent_no.split(',')]
+                        for patent_no in patent_nos:
+                            if patent_no:
+                                patent_obj, _ = Patent.objects.get_or_create(
+                                    patent_no=patent_no,
+                                    defaults={
+                                        'patent_title': raw_data.patent_title,
+                                        'tech_category': raw_data.tech_category.strip().lower() if raw_data.tech_category else '',
+                                        'patent_type': raw_data.patent_type,
+                                        'original_assignee': raw_data.original_assignee,
+                                        'current_assignee': raw_data.current_assignee,
+                                        'issue_date': raw_data.issue_date,
+                                        'expiry_date': raw_data.expiry_date,
+                                        'single_or_multiple': raw_data.single_or_multiple,
+                                        'standard_patent': raw_data.standard_patent,
+                                        'semiconductor_patent': raw_data.semiconductor_patent,
+                                        'tech_center': raw_data.tech_center,
+                                        'art_unit': raw_data.art_unit,
+                                        'acquisition_type': raw_data.acquisition_type,
+                                        'assignee_timeline': raw_data.assignee_timeline,
+                                        'industry': raw_data.industry,
+                                        'technology_keywords': raw_data.technology_keywords,
+                                        'reason_of_allowance': raw_data.reason_of_allowance,
+                                    }
+                                )
+                                if not CasePatent.objects.filter(case=case_obj, patent=patent_obj).exists():
+                                    case_patent_to_create.append(CasePatent(case=case_obj, patent=patent_obj))
 
-                    # Create CasePatent relation if not exists
-                    CasePatent.objects.get_or_create(case=case_obj, patent=patent_obj)
+                    # Sync CaseDetails
+                    if not CaseDetails.objects.filter(case=case_obj).exists():
+                        plaintiff = raw_data.plaintiff.strip().lower().split('vectair systems')[0].strip() if raw_data.plaintiff else ''
+                        defendant = raw_data.defendant.strip().lower() if raw_data.defendant else ''
+                        judge = raw_data.assigned_judge.strip().lower() if raw_data.assigned_judge else ''
+                        case_details_to_create.append(
+                            CaseDetails(
+                                case=case_obj,
+                                plaintiff=plaintiff,
+                                defendant=defendant,
+                                judge=judge,
+                                related_cases=raw_data.related_cases,
+                                case_closed_date=raw_data.case_closed_date,
+                                cause_of_action=raw_data.cause_of_action,
+                                accused_product=raw_data.accused_product,
+                                number_of_infringed_claims=raw_data.number_of_infringed_claims,
+                                third_party_funding_involved=raw_data.third_party_funding_involved,
+                                type_of_infringement=raw_data.type_of_infringement or '',
+                                case_strength_level=raw_data.case_strength_level,
+                                recent_action=raw_data.recent_action,
+                                winning_amount=raw_data.winning_amount,
+                                winning_party=raw_data.winning_party,
+                                other_possible_infringer=raw_data.other_possible_infringer,
+                                list_of_prior_art=raw_data.list_of_prior_art,
+                                plaintiff_type_and_size=raw_data.plaintiff_type_and_size,
+                                defendent_type_and_size=raw_data.defendent_type_and_size,
+                            )
+                        )
 
-                    r.is_synced = True
-                    batch_to_update.append(r)
-
-                    # Bulk update in chunks of 1000
-                    if len(batch_to_update) >= 1000:
-                        RawData.objects.bulk_update(batch_to_update, ['is_synced'])
-                        logger.info(f"Updated {len(batch_to_update)} records as synced.")
-                        batch_to_update.clear()
+                    raw_data.is_synced = True
+                    batch_to_update.append(raw_data)
 
                 except Exception as e:
-                    logger.error(f"Error syncing RawData ID {r.id}: {str(e)}")
+                    logger.error(f"Error syncing RawData ID {raw_data.id}: {str(e)}")
+                    continue
 
-        # Update any remaining records
+            if case_patent_to_create:
+                CasePatent.objects.bulk_create(case_patent_to_create, ignore_conflicts=True)
+            if case_details_to_create:
+                CaseDetails.objects.bulk_create(case_details_to_create, ignore_conflicts=True)
             if batch_to_update:
-                RawData.objects.bulk_update(batch_to_update, ['is_synced'])
-                logger.info(f"Final update: {len(batch_to_update)} records synced.")
+                RawData.objects.bulk_update(batch_to_update, ['is_synced'], batch_size=100)
 
-        logger.info("RawData sync completed.")
-
+        logger.info("Sync completed: Case, Patent, CasePatent, CaseDetails")
+        return True
 
     def post(self, request):
         file = request.FILES.get('file')
@@ -781,47 +1078,23 @@ class FileUploadViewNew(APIView):
             start_time = time.time()
             logger.info("Starting file processing")
 
-            file_content = BytesIO(file.read())
-            workbook = openpyxl.load_workbook(file_content, read_only=True, data_only=True)
-            sheet_name = workbook.sheetnames[0]
-            sheet = workbook[sheet_name]
-            # row_count = sum(1 for _ in sheet.iter_rows(min_row=2))
-            row_count = sheet.max_row - 1 if sheet.max_row else 0
-            # row_count = sheet.max_row - 1
-            print("Total data rows:", row_count)
-
-            def read_sheet_in_chunks(sheet_name, chunksize):
-                sheet = workbook[sheet_name]
-                headers = [cell.value for cell in next(sheet.iter_rows())]
-                rows = []
-                for row in sheet.iter_rows(min_row=2, values_only=True):
-                    row_dict = dict(zip(headers, row))
-                    rows.append(row_dict)
-                    if len(rows) >= chunksize:
-                        yield rows
-                        rows = []
-                if rows:
-                    yield rows
-
-            raw_data_records = []
+            df = pd.read_excel(file, dtype=str)
+            rows = df.to_dict('records')
+            chunks = [rows[i:i + chunk_size] for i in range(0, len(rows), chunk_size)]
             total_rows_processed = 0
-            for chunk in read_sheet_in_chunks(sheet_name, chunk_size):
-                with ThreadPoolExecutor(max_workers=1) as executor:
-                    futures = [executor.submit(self.process_chunk, chunk)]
-                    for future in as_completed(futures):
-                        raw_data_records.extend(future.result())
-                total_rows_processed += len(chunk)
+            raw_data_records = []
 
-            logger.info("Inserting into RawData table...")
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                futures = [executor.submit(self.process_chunk, chunk) for chunk in chunks]
+                for future in as_completed(futures):
+                    raw_data_records.extend(future.result())
+                    total_rows_processed += len(future.result())
+
             with transaction.atomic():
                 RawData.objects.bulk_create(raw_data_records, batch_size=200)
-                with connection.cursor() as cursor:
-                    cursor.execute("SELECT process_raw_data()")  # optional stored proc
+                logger.info(f"Inserted {len(raw_data_records)} rows into RawData")
+                self.sync_all_data()
 
-            logger.info("Syncing RawData → Case/Patent/CasePatent...")
-            self.sync_raw_to_case()
-
-            workbook.close()
             total_time = time.time() - start_time
             return Response({
                 'message': f'Upload complete. {total_rows_processed} rows processed.',
@@ -831,6 +1104,3 @@ class FileUploadViewNew(APIView):
         except Exception as e:
             logger.error(f"Upload failed: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-

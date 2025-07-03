@@ -96,6 +96,8 @@ class RawData(models.Model):
     is_valid=models.BooleanField(default=True,blank=True,null=True)
     is_processed=models.BooleanField(default=False,blank=True,null=True)
     is_synced = models.BooleanField(default=False)
+    plaintiff_type_and_size = models.CharField(max_length=255, null=True, blank=True)
+    defendent_type_and_size = models.CharField(max_length=255, null=True, blank=True)
     def __str__(self):
         return self.case_no
     
@@ -140,6 +142,8 @@ class CaseDetails(models.Model):
     no_of_defendents=models.TextField(blank=True, null=True)
     activity_timeline=models.TextField(blank=True, null=True)
     chances_of_winning=models.TextField(blank=True, null=True)
+    plaintiff_type_and_size = models.CharField(max_length=255, blank=True)  # Added
+    defendent_type_and_size = models.CharField(max_length=255, blank=True)
     
 class Patent(models.Model):
     patent_no = models.CharField(max_length=255, unique=True)
