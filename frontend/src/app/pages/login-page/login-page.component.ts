@@ -11,10 +11,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { MainPageComponent } from '../home/main-page/main-page.component';
 @Component({
   selector: 'app-login-page',
   standalone: true,
   imports: [
+    MainPageComponent,
     MatFormFieldModule,
     MatTabsModule,
     FormsModule,
@@ -36,20 +38,42 @@ export class LoginPageComponent {
   incorrectPassword: boolean = false;
   hide = signal(true);
 
-  constructor(private authService: AuthService, private apiService: ApiService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private apiService: ApiService,
+    private router: Router
+  ) {}
+
+  // login(): void {
+
+  //   this.incorrectPassword = false;
+  //   this.authService.login({"email":this.email, "password":this.password}).subscribe({
+  //     next: (user) => {
+  //       console.log('Logged in as:', user?.email);
+  //       alert("Log in Successfull")
+  //       this.router.navigate(['/main']);
+  //     },
+  //     error: (error) => {
+  //       this.incorrectPassword = !this.incorrectPassword;
+  //       console.error('Login failed:', error);
+  //     },
+  //   });
+  // }
 
   login(): void {
     this.incorrectPassword = false;
-    this.authService.login({"email":this.email, "password":this.password}).subscribe({
-      next: (user) => {
-        console.log('Logged in as:', user?.email);
-        this.router.navigate(['/']);
-      },
-      error: (error) => {
-        this.incorrectPassword = !this.incorrectPassword;
-        console.error('Login failed:', error);
-      },
-    });
+
+    this.authService
+      .login({ email: this.email, password: this.password })
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/main']); // ✅ will only work if guard lets you
+        },
+        error: (error) => {
+          this.incorrectPassword = true;
+          console.error('Login failed:', error);
+        },
+      });
   }
 
   clickEvent(event: MouseEvent) {

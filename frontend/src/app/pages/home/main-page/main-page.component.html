@@ -1,5 +1,6 @@
 
-    <mat-form-field appearance="outline" style="width: 100% ;margin-top: -7vh;">
+    <div>
+    <mat-form-field appearance="outline" style="width: 100% ;margin-top: -7vh;z-index: 900;">
       <mat-label>Quick Search</mat-label>
       <input
         matInput
@@ -17,6 +18,8 @@
         <mat-icon>clear</mat-icon>
       </button>
     </mat-form-field>
+    </div>
+    
     <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row ">
       <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
         <button
@@ -54,7 +57,7 @@
         <mat-expansion-panel-header>
           <mat-panel-title class="carde"
           [ngClass]="{ 'active-title': litigationPanel.expanded }"
-          style="line-height: 20px; font-size: 14px; font-weight: bolder;">
+          style="line-height: 20px; font-size: 14px; font-weight: bolder; font-family: 'Tenorite',sans-serif;">
             Litigation Venues & <br />
             Judicial Authorities
           </mat-panel-title>
@@ -656,18 +659,18 @@
           class="mat-elevation-z8"
           style="
             display: block;
-            height: 60vh;
+            height: 62.55vh;
             overflow-y: auto;
             overflow-x:scroll;
             margin: 0;
-            padding: 0 10px;
+            padding: 0 12px;
             position: relative;
           "
         >
           <!-- Sr. No. Column -->
           <ng-container matColumnDef="srNo">
-            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Sr. No.</th>
-            <td mat-cell *matCellDef="let element; let i = index" class="no-wrap">
+            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header col-sno">Sr. No.</th>
+            <td mat-cell *matCellDef="let element; let i = index" class="no-wrap col-sno">
               {{ (paginator.pageIndex * paginator.pageSize) + i + 1 }}
             </td>
           </ng-container>
@@ -684,7 +687,7 @@
             <td mat-cell *matCellDef="let element" class="no-wrap">
               <a
                 (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
-                style="cursor: pointer; color: blue"
+                style="cursor: pointer; color: blue ; font-weight: bolder;"
                 class="no-wrap"
               >
                 {{ element.case_no || 'NA' }}
@@ -703,10 +706,10 @@
           </ng-container>
           <!-- Status Column -->
           <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef class="sticky-header">Status</th>
+            <th mat-header-cell *matHeaderCellDef class="sticky-header col-status">Status</th>
             <td mat-cell 
             *matCellDef="let element" 
-            class="no-wrap">
+            class="no-wrap col-status">
               {{ element.case_status || "NA" }}
             </td>
           </ng-container>
@@ -727,7 +730,7 @@
           <!-- Win Prediction Column -->
           <ng-container matColumnDef="winningPrediction">
             <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Win Prediction</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
+            <td mat-cell *matCellDef="let element" class="no-wrap win-prediction-cell">
               <div
                 style="
                   position: relative;
@@ -761,7 +764,7 @@
           <!-- Related Cases Column -->
           <ng-container matColumnDef="relatedCases">
             <th mat-header-cell *matHeaderCellDef
-              style="font-weight: bolder; position: sticky; top: 0; background-color: var(--content-bg); z-index: 1;"
+              style="font-size: 14px;font-weight: bolder; position: sticky; top: 0; background-color: var(--content-bg); z-index: 1;"
               class="wrap-text2">Similar Cases</th>
             <td mat-cell *matCellDef="let element" class="no-wrap">
               <ng-container *ngIf="element.similar_cases && element.similar_cases.length > 0; else noCases">
@@ -769,7 +772,7 @@
                 <ng-container *ngFor="let i of getRange(element.similar_cases.length); let idx = index">
                   <ng-container *ngFor="let relatedCase of element.similar_cases.slice(idx * 2, (idx + 1) * 2); let j = index">
                     <a (click)="onSelectCaseNumber(relatedCase.case_no); $event.stopPropagation()"
-                      style="cursor: pointer; color: blue;" class="no-wrap"
+                      style="cursor: pointer; color:blue;" class="no-wrap"
                       matTooltip="Matched by: {{ relatedCase.match_reasons.join(', ') }}" matTooltipPosition="above">
                       {{ relatedCase.case_no }}
                     </a>
@@ -786,8 +789,7 @@
 
           <!-- Table Header and Row Definitions -->
           <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="sticky-header-row"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index"
-          [ngClass]="{ 'even-row': i % 2 === 0, 'odd-row': i % 2 !== 0 }"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       
         </table>
         </div>

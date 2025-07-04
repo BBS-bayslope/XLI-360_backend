@@ -22,6 +22,11 @@ export class AppComponent implements OnInit {
   constructor(private auth: AuthService, private router: Router) {}
 
   async ngOnInit() {
+
+    history.pushState(null, '', window.location.href);
+    window.onpopstate = () => {
+      history.pushState(null, '', window.location.href);
+    };
     // Subscribe to route changes
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {

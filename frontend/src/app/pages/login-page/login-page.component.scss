@@ -1,6 +1,6 @@
-// ::ng-deep mat-card-title h2 {
-//   font-family: 'Tenorite', sans-serif;
-// }
+::ng-deep mat-card-title h2 {
+  font-family: 'Tenorite', sans-serif;
+}
 
 // .mat-mdc-card {
 //   max-width: 400px;
@@ -198,6 +198,7 @@
   text-align: center;
   font-family: 'Tenorite', sans-serif;
   margin-left: 30%;
+  align-items: center;
 }
 
 // Title
@@ -211,9 +212,10 @@
 // Subtitle
 .mat-mdc-card-subtitle {
   font-size: 18px;
-  color: #2074f3;
-  font-weight: 600;
+  color: #E81F4F;
+  font-weight: bolder;
   margin-bottom: 25px;
+  font-family: 'Tenorite';
 }
 
 // Form fields

@@ -17,23 +17,29 @@ import { AdminUploadComponent } from './pages/admin-upload/admin-upload.componen
 import { AimodelComponent } from './aimodel/aimodel.component';
 
 export const routes: Routes = [
-  { path: 'adminds', component: AdminDashboardComponent },
+  {
+    path: 'adminds',
+    component: AdminDashboardComponent,
+    canActivate: [authGuard],
+  },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard] },
-  { path: 'dashboard', component: DashboardComponent },
-  // {path:'excel-sheet',    loadChildren: () => import('./excel-sheet/excel-sheet.component').then(c => c.ExcelSheetComponent)},
-  // {path:'admin',loadChildren:()=>import('./pages/admin/admin.component').then(c=>c.AdminComponent), canActivate:[authGuard]},
-  // {path:'dashboard', loadChildren:()=>import('./pages/home/dashboard/dashboard.component').then(c=>c.DashboardComponent), canActivate:[authGuard],
-  //     // children:[
-  //     //     {path:'admin',component:AdminComponent}
-  //     // ]
-  // },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [authGuard],
+  },
+
   { path: 'login', component: LoginPageComponent },
   { path: 'sign-up', component: SignupPageComponent },
   { path: 'forgot-password', component: ForgotPageComponent },
-  // {path:'',redirectTo:'login', pathMatch:'full'},
-  { path: '', component: MainPageComponent, children: [] },
-  { path: 'case-list', component: CaseListComponent },
-  { path: 'subscriptions', component: SubscriptionsComponent },
+
+  { path: 'main', component: MainPageComponent  },
+  { path: 'case-list', component: CaseListComponent, canActivate: [authGuard] },
+  {
+    path: 'subscriptions',
+    component: SubscriptionsComponent,
+    canActivate: [authGuard],
+  },
   {
     path: 'account-settings',
     component: AccountSettingsComponent,
@@ -42,13 +48,16 @@ export const routes: Routes = [
   {
     path: 'app-reports',
     component: ReportsComponent,
+    canActivate: [authGuard],
   },
-  // {path:'caseDetails/:docId', component:CaseListComponent},
-  // {path:'',redirectTo:'main-page', pathMatch:'full'},
+  {
+    path: 'admin-upload',
+    component: AdminUploadComponent,
+    canActivate: [authGuard],
+  },
+  { path: 'ai', component: AimodelComponent, canActivate: [authGuard] },
 
-  // { path: '', redirectTo: 'main-page', pathMatch: 'full' },
-  // { path: '', redirectTo: 'login', pathMatch: 'full' },
-  // {path:'',redirectTo:'login'}
-  { path: 'admin-upload', component: AdminUploadComponent },
-  {path:'ai',component:AimodelComponent}
+  // optional redirect
+  { path: '**', redirectTo: 'login' },
 ];
+

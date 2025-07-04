@@ -252,6 +252,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
 
+
+/* your-component.component.scss */
+:host {
+  font-family: 'Tenorite', sans-serif;
+}
+
 :root {
   --primary-color: #800080; /* Deep purple for primary elements */
   --accent-color: #FFFFFF; /* White for secondary elements and accents */
@@ -294,14 +300,17 @@ body.light-mode {
 
 /* Header container styling */
 header {
-  // background: linear-gradient(90deg, #000000 0%, #2A0033 100%); /* Black to dark purple gradient */
-  // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow */
-  position: relative;
+  position: relative;                  /* Stick to top */
   top: 0;
+  left: 0;
+  width: 100%;                      /* Full width */
   z-index: 1000;
-  // padding: 10px 20px;
-  
+  background-color: white;          /* Solid background to block content behind */
+  box-shadow: 0 3px 13px rgba(0, 0, 0, 0.2);
+  padding: 4px 10px;
 }
+
+
 
 /* Logo section styling */
 header div[routerLink] {
@@ -357,13 +366,13 @@ button[mat-raised-button][routerLink="subscriptions"] {
 
 /* Icon buttons styling */
 button[mat-icon-button].hover-icon {
-  color: #FFFFFF; /* White default */
+  color: #E81F4F; /* White default */
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
 button[mat-icon-button].hover-icon mat-icon {
   transition: color 0.3s ease, transform 0.3s ease;
-  color: #FFFFFF; /* White default */
+  color: #E81F4F; /* White default */
 }
 
 button[mat-icon-button].hover-icon:hover {

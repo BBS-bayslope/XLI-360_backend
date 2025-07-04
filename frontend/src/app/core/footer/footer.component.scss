@@ -1,93 +1,88 @@
 .footer-toolbar {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  padding: 20px;
+  align-items: center;
+  flex-wrap: wrap; // for small screen responsiveness
+  padding: 10px 20px;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: rgb(201, 181, 181); // Changed to white background
+  color: #333333; // Adjusted text color for contrast on white background
   font-size: 14px;
-  background-color: #1e1e2f; // Dark theme example
-  color: white;
-  height: 1%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); // Added box shadow for depth
 
   a {
-    color: #90caf9; // Light blue for links
+    color: #E81F4F; // Changed to a vibrant color for links (matches your earlier #E81F4F preference)
     text-decoration: none;
-    margin-right: 15px;
+    font-weight: 500;
+    transition: color 0.3s ease;
 
     &:hover {
+      color: #c91840; // Slightly darker shade on hover
       text-decoration: underline;
     }
   }
 
   .footer-left {
-    flex: 1 1 100%;
-    margin-bottom: 10px;
+    flex: 1;
+    text-align: left;
   }
 
   .footer-center {
-    flex: 1 1 100%;
+    flex: 2;
     text-align: center;
-    margin-bottom: 10px;
-
-    span {
-      display: block;
-      margin-bottom: 10px;
-    }
 
     .footer-links {
       display: flex;
       justify-content: center;
       gap: 15px;
       flex-wrap: wrap;
-
-      a {
-        cursor: pointer;
-        font-weight: 500;
-      }
     }
   }
 
   .footer-right {
-    flex: 1 1 100%;
-    text-align: center;
-    margin-top: 10px;
+    flex: 1;
+    text-align: right;
 
     b {
-      display: block;
-      margin-bottom: 5px;
+      font-weight: 600;
+      display: block; // Ensure "Follow us" is on its own line
     }
 
-    .social-icon img {
-      transition: transform 0.3s ease;
-      filter: brightness(0) invert(1); // Makes icons white on dark bg
-
-      &:hover {
-        transform: scale(1.2);
-      }
-    }
-
-    div {
+    .social-icons {
       display: flex;
-      justify-content: center;
       gap: 15px;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end; // Align social icons to the right
+
+      img {
+        transition: transform 0.3s ease;
+        filter: none; // Removed invert filter since background is white
+        width: 25px;
+        height: 25px;
+
+        &:hover {
+          transform: scale(1.2);
+        }
+      }
     }
   }
 
-  @media screen and (min-width: 768px) {
+  // Responsive adjustments
+  @media screen and (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
+
     .footer-left,
     .footer-center,
     .footer-right {
-      flex: 1 1 30%;
-      text-align: left;
-      margin: 0;
-    }
-
-    .footer-center {
+      flex: 1 1 100%;
+      margin: 10px 0;
       text-align: center;
     }
 
-    .footer-right {
-      text-align: right;
+    .footer-right .social-icons {
+      justify-content: center; // Center social icons on small screens
     }
   }
 }

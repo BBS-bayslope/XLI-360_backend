@@ -1,11 +1,11 @@
 <div class="reports-container">
-    <h2>PDF Reports</h2>
+    <!-- <h2>PDF Reports</h2> -->
   
     <!-- PDF Viewer Section -->
     <div class="pdf-viewer" *ngIf="showPdf">
       <button class="close-btn" (click)="closePdf()">Close PDF</button>
-      <div *ngIf="selectedPdfUrl">
-        <iframe [src]="selectedPdfUrl" width="100%" height="600px" frameborder="0"></iframe>
+      <div *ngIf="selectedPdfUrl" class="iframe-wrapper">
+        <iframe [src]="selectedPdfUrl " frameborder="0"></iframe>
       </div>
     </div>
   

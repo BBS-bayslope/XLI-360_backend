@@ -1,43 +1,127 @@
-/* You can add global styles to this file, and also import other style files */
+// /* You can add global styles to this file, and also import other style files */
+// @import url('https://db.onlinewebfonts.com/c/604c4aa7925b327ca117a55ba49275cd?family=Tenorite+Regular');
+
+// * {
+//   font-family: 'Tenorite', sans-serif !important;
+// }
+
+// :host ::ng-deep {
+//   font-family: 'Tenorite', sans-serif !important;
+// }
+
+
+
+
+// html,
+// body {
+//   height: 100%;
+//   font-family: 'Tenorite', sans-serif;
+// }
+// body {
+//   margin: 0;
+//   // font-family: "Poppins", sans-serif;
+//   font-family: 'Tenorite', sans-serif;
+// }
+
+// html, body { height: 100%; }
+// body { margin: 0;  font-family: 'Tenorite', sans-serif;}
+
+
+// .dark-mode {
+//   // background-color: grey !important;
+//   color: #ffffff !important;
+// }
+
+// body {
+//   transition: background-color 0.3s ease, color 0.3s ease;
+// }
+
+
+
+
+// ::ng-deep .mat-drawer-inner-container {
+//   width: 100% !important;
+//   height: 65% !important;
+//   background: var(--content-bg); /* Optional */
+//   overflow: auto;
+//   -webkit-overflow-scrolling: touch;
+
+//   /* Add transition */
+//   transition: transform 0.3s ease, box-shadow 0.3s ease;
+// }
+
+// /* Hover effect: lift slightly */
+// ::ng-deep .mat-drawer-inner-container:hover {
+//   transform: translateY(-4px); /* Lift up */
+//   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+// }
+
+
+
+/* Step 1: Use @font-face to name the font as "Tenorite" */
+@font-face {
+  font-family: 'Tenorite';
+  src: url('https://db.onlinewebfonts.com/t/604c4aa7925b327ca117a55ba49275cd.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Step 2: Apply "Tenorite" globally */
+* {
+  font-family: 'Tenorite', sans-serif !important;
+}
+
+.material-symbols-outlined,
+.mat-icon,
+.material-icons,
+.fa,
+.fas,
+.far,
+.fal,
+.fab {
+  font-family: 'Material Icons','Material Symbols Outlined', 'FontAwesome', sans-serif !important;
+}
+
+:host ::ng-deep {
+  font-family: 'Tenorite', sans-serif !important;
+}
 
 html,
 body {
   height: 100%;
-}
-body {
   margin: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Tenorite', sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  // height: 100%;
+  // margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
 .dark-mode {
-  // background-color: grey !important;
   color: #ffffff !important;
 }
-
-body {
-  transition: background-color 0.3s ease, color 0.3s ease;
+.main-content {
+  flex: 1;
 }
 
-
-
-
+/* Optional drawer UI styling */
 ::ng-deep .mat-drawer-inner-container {
   width: 100% !important;
   height: 65% !important;
-  background: var(--content-bg); /* Optional */
+  background: var(--content-bg);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-
-  /* Add transition */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hover effect: lift slightly */
 ::ng-deep .mat-drawer-inner-container:hover {
-  transform: translateY(-4px); /* Lift up */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

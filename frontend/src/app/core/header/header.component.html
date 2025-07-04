@@ -4,8 +4,10 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      background-color: black;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      color: #E81F4F;
+      font-style: 'Tenorite','sans-serif';
+      font-weight: bolder;
+      
       position: sticky;
     "
   >
@@ -40,34 +42,31 @@
         width: 100%;
       "
     >
-      <button
+      <!-- <button
         color="primary"
         mat-raised-button
         style="padding: 20px; margin-left: 10px"
         routerLink="subscriptions"
       >
         Subscribe
-      </button>
+      </button> -->
       <!-- [routerLink]="user ? '/account-settings' : 'login'" -->
-      <button
-        
-        mat-icon-button
-        class="hover-icon"
-      >
-        <mat-icon>account_circle</mat-icon>
+      <button mat-icon-button (click)="logout()" matTooltip="Logout">
+        <mat-icon>logout</mat-icon>
       </button>
+      
       <!-- <button mat-icon-button class="hover-icon">
         <mat-icon>headphones</mat-icon>
       </button> -->
-      <button routerLink="/" mat-icon-button class="hover-icon">
+      <button routerLink="/" mat-icon-button class="hover-icon" matTooltip="Home">
         <mat-icon>home</mat-icon>
       </button>
       <button
         [cdkMenuTriggerFor]="menu"
         class="example-standalone-trigger"
         mat-stroked-button
-        style="color: white;
-    font-weight: bolder;"
+        style="color: White;font-family: 'Tenorite','sans-serif';
+    font-weight: bolder; background-color: #6600FF;"
       >
         Buy / Sell Patents
       </button>

@@ -1,3 +1,5 @@
 <app-header style="top: 0; right: 0;left: 0;position: fixed;z-index: 1000;" *ngIf="showHeaderFooter"></app-header>
-<router-outlet></router-outlet>
+<div class="main-content">
+    <router-outlet></router-outlet>
+  </div>
 <app-footer *ngIf="showHeaderFooter"></app-footer>

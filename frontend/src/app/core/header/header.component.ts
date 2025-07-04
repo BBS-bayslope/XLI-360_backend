@@ -13,15 +13,18 @@ import { map } from 'rxjs/internal/operators/map';
 import { ReactiveFormsModule } from '@angular/forms'; // Import this
 import { CommonModule } from '@angular/common'; // Add this
 import { AuthService } from '../../services/auth.service';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { User } from '@angular/fire/auth';
 import { ApiService } from '../../services/api.service';
+import { LoginPageComponent } from '../../pages/login-page/login-page.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
+    MatTooltipModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
@@ -46,7 +49,12 @@ export class HeaderComponent implements OnInit {
   filteredOptions: Observable<any[]>;
   user: User | null = null;
 
-  constructor(private dataService: AuthService, private api: ApiService) {
+  constructor(
+    private dataService: AuthService,
+    private api: ApiService,
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.filteredOptions = this.searchControl.valueChanges.pipe(
       startWith(''),
       map((value) => this._filter(value || ''))
@@ -93,14 +101,25 @@ export class HeaderComponent implements OnInit {
   }
 
   goToBuyer() {
-    console.log("it is clicked");
-    
+    console.log('it is clicked');
+
     window.location.href =
       'http://ec2-3-144-99-241.us-east-2.compute.amazonaws.com/buyer';
   }
-  goToSell(){
+  goToSell() {
     window.location.href =
       'http://ec2-3-144-99-241.us-east-2.compute.amazonaws.com/user-seller-data';
+  }
 
+  logout(): void {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']).then(() => {
+        // Prevent back button
+        history.pushState(null, '', location.href);
+        window.onpopstate = () => {
+          history.go(1);
+        };
+      });
+    });
   }
 }

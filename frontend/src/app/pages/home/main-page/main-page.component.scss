@@ -1817,6 +1817,7 @@
 
 
 
+
 // @import url('https://fonts.googleapis.com/css2?family=Tenor+Sans&display=swap');
 
 
@@ -1828,6 +1829,12 @@
   --background: linear-gradient(135deg, #FFFFFF, #E5CCFF); /* White to light Accenture purple */
   --content-bg: #FFFFFF; /* White content background */
 }
+
+/* your-component.component.scss */
+:host {
+  font-family: 'Tenorite', sans-serif;
+}
+
 
 .dark-mode {
   background: linear-gradient(135deg, #000000, #4B0082); /* Black to dark purple for dark mode */
@@ -1880,7 +1887,7 @@ mat-sidenav {
 
 ::ng-deep .mat-drawer-inner-container {
   width: 100% !important;
-  height: 69% !important;
+  height: 78% !important;
   background: var(--content-bg);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
@@ -1938,35 +1945,36 @@ mat-expansion-panel mat-form-field {
 
 .year-filter-buttons button {
   padding: 12px 24px;
-  background-color: #E5CCFF; /* Light Accenture purple */
-  border: 1px solid #A100FF; /* Accenture purple border */
-  color: #000000;
+  background-color: white; /* Light Accenture purple */
+  border: 1px solid #E81F4F; /* Accenture purple border */
+  color: #E81F4F;
   border-radius: 8px;
   font-family: Tenorite, sans-serif; /* Tenorite font */
-  font-weight: 500;
-  font-size: 16px;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 6px rgba(161, 0, 255, 0.15);
 }
 
 .year-filter-buttons button:hover {
-  background-color: #D4A5FF; /* Lighter Accenture purple */
+  background-color:#E81F4F; /* Lighter Accenture purple */
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(161, 0, 255, 0.3);
+  box-shadow: #E81F4F;
+  color: white;
 }
 
 .year-filter-buttons button:active {
-  background-color: #A100FF; /* Accenture purple */
+  background-color: #E81F4F; /* Accenture purple */
   transform: scale(0.97);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: #E81F4F;
 }
 
 .year-filter-buttons button.active {
-  background: linear-gradient(90deg, #A100FF, #4B0082); /* Accenture purple gradient */
-  color: #FFFFFF;
-  border-color: #A100FF;
-  box-shadow: 0 4px 10px rgba(161, 0, 255, 0.5);
+  background: #E81F4F;
+  color: white;
+  border-color: #E81F4F;
+  box-shadow: #E81F4F;
 }
 
 /* Sticky filter row */
@@ -2072,16 +2080,33 @@ body.dark-mode mat-row:nth-child(even) {
   overflow: hidden;
   text-overflow: ellipsis;
   width: 10%;
+  font-size: 12px;
+  font-family: 'Tenorite','sans-serif';
+  text-align: center;
   // border-bottom: 2px solid #999;
 }
 
+// .win-prediction-cell {
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   padding: 8px 0;
+//   height: 100%;
+//   text-align: center;
+// }
+
+
 .wrap-text2 {
+  text-align: center;
   width: 100px;
+  text-align: center;
   white-space: normal;
   overflow-wrap: break-word;
   line-height: 1.4;
   // padding: 8px 12px;
   box-sizing: border-box;
+  font-family: 'Tenorite','sans-serif';
+  font-size: 12px;
   // border-bottom: 2px solid #999;
 }
 
@@ -2099,14 +2124,14 @@ mat-cell.wrap-text2 {
 
 /* Custom tab labels */
 .custom-tab-label {
-  font-family: Tenorite, sans-serif; /* Tenorite font */
-  font-weight: BLOD;
+  font-family: 'Tenorite', sans-serif; /* Tenorite font */
+  font-weight: bolder;
   cursor: pointer;
   color: #090909; /* Dark Black */ 
   transition: color 0.3s, transform 0.2s;
 
   &:hover {
-    color: #A100FF; /* Accenture  purple */
+    color: #E81F4F; /* Accenture  purple */
     transform: scale(1.05);
   }
 }
@@ -2177,10 +2202,13 @@ table.mat-table {
   top: 0;
   background: var(--content-bg);
   z-index: 10;
-  font-weight: 700;
+  font-weight: bolder;
+  font-family: 'Tenorite','sans-serif';
+  font-size: 14px;
   padding: 8px;
   background-color: #FFFFFF !important;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  text-align: center;
 }
 
 .sticky-header-row {
@@ -2193,18 +2221,18 @@ table.mat-table {
 }
 
 .mat-header-row th {
-  border-bottom: 2px solid #A100FF; /* Accenture purple */
+  border-bottom: 2px solid #E81F4F; /* Accenture purple */
 }
 
 th.mat-header-cell,
 td.mat-cell {
   padding: 8px;
-  border-bottom: 1px solid #A100FF; /* Accenture purple */
+  border-bottom: 1px solid #E81F4F; /* Accenture purple */
 }
 
 th.mat-header-cell {
   text-align: left;
-  color: #A100FF; /* Accenture purple */
+  color: #E81F4F; /* Accenture purple */
 }
 
 .no-results {
@@ -2230,13 +2258,14 @@ th.mat-header-cell {
 
 .no-data-message mat-icon {
   font-size: 48px;
-  color: #A100FF; /* Accenture purple */
+  color: #E81F4F; /* Accenture purple */
   margin-bottom: 10px;
 }
 
 ::ng-deep [mat-align-tabs=center] > .mat-mdc-tab-header .mat-mdc-tab-labels {
   justify-content: space-evenly;
   margin-left: -58px;
+  
 }
 
 ::ng-deep .mat-mdc-tab-labels {
@@ -2245,10 +2274,10 @@ th.mat-header-cell {
 
 :host ::ng-deep {
   .plaintiff {
-    color: #A100FF !important; /* Accenture purple */
+    color: #E81F4F !important; /* Accenture purple */
   }
   .defendant {
-    color: #D32F2F !important; /* Red for defendant */
+    color: #E81F4F !important; /* Red for defendant */
   }
 }
 
@@ -2266,7 +2295,7 @@ th.mat-header-cell {
 }
 
 .active-title {
-  color: #A100FF !important; /* Accenture purple */
+  color: #E81F4F !important; /* Accenture purple */
 }
 
 /* Alternating row colors */
@@ -2309,32 +2338,29 @@ tr.mat-row:hover {
 
 ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
   color: black;
-  border-color: black !important;
+  // border-color: black !important;
 }
 
 ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-thick {
   color: black;
-  border-color: black !important;
+  // border-color: black !important;
 }
 
 ::ng-deep .mat-mdc-tab-list {
   margin-left: 3rem !important;
 }
 
-::ng-deep .mat-mdc-text-field-wrapper {
-  
-}
 
 :host ::ng-deep .mat-mdc-text-field-wrapper {
   width: 20%;
-  z-index: 0;
+  // z-index: 0;
   border: 1px solid Black; /* Accenture purple */
   margin-left: 19rem;
   width: 29%;
-  z-index: 1000;
-  top: 10px;
+  z-index: 900;
+  // top: 10px;
   height: 49px;
-  border-block-color: Black; /* Accenture purple */
+  // border-block-color: Black; /* Accenture purple */
   margin-top: 7rem;
 }
 
@@ -2347,3 +2373,38 @@ th, td {
   padding: 8px;
   font-family: Tenorite, sans-serif; /* Tenorite font */
 }
+
+
+/* Set specific width for Sr. No. column */
+.col-sno {
+  width: 60px !important;
+  max-width: 60px !important;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Set specific width for Status column */
+.col-status {
+  width: 70px !important;
+  max-width: 70px !important;
+  min-width: 50px;
+  text-align: center;
+}
+
+
+
+/* Remove left border for Sr. No. column */
+::ng-deep .mat-column-srNo {
+  border-left: none !important;
+}
+
+/* Remove right border for Similar Cases column */
+::ng-deep .mat-column-relatedCases {
+  border-right: none !important;
+}
+
+/* Also remove bottom border for last row (optional) */
+::ng-deep table.mat-table tr:last-child td {
+  border-bottom: none !important;
+}
+
