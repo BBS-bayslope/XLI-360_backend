@@ -22,19 +22,19 @@ export const routes: Routes = [
     component: AdminDashboardComponent,
     canActivate: [authGuard],
   },
-  { path: 'admin', component: AdminComponent, canActivate: [authGuard] },
+  { path: 'admin', component: AdminComponent },
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [authGuard],
+    
   },
 
   { path: 'login', component: LoginPageComponent },
   { path: 'sign-up', component: SignupPageComponent },
   { path: 'forgot-password', component: ForgotPageComponent },
 
-  { path: 'main', component: MainPageComponent  },
-  { path: 'case-list', component: CaseListComponent, canActivate: [authGuard] },
+  { path: '', component: MainPageComponent  },
+  { path: 'case-list', component: CaseListComponent },
   {
     path: 'subscriptions',
     component: SubscriptionsComponent,
@@ -58,6 +58,6 @@ export const routes: Routes = [
   { path: 'ai', component: AimodelComponent, canActivate: [authGuard] },
 
   // optional redirect
-  { path: '**', redirectTo: 'login' },
+  // { path: '**', redirectTo: 'login' },
 ];
 

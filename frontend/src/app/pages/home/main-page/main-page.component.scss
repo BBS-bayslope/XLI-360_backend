@@ -1980,13 +1980,13 @@ mat-expansion-panel mat-form-field {
 /* Sticky filter row */
 .sticky-filter-row {
   // position: sticky;
-  top: 70px;
-  z-index: 999;
+  // top: 70px;
+  // z-index: 999;
   background: var(--content-bg);
-  padding: 8px 0;
+  // padding: 8px 0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   margin-left: 55%;
-  margin-top: -12vh;
+  margin-top: -8vh;
 }
 
 /* Sidenav content */
@@ -2218,6 +2218,7 @@ table.mat-table {
   z-index: 10;
   background-color: #FFFFFF !important;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  font-family: 'Tenorite','sans-serif';
 }
 
 .mat-header-row th {
@@ -2236,7 +2237,7 @@ th.mat-header-cell {
 }
 
 .no-results {
-  font-family: Tenorite, sans-serif; /* Tenorite font */
+  font-family: 'Tenorite', sans-serif; /* Tenorite font */
   font-size: 16px;
   color: #666;
   text-align: center;
@@ -2277,17 +2278,19 @@ th.mat-header-cell {
     color: #E81F4F !important; /* Accenture purple */
   }
   .defendant {
-    color: #E81F4F !important; /* Red for defendant */
+    // color: #E81F4F !important; /* Red for defendant */
   }
 }
 
 .carde {
   transition: transform 0.3s ease;
   line-height: 20px;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: #000000;
-  font-family: Tenorite, sans-serif; /* Tenorite font */
+  font-family: 'Tenorite', sans-serif; /* Tenorite font */
+  // align-items: center;
+  // text-align: center;
 }
 
 .carde:hover {
@@ -2355,15 +2358,15 @@ tr.mat-row:hover {
   width: 20%;
   // z-index: 0;
   border: 1px solid Black; /* Accenture purple */
-  margin-left: 19rem;
-  width: 29%;
+  margin-left: 2rem;
+  width: 49%;
   z-index: 900;
   // top: 10px;
   height: 49px;
   // border-block-color: Black; /* Accenture purple */
-  margin-top: 7rem;
+  // margin-top: 7.5rem;
 }
-
+// 
 th, td {
   border: 1px solid black; /* Accenture purple */
   border-collapse: collapse;
@@ -2405,6 +2408,42 @@ th, td {
 
 /* Also remove bottom border for last row (optional) */
 ::ng-deep table.mat-table tr:last-child td {
-  border-bottom: none !important;
+  border-bottom: 1px solid black !important;
 }
 
+
+
+.quick-search-wrapper {
+  // position: relative;
+  margin-top: 17vh;
+  // z-index: 900;
+}
+
+/* Input Styling */
+.responsive-search-input {
+  width: 290px;
+  padding: 8px 35px 8px 10px;
+  font-size: 16px;
+  border: 1px solid black;
+  border-radius: 4px;
+  margin-left: 26vw;
+}
+
+/* Button Styling */
+.clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* 📱 Responsive: On small screens, full width */
+@media (max-width: 600px) {
+  .responsive-search-input {
+    width: 100%;
+  }
+}

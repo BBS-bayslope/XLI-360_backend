@@ -561,7 +561,7 @@
 // // General wrapper styling with a subtle gradient background
 .caseList-wrapper {
   max-width: 100%;
-  margin: 30px auto;
+  margin: 16px auto;
   padding: 30px;
   background: linear-gradient(135deg, #f9fbff 0%, #ffffff 100%); // Gradient for a classy look
   border: 1px solid #e0e0e0;
@@ -573,13 +573,13 @@
 // Header styling for case number and name
 .caseList-wrapper h4 {
   font-family: 'Tenorite', serif; // Elegant font for headings
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
-  color: #6600FF; // Deep navy blue for a professional tone (already #E81F4F)
+  color: #E81F4F; // Deep navy blue for a professional tone (already #E81F4F)
   margin-bottom: 30px;
   text-align: left;
   border-bottom: 1px solid black; // Gold accent line replaced
-  padding-bottom: 12px;
+  // padding-bottom: 12px;
   letter-spacing: 0.5px;
 }
 
@@ -616,8 +616,8 @@
 .details {
   margin: 30px;
   background-color: #ffffff; // White background for contrast
-  border-radius: 10px;
-  padding: 20px;
+  // border-radius: 10px;
+  padding: 16px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05); // Soft shadow for depth
   // border-left: 4px solid #E81F4F; // Gold accent on the left (replaced #d4af37)
   transition: box-shadow 0.3s ease;

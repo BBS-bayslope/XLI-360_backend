@@ -1,26 +1,21 @@
 
-    <div>
-    <mat-form-field appearance="outline" style="width: 100% ;margin-top: -7vh;z-index: 900;">
-      <mat-label>Quick Search</mat-label>
-      <input
-        matInput
-        [(ngModel)]="searchInputText"
-        (input)="onSearchInputText(searchInputText)"
-        [placeholder]="'Quick Search'"
-      />
-      <button
-        mat-icon-button
-        matSuffix
-        (click)="clearSearchTextInput()"
-        *ngIf="searchInputText"
-        aria-label="Clear search"
-      >
-        <mat-icon>clear</mat-icon>
-      </button>
-    </mat-form-field>
-    </div>
+    <!-- <div> -->
+      <div class="quick-search-wrapper">
+        <input
+          type="text"
+          [(ngModel)]="searchInputText"
+          (input)="onSearchInputText(searchInputText)"
+          placeholder="Quick Search"
+          class="responsive-search-input"
+        />
+          <!-- <button *ngIf="searchInputText" (click)="clearSearchTextInput()" aria-label="Clear search">
+            ✖
+          </button> -->
+      </div>
+      
+    <!-- </div> -->
     
-    <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row ">
+    <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row " >
       <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
         <button
           [ngClass]="{ 'active': selectedYear === year }"
@@ -651,161 +646,173 @@
             ">
             loading litigation cases..
           </div>
-          <div class="table-scroll-container" style="overflow-x: scroll; width: 100% ; display: block; overflow-y: hidden; ">
-          <table
-          mat-table
-          *ngIf="!loader"
-          [dataSource]="tabledata"
-          class="mat-elevation-z8"
-          style="
-            display: block;
-            height: 62.55vh;
-            overflow-y: auto;
-            overflow-x:scroll;
-            margin: 0;
-            padding: 0 12px;
-            position: relative;
-          "
-        >
-          <!-- Sr. No. Column -->
-          <ng-container matColumnDef="srNo">
-            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header col-sno">Sr. No.</th>
-            <td mat-cell *matCellDef="let element; let i = index" class="no-wrap col-sno">
-              {{ (paginator.pageIndex * paginator.pageSize) + i + 1 }}
-            </td>
-          </ng-container>
-          <!-- Case Date Column -->
-          <ng-container matColumnDef="caseComplaintDate">
-            <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Date</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
-              {{ formatDate(convertToDate(element.complaint_date)) }}
-            </td>
-          </ng-container>
-          <!-- Case Number Column -->
-          <ng-container matColumnDef="caseNumber">
-            <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Number</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
-              <a
-                (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
-                style="cursor: pointer; color: blue ; font-weight: bolder;"
-                class="no-wrap"
-              >
-                {{ element.case_no || 'NA' }}
-              </a>
-            </td>
-          </ng-container>
-          <!-- Case Name Column -->
-          <ng-container matColumnDef="caseName">
-            <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Case Name</th>
-            <td
-              mat-cell
-              *matCellDef="let element"
-              class="wrap-text2"
-              [innerHTML]="element.case_name | caseNameHighlight:6"
-            ></td>
-          </ng-container>
-          <!-- Status Column -->
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef class="sticky-header col-status">Status</th>
-            <td mat-cell 
-            *matCellDef="let element" 
-            class="no-wrap col-status">
-              {{ element.case_status || "NA" }}
-            </td>
-          </ng-container>
-          <!-- Court Column -->
-          <ng-container matColumnDef="court_name">
-            <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Court Name</th>
-            <td mat-cell *matCellDef="let element" class="wrap-text2">
-              {{ element.court_name || "NA" }}
-            </td>
-          </ng-container>
-          <!-- Venue Column -->
-          <ng-container matColumnDef="venue">
-            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Litigation Venues</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
-              {{ element.litigation_venues || "NA" }}
-            </td>
-          </ng-container>
-          <!-- Win Prediction Column -->
-          <ng-container matColumnDef="winningPrediction">
-            <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Win Prediction</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap win-prediction-cell">
-              <div
-                style="
-                  position: relative;
-                  width: 32px;
-                  height: 32px;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                "
-              >
-                <mat-progress-spinner
-                  [diameter]="32"
-                  [mode]="'determinate'"
-                  [value]="100"
-                  color="accent"
-                  style="position: absolute"
-                ></mat-progress-spinner>
-                <mat-progress-spinner
-                  [diameter]="32"
-                  [mode]="'determinate'"
-                  [value]="winningPercentage || 0"
-                  color="primary"
-                  style="position: absolute"
-                ></mat-progress-spinner>
-                <span style="position: absolute; font-size: 10px; font-weight: 500">
-                  {{ (winningPercentage || 0) | number:'1.0-0' }}%
-                </span>
-              </div>
-            </td>
-          </ng-container>
-          <!-- Related Cases Column -->
-          <ng-container matColumnDef="relatedCases">
-            <th mat-header-cell *matHeaderCellDef
-              style="font-size: 14px;font-weight: bolder; position: sticky; top: 0; background-color: var(--content-bg); z-index: 1;"
-              class="wrap-text2">Similar Cases</th>
-            <td mat-cell *matCellDef="let element" class="no-wrap">
-              <ng-container *ngIf="element.similar_cases && element.similar_cases.length > 0; else noCases">
-                <!-- Loop through the cases in groups of 2 -->
-                <ng-container *ngFor="let i of getRange(element.similar_cases.length); let idx = index">
-                  <ng-container *ngFor="let relatedCase of element.similar_cases.slice(idx * 2, (idx + 1) * 2); let j = index">
-                    <a (click)="onSelectCaseNumber(relatedCase.case_no); $event.stopPropagation()"
-                      style="cursor: pointer; color:blue;" class="no-wrap"
-                      matTooltip="Matched by: {{ relatedCase.match_reasons.join(', ') }}" matTooltipPosition="above">
-                      {{ relatedCase.case_no }}
-                    </a>
-                    <span *ngIf="j < element.similar_cases.slice(idx * 2, (idx + 1) * 2).length - 1">, </span>
-                  </ng-container>
-                  <br *ngIf="idx < getRange(element.similar_cases.length).length - 1">
-                </ng-container>
+          <div class="table-scroll-container" style="overflow-x: scroll; width: 100%; display: block; overflow-y: hidden;">
+            <!-- No cases found message -->
+            <div
+              *ngIf="!loader && tabledata.length === 0"
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 60vh;
+                margin-bottom: 20px;
+                font-size: 16px;
+                color: #666;
+              "
+              class="no-results"
+            >
+              <span>
+                {{ searchInputText ? 'No results found for "' + searchInputText + '"' : 'No cases found for the selected filters. Try a different venue or clear filters.' }}
+              </span>
+            </div>
+            <!-- Table -->
+            <table
+              mat-table
+              *ngIf="!loader && tabledata.length > 0"
+              [dataSource]="tabledata"
+              class="mat-elevation-z8"
+              style="
+                display: block;
+                height: 62.55vh;
+                overflow-y: auto;
+                overflow-x: scroll;
+                margin: 0;
+                padding: 0 12px;
+                position: relative;
+              "
+            >
+              <!-- Sr. No. Column -->
+              <ng-container matColumnDef="srNo">
+                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header col-sno">Sr. No.</th>
+                <td mat-cell *matCellDef="let element; let i = index" class="no-wrap col-sno">
+                  {{ (paginator.pageIndex * paginator.pageSize) + i + 1 }}
+                </td>
               </ng-container>
-              <ng-template #noCases>
-                NA
-              </ng-template>
-            </td>
-          </ng-container>
-
-          <!-- Table Header and Row Definitions -->
-          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="sticky-header-row"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      
-        </table>
-        </div>
-
-        <!-- <div *ngIf="!loader && tabledata.length === 0" style="
-        height: 60vh;
-        width: 100%;
-        margin-bottom: 600px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    " class="no-results">
-      {{ searchInputText ? 'No results found for "' + searchInputText + '"' : 'No result to display' }}
-    </div> -->
-
+              <!-- Case Date Column -->
+              <ng-container matColumnDef="caseComplaintDate">
+                <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Date</th>
+                <td mat-cell *matCellDef="let element" class="no-wrap">
+                  {{ formatDate(convertToDate(element.complaint_date)) }}
+                </td>
+              </ng-container>
+              <!-- Case Number Column -->
+              <ng-container matColumnDef="caseNumber">
+                <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Number</th>
+                <td mat-cell *matCellDef="let element" class="no-wrap">
+                  <a
+                    (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
+                    style="cursor: pointer; color: blue; font-weight: bolder;"
+                    class="no-wrap"
+                  >
+                    {{ element.case_no || 'NA' }}
+                  </a>
+                </td>
+              </ng-container>
+              <!-- Case Name Column -->
+              <ng-container matColumnDef="caseName">
+                <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Case Name</th>
+                <td
+                  mat-cell
+                  *matCellDef="let element"
+                  class="wrap-text2"
+                  [innerHTML]="element.case_name | caseNameHighlight:6"
+                ></td>
+              </ng-container>
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="sticky-header col-status">Status</th>
+                <td mat-cell *matCellDef="let element" class="no-wrap col-status">
+                  {{ element.case_status || "NA" }}
+                </td>
+              </ng-container>
+              <!-- Court Column -->
+              <ng-container matColumnDef="court_name">
+                <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Court Name</th>
+                <td mat-cell *matCellDef="let element" class="wrap-text2">
+                  {{ element.court_name || "NA" }}
+                </td>
+              </ng-container>
+              <!-- Venue Column -->
+              <ng-container matColumnDef="venue">
+                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Litigation Venues</th>
+                <td mat-cell *matCellDef="let element" class="no-wrap">
+                  {{ element.litigation_venues || "NA" }}
+                </td>
+              </ng-container>
+              <!-- Win Prediction Column -->
+              <ng-container matColumnDef="winningPrediction">
+                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Win Prediction</th>
+                <td mat-cell *matCellDef="let element" class="no-wrap win-prediction-cell">
+                  <div
+                    style="
+                      position: relative;
+                      width: 32px;
+                      height: 32px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <mat-progress-spinner
+                      [diameter]="32"
+                      [mode]="'determinate'"
+                      [value]="100"
+                      color="accent"
+                      style="position: absolute"
+                    ></mat-progress-spinner>
+                    <mat-progress-spinner
+                      [diameter]="32"
+                      [mode]="'determinate'"
+                      [value]="winningPercentage || 0"
+                      color="primary"
+                      style="position: absolute"
+                    ></mat-progress-spinner>
+                    <span style="position: absolute; font-size: 10px; font-weight: 500">
+                      {{ (winningPercentage || 0) | number:'1.0-0' }}%
+                    </span>
+                  </div>
+                </td>
+              </ng-container>
+              <!-- Related Cases Column -->
+              <ng-container matColumnDef="relatedCases">
+                <th
+                  mat-header-cell
+                  *matHeaderCellDef
+                  style="font-size: 14px; font-weight: bolder; position: sticky; top: 0; background-color: var(--content-bg); z-index: 1;"
+                  class="wrap-text2"
+                >Similar Cases</th>
+                <td mat-cell *matCellDef="let element" class="no-wrap">
+                  <ng-container *ngIf="element.similar_cases && element.similar_cases.length > 0; else noCases">
+                    <!-- Loop through the cases in groups of 2 -->
+                    <ng-container *ngFor="let i of getRange(element.similar_cases.length); let idx = index">
+                      <ng-container *ngFor="let relatedCase of element.similar_cases.slice(idx * 2, (idx + 1) * 2); let j = index">
+                        <a
+                          (click)="onSelectCaseNumber(relatedCase.case_no); $event.stopPropagation()"
+                          style="cursor: pointer; color: blue;"
+                          class="no-wrap"
+                          matTooltip="Matched by: {{ relatedCase.match_reasons.join(', ') }}"
+                          matTooltipPosition="above"
+                        >
+                          {{ relatedCase.case_no }}
+                        </a>
+                        <span *ngIf="j < element.similar_cases.slice(idx * 2, (idx + 1) * 2).length - 1">, </span>
+                      </ng-container>
+                      <br *ngIf="idx < getRange(element.similar_cases.length).length - 1">
+                    </ng-container>
+                  </ng-container>
+                  <ng-template #noCases>
+                    NA
+                  </ng-template>
+                </td>
+              </ng-container>
+        
+              <!-- Table Header and Row Definitions -->
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="sticky-header-row"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            </table>
+          </div>
+        
           <mat-paginator [pageSize]="20" showFirstLastButtons [length]="totalCount"></mat-paginator>
         </mat-tab>
 
