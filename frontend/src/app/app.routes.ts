@@ -38,22 +38,22 @@ export const routes: Routes = [
   {
     path: 'subscriptions',
     component: SubscriptionsComponent,
-    canActivate: [authGuard],
+    
   },
   {
     path: 'account-settings',
     component: AccountSettingsComponent,
-    canActivate: [authGuard],
+    
   },
   {
     path: 'app-reports',
     component: ReportsComponent,
-    canActivate: [authGuard],
+    
   },
   {
     path: 'admin-upload',
     component: AdminUploadComponent,
-    canActivate: [authGuard],
+    
   },
   { path: 'ai', component: AimodelComponent, canActivate: [authGuard] },
 

@@ -49,7 +49,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 // import { DarkModeService } from 'angular-dark-mode';
 // import { MatTableModule } from '@angular/material/table';
 
-
 import {
   // CaseNameHighlightPipe,
   // DarkModeService,
@@ -159,7 +158,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
 
   tabIndex: number = 0; // Default to the first tab
-  years = ['2025', '2024', '2023','']; // '' = All
+  years = ['2025', '2024', '2023', '']; // '' = All
   selectedYear = '';
   displayedColumns: string[] = [
     'srNo',
@@ -225,7 +224,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log("fetchdata",this.fetchData)
+    console.log('fetchdata', this.fetchData);
     this.darkModeService.darkMode$.subscribe((isDarkMode) => {
       if (isDarkMode) {
         document.body.classList.add('dark-mode');
@@ -346,6 +345,16 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
           case_name: item.case_name || item.caseName || '',
           similar_cases: item.similar_cases || [],
         }));
+
+        // Apply litigation venues filter only if specific venues are selected
+        if (
+          this.selectedSources.size > 0 &&
+          this.selectedSources.size < this.litigationVenueOptions.length
+        ) {
+          this.tabledata = this.tabledata.filter((item) =>
+            this.selectedSources.has(item.litigation_venues)
+          );
+        }
 
         if (this.payload.year) {
           this.tabledata = this.tabledata.filter((item) => {
@@ -2675,12 +2684,7 @@ function levenshteinDistance(a: string, b: string): number {
   }
 
   return matrix[a.length][b.length];
-
-
-  
 }
-
-
 
 function calculateSimilarity(a: string, b: string): number {
   const distance = levenshteinDistance(a.toLowerCase(), b.toLowerCase());

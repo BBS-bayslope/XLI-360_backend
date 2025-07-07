@@ -140,7 +140,9 @@
             <strong>Type of Patent</strong>
           </div>
           <div class="col-6">
-            <span>{{ case?.patents.length!==0?case?.patents[0].patent_type:"Not Available" || "Not Available" }}</span>
+            <!-- <span>{{ case?.patents.length!==0?case?.patents[0].patent_type:"Not Available" || "Not Available" }}</span> -->
+            <span>{{ case?.patents?.length ? case.patents[0]?.patent_type || 'Not Available' : 'Not Available' }}</span>
+
           </div>
         </div>
       </div>
@@ -287,7 +289,9 @@
             <strong>Industry</strong>
           </div>
           <div class="col-6">
-            <span>{{ case?.patents?.length !== 0 ? case?.patents[0].industry : "Not Available" || "Not Available" }}</span>
+            <!-- <span>{{ case?.patents?.length !== 0 ? case?.patents[0].industry : "Not Available" || "Not Available" }}</span> -->
+            <span>{{ case?.patents?.length ? case.patents[0]?.industry || 'Not Available' : 'Not Available' }}</span>
+
           </div>
         </div>
       </div>
@@ -297,7 +301,9 @@
             <strong>Technology Category</strong>
           </div>
           <div class="col-6">
-            <span>{{ case?.patents?.length !== 0 ? case?.patents[0].technology_keywords : "Not Available" || "Not Available" }}</span>
+            <!-- <span>{{ case?.patents?.length !== 0 ? case?.patents[0].technology_keywords : "Not Available" || "Not Available" }}</span> -->
+            <span>{{ case?.patents?.length ? case.patents[0]?.technology_keywords || 'Not Available' : 'Not Available' }}</span>
+
           </div>
         </div>
       </div>
@@ -307,7 +313,14 @@
             <strong>Tech Keywords</strong>
           </div>
           <div class="col-6">
-            <span>{{ case?.patents?.length !== 0 ? case?.patents[0].technology_keywords : "Not Available" || "Not Available" }}</span>
+            <span>
+              {{
+                case?.patents?.length && case.patents[0]?.technology_keywords
+                  ? case.patents[0].technology_keywords
+                  : 'Not Available'
+              }}
+            </span>
+            
           </div>
         </div>
       </div>

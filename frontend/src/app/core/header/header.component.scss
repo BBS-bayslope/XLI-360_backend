@@ -366,13 +366,13 @@ button[mat-raised-button][routerLink="subscriptions"] {
 
 /* Icon buttons styling */
 button[mat-icon-button].hover-icon {
-  color: #E81F4F; /* White default */
+  color: #6600FF; /* White default */
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
 button[mat-icon-button].hover-icon mat-icon {
   transition: color 0.3s ease, transform 0.3s ease;
-  color: #E81F4F; /* White default */
+  color: #6600FF; /* White default */
 }
 
 button[mat-icon-button].hover-icon:hover {

@@ -1,29 +1,29 @@
+<!-- 🔄 Combine into single row wrapper -->
+<div class="filter-toolbar d-flex justify-content-between align-items-center flex-wrap">
+  
+  <!-- Left: Search input -->
+  <div class="quick-search-wrapper">
+    <input
+      type="text"
+      [(ngModel)]="searchInputText"
+      (input)="onSearchInputText(searchInputText)"
+      placeholder=" Search"
+      class="responsive-search-input"
+    />
+  </div>
 
-    <!-- <div> -->
-      <div class="quick-search-wrapper">
-        <input
-          type="text"
-          [(ngModel)]="searchInputText"
-          (input)="onSearchInputText(searchInputText)"
-          placeholder="Quick Search"
-          class="responsive-search-input"
-        />
-          <!-- <button *ngIf="searchInputText" (click)="clearSearchTextInput()" aria-label="Clear search">
-            ✖
-          </button> -->
-      </div>
-      
-    <!-- </div> -->
-    
-    <div class="row d-flex g-1 justify-content-start align-items-center sticky-filter-row " >
-      <div class="col-2 year-filter-buttons m custom-tab-label" *ngFor="let year of years">
-        <button
-          [ngClass]="{ 'active': selectedYear === year }"
-          (click)="selectYear(year)">
-          {{ year === '' ? 'All' : year }}
-        </button>
-      </div>
+  <!-- Right: Year buttons -->
+  <div class="year-filters d-flex flex-wrap gap-2">
+    <div class="year-filter-buttons m custom-tab-label" *ngFor="let year of years">
+      <button
+        [ngClass]="{ 'active': selectedYear === year }"
+        (click)="selectYear(year)">
+        {{ year === '' ? 'All' : year }}
+      </button>
     </div>
+  </div>
+</div>
+
 
 <mat-sidenav-container class="drawer-container">
   <mat-sidenav #drawer mode="side" opened>
@@ -102,7 +102,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casenumberPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Case Number </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let no of selectedCaseNumbers" (removed)="removeCaseNo(no)">
             {{ no }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -183,7 +183,7 @@
           style="font-size: 14px; font-weight: bolder;"> Plaintiff </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search Plaintiff</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let plaintiff of selectedPlaintiff" (removed)="removePlaintiff(plaintiff)">
             {{ plaintiff }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -212,7 +212,7 @@
           style="font-size: 14px; font-weight: bolder;"> Defendant </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search Defendant</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeDefandant(defendant)">
             {{ defendant }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -239,7 +239,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': industryPanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Industry </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeIndustry(industry)">
             {{ industry }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -266,7 +266,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': techcategoryPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Tech Category </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let category of selectedTechCategory" (removed)="removeCategory(category)">
             {{ category }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -293,7 +293,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': technologykeyPanel.expanded }" style="font-size: 14px; font-weight: bolder;">Technology Keywords</mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let keyword of selectedTechnologyKeywords" (removed)="removeKeyword(keyword)">
             {{ keyword }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -322,14 +322,14 @@
           <mat-panel-title class="wrap-text2"  [ngClass]="{ 'active-title': courtnamePanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Court Name </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let court of selectedCourtName" (removed)="removeKeyword(court)">
             {{ court }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
           <input matInput [(ngModel)]="courtNameInputValue"
             (focus)="onSearchCourtNamesInput(courtNameInputValue)"
-            (input)="onSearchCourtNamesInput(courtNameInputValue)" placeholder="Search Court Name" />
+            (input)="onSearchCourtNamesInput(courtNameInputValue)" placeholder="" />
         </mat-form-field>
         <section class="example-section">
           <mat-checkbox [checked]="selectedCourtName.has(courtName)"
@@ -380,7 +380,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': patentnumPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Patent No. </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let patentNo of selectedpatentNo" (removed)="removePatentNo(patentNo)">
             {{ patentNo }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -408,7 +408,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': causeofactionPanel.expanded }"  style="font-size: 14px; font-weight: bolder;">Cause of Action</mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let action of selectedCauseOfAction" (removed)="removeactions(action)">
             {{ action }}
             <mat-icon matChipRemove>cancel</mat-icon>

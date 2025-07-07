@@ -1939,43 +1939,57 @@ mat-expansion-panel mat-form-field {
 /* Year filter buttons */
 .year-filter-buttons {
   display: flex;
-  gap: 10px;
   margin: 0;
 }
 
 .year-filter-buttons button {
-  padding: 12px 24px;
-  background-color: white; /* Light Accenture purple */
-  border: 1px solid #E81F4F; /* Accenture purple border */
-  color: #E81F4F;
+  padding: 10px 18px;
+  background-color: white;
+  border: 1px solid #6600FF;
+  color: #6600FF;
   border-radius: 8px;
-  font-family: Tenorite, sans-serif; /* Tenorite font */
+  font-family: Tenorite, sans-serif;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 6px rgba(161, 0, 255, 0.15);
+  white-space: nowrap;
 }
 
+/* Hover & Active states */
 .year-filter-buttons button:hover {
-  background-color:#E81F4F; /* Lighter Accenture purple */
-  transform: translateY(-2px);
-  box-shadow: #E81F4F;
+  background-color: #6600FF;
   color: white;
+  transform: translateY(-2px);
 }
 
 .year-filter-buttons button:active {
-  background-color: #E81F4F; /* Accenture purple */
+  background-color: #6600FF;
   transform: scale(0.97);
-  box-shadow: #E81F4F;
 }
 
 .year-filter-buttons button.active {
-  background: #E81F4F;
+  background-color: #6600FF;
   color: white;
-  border-color: #E81F4F;
-  box-shadow: #E81F4F;
+  border-color: #6600FF;
 }
+
+/* ✅ Responsive font & padding adjustments */
+@media (min-width: 1200px) {
+  .year-filter-buttons button {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  .year-filter-buttons button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
 
 /* Sticky filter row */
 .sticky-filter-row {
@@ -2033,7 +2047,7 @@ mat-header-cell {
   z-index: 10;
   padding: 10px 16px;
   color: #A100FF; /* Accenture purple */
-  border-bottom: 2px solid #A100FF;
+  border-bottom: 1px solid #A100FF;
 }
 
 /* Table rows and cells */
@@ -2131,7 +2145,7 @@ mat-cell.wrap-text2 {
   transition: color 0.3s, transform 0.2s;
 
   &:hover {
-    color: #E81F4F; /* Accenture  purple */
+    color: #6600FF; /* Accenture  purple */
     transform: scale(1.05);
   }
 }
@@ -2218,22 +2232,22 @@ table.mat-table {
   z-index: 10;
   background-color: #FFFFFF !important;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  font-family: 'Tenorite','sans-serif';
+  font-family: 'Tenorite',sans-serif;
 }
 
 .mat-header-row th {
-  border-bottom: 2px solid #E81F4F; /* Accenture purple */
+  border-bottom: 2px solid #6600FF; /* Accenture purple */
 }
 
 th.mat-header-cell,
 td.mat-cell {
   padding: 8px;
-  border-bottom: 1px solid #E81F4F; /* Accenture purple */
+  border-bottom: 1px solid #6600FF; /* Accenture purple */
 }
 
 th.mat-header-cell {
   text-align: left;
-  color: #E81F4F; /* Accenture purple */
+  color: #6600FF; /* Accenture purple */
 }
 
 .no-results {
@@ -2259,7 +2273,7 @@ th.mat-header-cell {
 
 .no-data-message mat-icon {
   font-size: 48px;
-  color: #E81F4F; /* Accenture purple */
+  color: #6600FF; /* Accenture purple */
   margin-bottom: 10px;
 }
 
@@ -2275,10 +2289,10 @@ th.mat-header-cell {
 
 :host ::ng-deep {
   .plaintiff {
-    color: #E81F4F !important; /* Accenture purple */
+    color: #6600FF !important; /* Accenture purple */
   }
   .defendant {
-    // color: #E81F4F !important; /* Red for defendant */
+    // color: #6600FF !important; /* Red for defendant */
   }
 }
 
@@ -2298,7 +2312,7 @@ th.mat-header-cell {
 }
 
 .active-title {
-  color: #E81F4F !important; /* Accenture purple */
+  color: #6600FF !important; /* Accenture purple */
 }
 
 /* Alternating row colors */
@@ -2358,8 +2372,8 @@ tr.mat-row:hover {
   width: 20%;
   // z-index: 0;
   border: 1px solid Black; /* Accenture purple */
-  margin-left: 2rem;
-  width: 49%;
+  // margin-left: 2rem;
+  width: 104%;
   z-index: 900;
   // top: 10px;
   height: 49px;
@@ -2420,14 +2434,39 @@ th, td {
 }
 
 /* Input Styling */
+// .responsive-search-input {
+//   width: 290px;
+//   padding: 8px 35px 8px 10px;
+//   font-size: 16px;
+//   border: 1px solid black;
+//   border-radius: 4px;
+//   margin-left: 26vw;
+// }
+
 .responsive-search-input {
-  width: 290px;
+  width: 100%;
+  max-width: 400px;
   padding: 8px 35px 8px 10px;
-  font-size: 16px;
+  font-size: 14px;
   border: 1px solid black;
   border-radius: 4px;
-  margin-left: 26vw;
+  margin: 0 auto; /* Centered by default */
+  display: block;
 }
+
+/* Optional: Make sure parent container is flex or block */
+@media (min-width: 768px) {
+  .responsive-search-input {
+      max-width: 350px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-search-input{
+      max-width: 300px;
+  }
+}
+
 
 /* Button Styling */
 .clear-btn {
@@ -2446,4 +2485,91 @@ th, td {
   .responsive-search-input {
     width: 100%;
   }
+}
+
+
+
+
+.filter-toolbar {
+  padding: 8px 100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+/* Search input */
+.quick-search-wrapper {
+  flex: 1 1 auto;
+}
+
+// .responsive-search {
+//   width: 100%;
+//   max-width: 280px;
+//   padding: 8px 35px 8px 10px;
+//   font-size: 14px;
+//   border: 1px solid black;
+//   border-radius: 4px;
+//   display: block;
+// }
+
+/* Button section */
+.year-filters {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 9%;
+}
+
+.year-filter-buttons {
+  display: flex;
+  margin: 0;
+}
+
+
+
+
+.filter-section {
+  width: 100%;
+  padding: 8px;
+
+  .filter-title {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Tenorite', sans-serif;
+    color: #d9006c;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .filter-search {
+    width: 100%;
+    margin-bottom: 12px;
+
+    input {
+      font-family: 'Tenorite', sans-serif;
+    }
+  }
+
+  .filter-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    mat-checkbox {
+      font-size: 12px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      white-space: normal;
+      font-family: 'Tenorite', sans-serif;
+      overflow: hidden;
+    }
+  }
+}
+
+::ng-deep .mdc-data-table__row:last-child .mat-mdc-cell {
+  border-bottom: 1px solid black;
 }

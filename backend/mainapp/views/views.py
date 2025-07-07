@@ -564,7 +564,121 @@ class CaseListView(APIView):
             params_offset = int(request.data.get("offset", 0))
             params_limit = int(request.data.get("limit", 10))
 
+            case_status_filter = request.data.get("case_status", "")  # Array of case statuses
+            industry_filter = request.data.get("industry", [])  # Array of industries
+            litigation_venues_filter = request.data.get("litigation_venues", [])  # Array of venues
+            params_offset = int(request.data.get("offset", 0))
+            params_limit = int(request.data.get("limit", 10))
+            filed_date_list=request.data.get("filed_date_list",[])
+            case_closed_data_list=request.data.get("case_closed_data_list",[])
+            patent_no=request.data.get("patent_no",[])
+            court_name=request.data.get("court_name",[])
+            acquisition_type=request.data.get("acquisition_type","")
+            patent_type=request.data.get("patent_type","")
+            case_no=request.data.get("case_no",[])
+            defendants=request.data.get("defendants",[])
+            plaintiff=request.data.get("plaintiff",[])    
+            tech_category=request.data.get("tech_category",[])
+            tech_keyword=request.data.get("tech_keyword",[])
+            causeofaction=request.data.get("causeOfaction",[])
+            standard_patent=request.data.get("standard_patent","")
+            semiconductor_patent=request.data.get("semiconductor_patent","")
+            case_name = request.data.get("case_name","")  # List of words to search in case names
+            year_filter = request.data.get("year", "")
+
+            
+
             queryset = Case.objects.all()
+
+
+            if year_filter:
+                queryset = queryset.filter(complaint_date__startswith=year_filter)
+
+            # Apply filters if provided
+            if litigation_venues_filter:
+                queryset = queryset.filter(litigation_venues__in=litigation_venues_filter)
+            
+            if case_no:
+                queryset = queryset.filter(case_no__in=case_no)
+
+            # Apply case name filtering
+            if case_name:
+                query = Q()
+                query |= Q(case_name__icontains=case_name) | Q(casedetails__plaintiff__icontains=case_name) | Q(casedetails__defendant__icontains=case_name) | Q(patents__industry__icontains=case_name) | Q(patents__tech_category__icontains=case_name) | Q(patents__technology_keywords__icontains=case_name)
+                 # Case-insensitive search
+                
+                queryset = queryset.filter(query)
+
+            
+            if case_status_filter:
+                queryset = queryset.annotate(lower_case_status=Lower('case_status')).filter(lower_case_status=case_status_filter.lower())
+
+            
+            if filed_date_list:
+                queryset=queryset.filter(
+                Q(complaint_date__gte=filed_date_list[0]) &
+                Q(complaint_date__lte=filed_date_list[1]))
+            if case_closed_data_list:
+                queryset = queryset.filter(
+                    Q(casedetails__case_closed_date__gte=case_closed_data_list[0]) & 
+                    Q(casedetails__case_closed_date__lte=case_closed_data_list[1])
+                )
+            
+            if plaintiff:
+                queryset = queryset.filter(
+                    Q(casedetails__plaintiff__in=plaintiff)
+                )
+            
+            if defendants:
+                queryset = queryset.filter(
+                    Q(casedetails__defendant__in=defendants)
+                )
+            
+            if causeofaction:
+                query = Q()
+                for action in causeofaction: 
+                    query |= Q(casedetails__cause_of_action__icontains=action) 
+                
+                queryset = queryset.filter(query)
+            if case_status_filter:
+                queryset = queryset.filter(case_status=case_status_filter)
+            
+            if patent_no:
+                queryset = queryset.filter(patents__patent_no__in=patent_no)
+                
+            if patent_type:
+                queryset = queryset.filter(patents__patent_type=patent_type)
+            
+            if acquisition_type:
+                queryset = queryset.filter(patents__acquisition_type=acquisition_type)
+            
+            if standard_patent:
+                queryset = queryset.filter(patents__standard_patent=standard_patent)
+            
+            if semiconductor_patent:
+                queryset = queryset.filter(patents__semiconductor_patent=semiconductor_patent)
+            
+            if industry_filter:
+                queryset = queryset.filter(patents__industry__in=industry_filter).distinct()  # Many-to-many filter
+            
+            if court_name:
+                queryset = queryset.filter(court_name__in=court_name)
+
+
+
+            query = Q()
+
+            if tech_category:
+                for category in tech_category:
+                    query |= Q(patents__tech_category__icontains=category)
+
+            if tech_keyword:
+                for keyword in tech_keyword:
+                    query |= Q(patents__technology_keywords__icontains=keyword)
+
+            # Querying the cases
+            queryset = queryset.filter(query).distinct()
+            
 
             # Apply filters
             if case_name or case_number:
@@ -581,6 +695,8 @@ class CaseListView(APIView):
             offset = params_offset * params_limit
             total_count = queryset.count()
             limited_queryset = list(queryset[offset:offset + params_limit])
+
+            serializer = CaseSerializer(limited_queryset, many=True)
 
             if not limited_queryset:
                 return Response({"data": [], "total_count": total_count})

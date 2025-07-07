@@ -575,7 +575,7 @@
   font-family: 'Tenorite', serif; // Elegant font for headings
   font-size: 20px;
   font-weight: 700;
-  color: #E81F4F; // Deep navy blue for a professional tone (already #E81F4F)
+  color: #6600FF; // Deep navy blue for a professional tone (already #6600FF)
   margin-bottom: 30px;
   text-align: left;
   border-bottom: 1px solid black; // Gold accent line replaced
@@ -598,7 +598,7 @@
   transition: color 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    color: #E81F4F; // Gold on hover (already #E81F4F)
+    color: #6600FF; // Gold on hover (already #6600FF)
     transform: translateX(-5px); // Subtle slide effect
   }
 
@@ -608,7 +608,7 @@
   }
 
   &:hover mat-icon {
-    color: #E81F4F; // Gold on hover (replaced)
+    color: #6600FF; // Gold on hover (replaced)
   }
 }
 
@@ -619,7 +619,7 @@
   // border-radius: 10px;
   padding: 16px;
   box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05); // Soft shadow for depth
-  // border-left: 4px solid #E81F4F; // Gold accent on the left (replaced #d4af37)
+  // border-left: 4px solid #6600FF; // Gold accent on the left (replaced #d4af37)
   transition: box-shadow 0.3s ease;
   border-color: 1px solid black;
 
@@ -633,7 +633,7 @@
   font-family: "Tenorite", serif;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #E81F4F; // Deep navy blue
+  color: #6600FF; // Deep navy blue
   margin-bottom: 20px;
   padding-left: 10px;
   border-left: 4px solid #6600FF; // Blue accent for consistency (unchanged)
@@ -654,8 +654,8 @@
   min-width: 200px;
   box-sizing: border-box;
   background-color: #e6f0fa; // Light blue shade
-  border-bottom: 1px solid #E81F4F; // Gold border (replaced #d4af37)
-  border-right: 1px solid #E81F4F; // Gold border (replaced #d4af37)
+  border-bottom: 1px solid #6600FF; // Gold border (replaced #d4af37)
+  border-right: 1px solid #6600FF; // Gold border (replaced #d4af37)
   padding: 15px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 
@@ -678,7 +678,7 @@
 
 // Ensure right border for items in the last row
 .flex-item:nth-last-child(-n + 5):not(:nth-child(5n)) {
-  border-right: 1px solid #E81F4F; // Gold border (replaced #d4af37)
+  border-right: 1px solid #6600FF; // Gold border (replaced #d4af37)
 }
 
 // Styling for labels and values
@@ -762,7 +762,7 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
-  border: 1px solid #E81F4F; // Gold border (replaced #d4af37)
+  border: 1px solid #6600FF; // Gold border (replaced #d4af37)
   transition: transform 0.3s ease;
 
   &:hover {
@@ -792,7 +792,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  background: linear-gradient(90deg, #E81F4F 0%, #E81F4F 100%); // Gold gradient (replaced #d4af37 and #b8972e)
+  background: linear-gradient(90deg, #6600FF 0%, #6600FF 100%); // Gold gradient (replaced #d4af37 and #b8972e)
   color: #ffffff;
   border-radius: 8px;
   padding: 12px 25px;
@@ -803,7 +803,7 @@
   transition: background 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    background: linear-gradient(90deg, #E81F4F 0%, #E81F4F 100%); // Reverse gradient on hover (replaced #b8972e and #d4af37)
+    background: linear-gradient(90deg, #6600FF 0%, #6600FF 100%); // Reverse gradient on hover (replaced #b8972e and #d4af37)
     transform: translate(-50%, -55%); // Slight lift
   }
 }
