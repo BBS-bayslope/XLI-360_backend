@@ -14,7 +14,7 @@
       <div class="pdf-item" *ngFor="let report of reports">
         <img src="pdf.png" alt="PDF Icon" class="pdf-icon" />
         <div class="pdf-details">
-          <button class="year-btn">{{ report.year }}</button>
+          <div class="year-btn">{{ report.year }}</div>
           <div class="actions">
             <button class="view-btn" (click)="viewFile(report.id)">View</button>
             <button class="download-btn" (click)="downloadFile(report.id)">Download</button>

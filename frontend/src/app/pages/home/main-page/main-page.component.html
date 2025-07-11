@@ -187,17 +187,20 @@
           <mat-label>Search</mat-label>
         
           <input
+          
             matInput
             [(ngModel)]="plaintiffInputValue"
             [matAutocomplete]="autoSearchPlaintiff"
-            (input)="onSearchPlaintiffInput(plaintiffInputValue)" />
+            (input)="onSearchPlaintiffInput(plaintiffInputValue)" 
+            />
 
             <button
     *ngIf="plaintiffInputValue"
     matSuffix
     mat-icon-button
     aria-label="Clear"
-    (click)="plaintiffInputValue = ''">
+    (click)="plaintiffInputValue = ''"
+    >
     <mat-icon>close</mat-icon>
   </button>
         
@@ -1057,7 +1060,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        font-size: 9px;
+        font-size: 14px;
         
       "
     >

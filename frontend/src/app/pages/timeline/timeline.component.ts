@@ -132,14 +132,17 @@ export class TimelineComponent implements OnChanges {
     if (!this.data.length) return;
 
     // Clear previous chart
-    d3.select(this.timelineContainer.nativeElement).selectAll("*").remove();
+    d3.select(this.timelineContainer.nativeElement).selectAll('*').remove();
 
     const margin = { top: 0, right: 0, bottom: 0, left: 30 };
-    const minSpacing = 80; // Min spacing between points
+    const minSpacing = 150; // Min spacing between points
 
     // Dynamic width based on number of data points
-    const grouped = d3.groups(this.data, d => d3.timeFormat("%Y-%m")(d.date));
-    const width = Math.max(grouped.length * minSpacing, 900);
+    const grouped = d3.groups(this.data, (d) => d3.timeFormat('%Y-%m')(d.date));
+    const containerWidth = this.timelineContainer.nativeElement.offsetWidth;
+    // const width = Math.max(grouped.length * minSpacing, containerWidth);
+    const width = 600; // Ya koi bhi desired fixed width
+
     const height = 100 - margin.top - margin.bottom;
 
     const svgElement = d3
@@ -147,20 +150,22 @@ export class TimelineComponent implements OnChanges {
       .append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
-      .style('margin-left', '-6%'); // 👈 Add this line
+      .style('display', 'block')
+      .style('margin', '0 auto'); // ✅ Center the SVG
 
     const svg = svgElement
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`);
-  
 
-    const xScale = d3.scaleTime()
+    const xScale = d3
+      .scaleTime()
       .domain([this.startDate, this.endDate])
       .range([0, width]);
 
     const formatTime = d3.timeFormat('%Y');
 
-    const xAxis = d3.axisBottom(xScale)
+    const xAxis = d3
+      .axisBottom(xScale)
       .ticks(d3.timeYear)
       .tickFormat((domainValue: Date | d3.NumberValue) => {
         if (domainValue instanceof Date) {
@@ -169,28 +174,31 @@ export class TimelineComponent implements OnChanges {
         return '';
       });
 
-    svg.append("g")
-      .attr("transform", `translate(0, ${height / 2})`)
+    svg
+      .append('g')
+      .attr('transform', `translate(0, ${height / 2})`)
       .call(xAxis);
 
-    svg.append("line")
-      .attr("x1", 0)
-      .attr("y1", height / 2)
-      .attr("x2", width)
-      .attr("y2", height / 2)
-      .attr("stroke", "#ccc")
-      .attr("stroke-width", 2);
+    svg
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', height / 2)
+      .attr('x2', width)
+      .attr('y2', height / 2)
+      .attr('stroke', '#ccc')
+      .attr('stroke-width', 2);
 
-    const tooltip = d3.select(this.timelineContainer.nativeElement)
-      .append("div")
-      .style("position", "absolute")
-      .style("visibility", "hidden")
-      .style("background", "white")
-      .style("border", "1px solid black")
-      .style("padding", "5px")
-      .style("border-radius", "5px")
-      .style("font-size", "12px")
-      .style("pointer-events", "none");
+    const tooltip = d3
+      .select(this.timelineContainer.nativeElement)
+      .append('div')
+      .style('position', 'absolute')
+      .style('visibility', 'hidden')
+      .style('background', 'white')
+      .style('border', '1px solid black')
+      .style('padding', '5px')
+      .style('border-radius', '5px')
+      .style('font-size', '12px')
+      .style('pointer-events', 'none');
 
     // Group data by month (YYYY-MM)
     grouped.forEach(([monthKey, events]) => {
@@ -198,24 +206,31 @@ export class TimelineComponent implements OnChanges {
       const xPos = xScale(date);
 
       const combinedTooltipText = events
-        .map(e => `<strong>•</strong> ${e.label}`)
+        .map((e) => `<strong>•</strong> ${e.label}`)
         .join('<br>');
 
-      svg.append("circle")
-        .attr("cx", xPos)
-        .attr("cy", height / 2)
-        .attr("r", 8)
-        .style("fill", "steelblue")
-        .on("mouseover", (event) => {
-          tooltip.style("visibility", "visible")
-            .html(`<strong>Date:</strong> ${d3.timeFormat("%b, %Y")(date)}<br><br>${combinedTooltipText}`);
+      svg
+        .append('circle')
+        .attr('cx', xPos)
+        .attr('cy', height / 2)
+        .attr('r', 8)
+        .style('fill', 'steelblue')
+        .on('mouseover', (event) => {
+          tooltip
+            .style('visibility', 'visible')
+            .html(
+              `<strong>Date:</strong> ${d3.timeFormat('%b, %Y')(
+                date
+              )}<br><br>${combinedTooltipText}`
+            );
         })
-        .on("mousemove", (event) => {
-          tooltip.style("top", `${event.pageY - 30}px`)
-            .style("left", `${event.pageX + 10}px`);
+        .on('mousemove', (event) => {
+          tooltip
+            .style('top', `${event.pageY - 30}px`)
+            .style('left', `${event.pageX + 10}px`);
         })
-        .on("mouseout", () => {
-          tooltip.style("visibility", "hidden");
+        .on('mouseout', () => {
+          tooltip.style('visibility', 'hidden');
         });
     });
   }
