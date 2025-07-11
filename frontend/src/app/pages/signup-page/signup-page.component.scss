@@ -199,7 +199,7 @@ input[type="checkbox"] {
 .custom-checkbox {
   width: 15px;
   height: 15px;
-  border: 2px solid #2074f3;
+  border: 2px solid #6600FF;
   border-radius: 4px;
   background-color: #fff;
   cursor: pointer;
@@ -209,7 +209,7 @@ input[type="checkbox"] {
 }
 input[type="checkbox"]:checked + .custom-checkbox {
   // border: none;
-  background-color: #2074f3;
+  background-color: #6600FF;
 }
 input[type="checkbox"]:checked + .custom-checkbox:after {
   content: "";

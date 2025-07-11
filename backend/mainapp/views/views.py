@@ -1,5 +1,7 @@
 from django.shortcuts import render
 # Create your views here.
+from django.db.models.functions import Right
+
 # from mainapp.views.models import Report
 from mainapp.models import Report
 from openai import OpenAI
@@ -681,16 +683,22 @@ class CaseListView(APIView):
             
 
             # Apply filters
-            if case_name or case_number:
-                if case_number and len(case_number) == 3 and case_number.isdigit():
+# Only apply case_name or case_number filter if full case_no not already used
+            # Apply filters only if case_no is not already set
+            if not case_no:
+                if case_number and len(case_number) >= 3 and case_number.isdigit():
                     queryset = queryset.annotate(
                         last_3_digits=Right("case_no", 3)
                     ).filter(last_3_digits=case_number)
-                else:
-                    search_term = case_name or case_number
-                    queryset = queryset.filter(
-                        Q(case_name__icontains=search_term) | Q(case_no__icontains=search_term)
-                    )
+                elif case_number:
+        # Optional: allow full or partial search in case_no if not 3 digits
+                    queryset = queryset.filter(case_no__icontains=case_number)
+                elif case_name:
+                    queryset = queryset.filter(case_name__icontains=case_name)
+
+
+
+
 
             offset = params_offset * params_limit
             total_count = queryset.count()

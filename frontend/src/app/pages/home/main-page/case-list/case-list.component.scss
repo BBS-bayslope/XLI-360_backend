@@ -578,7 +578,7 @@
   color: #6600FF; // Deep navy blue for a professional tone (already #6600FF)
   margin-bottom: 30px;
   text-align: left;
-  border-bottom: 1px solid black; // Gold accent line replaced
+  // border-bottom: 1px solid black; // Gold accent line replaced
   // padding-bottom: 12px;
   letter-spacing: 0.5px;
 }
@@ -679,6 +679,7 @@
 // Ensure right border for items in the last row
 .flex-item:nth-last-child(-n + 5):not(:nth-child(5n)) {
   border-right: 1px solid #6600FF; // Gold border (replaced #d4af37)
+  border-bottom: 1px solid #6600FF;
 }
 
 // Styling for labels and values
@@ -708,7 +709,7 @@
   margin-top: 15px;
 
   thead {
-    background: linear-gradient(90deg, #1a3c6d 0%, #2074f3 100%); // Gradient header
+    background: linear-gradient(90deg, #1a3c6d 0%, #6600FF 100%); // Gradient header
     color: #ffffff;
     font-weight: 600;
 
@@ -841,4 +842,10 @@
   .details h5 {
     font-size: 1.2rem;
   }
+}
+
+
+.activity-wrapper {
+  max-width: 90%; // or any fixed value like 800px
+  margin: auto;
 }

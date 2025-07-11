@@ -9,6 +9,7 @@
       (input)="onSearchInputText(searchInputText)"
       placeholder=" Search"
       class="responsive-search-input"
+      style="height: 45px;"
     />
   </div>
 
@@ -102,13 +103,13 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casenumberPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Case Number </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
+          <mat-label>Search</mat-label>
           <mat-chip *ngFor="let no of selectedCaseNumbers" (removed)="removeCaseNo(no)">
             {{ no }}
             <mat-icon matChipRemove>cancel</mat-icon>
           </mat-chip>
           <input matInput [(ngModel)]="caseNumberInputValue"
-            [matAutocomplete]="autoSearchCaseNumber" (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
+            [matAutocomplete]="autoSearchCaseNumber" [disabled]="isLoadingFilters"  (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
           <mat-autocomplete #autoSearchCaseNumber="matAutocomplete"
             (optionSelected)="selectCaseNumber($event.option.value)">
             <mat-option *ngFor="let caseNumber of filteredCaseNumbers" [value]="caseNumber">
@@ -182,14 +183,24 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': plaintiffPanel.expanded }"
           style="font-size: 14px; font-weight: bolder;"> Plaintiff </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let plaintiff of selectedPlaintiff" (removed)="removePlaintiff(plaintiff)">
-            {{ plaintiff }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input matInput [(ngModel)]="plaintiffInputValue"
-            [matAutocomplete]="autoSearchPlaintiff" (input)="onSearchPlaintiffInput(plaintiffInputValue)" />
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Search</mat-label>
+        
+          <input
+            matInput
+            [(ngModel)]="plaintiffInputValue"
+            [matAutocomplete]="autoSearchPlaintiff"
+            (input)="onSearchPlaintiffInput(plaintiffInputValue)" />
+
+            <button
+    *ngIf="plaintiffInputValue"
+    matSuffix
+    mat-icon-button
+    aria-label="Clear"
+    (click)="plaintiffInputValue = ''">
+    <mat-icon>close</mat-icon>
+  </button>
+        
           <mat-autocomplete #autoSearchPlaintiff="matAutocomplete"
             (optionSelected)="selectPlaintiff($event.option.value)">
             <mat-option *ngFor="let plaintiff of filteredPlaintiff" [value]="plaintiff">
@@ -200,37 +211,92 @@
             </mat-option>
           </mat-autocomplete>
         </mat-form-field>
+        
+        <!-- ✅ Chips shown below or above form-field -->
+        <div class="chip-wrapper">
+          <mat-chip *ngFor="let plaintiff of selectedPlaintiff" [removable]="true"
+            (removed)="removePlaintiff(plaintiff)">
+            {{ plaintiff }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </div>
+        
+        
+
+        
       </mat-expansion-panel>
       </div>
 
       <!-- Defendant -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #defendantPanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="carde"
-          [ngClass]="{ 'active-title': defendantPanel.expanded }"
-          style="font-size: 14px; font-weight: bolder;"> Defendant </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeDefandant(defendant)">
-            {{ defendant }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input matInput [(ngModel)]="defendantInputValue"
-            [matAutocomplete]="autoSearchDefendant" (input)="onSearchDefendantInput(defendantInputValue)" />
-          <mat-autocomplete #autoSearchDefendant="matAutocomplete"
-            (optionSelected)="selectDefendant($event.option.value)">
-            <mat-option *ngFor="let defendant of filteredDefendants" [value]="defendant">
-              {{ defendant }}
-            </mat-option>
-            <mat-option *ngIf="filteredDefendants.length === 0 && defendantInputValue" disabled>
-              No results found
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </mat-expansion-panel>
-      </div>
+<!-- Defendant -->
+<div class="panel-wrapper">
+  <mat-expansion-panel #defendantPanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        class="carde"
+        [ngClass]="{ 'active-title': defendantPanel.expanded }"
+        style="font-size: 14px; font-weight: bolder;"
+      >
+        Defendant
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <!-- ✅ Input Field -->
+    <mat-form-field appearance="outline" style="width: 100%">
+      <mat-label>Search</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="defendantInputValue"
+        [matAutocomplete]="autoSearchDefendant"
+        (input)="onSearchDefendantInput(defendantInputValue)"
+      />
+
+      <!-- ✅ Optional Clear Button -->
+      <button
+        *ngIf="defendantInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="defendantInputValue = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <mat-autocomplete
+        #autoSearchDefendant="matAutocomplete"
+        (optionSelected)="selectDefendant($event.option.value)"
+      >
+        <mat-option
+          *ngFor="let defendant of filteredDefendants"
+          [value]="defendant"
+        >
+          {{ defendant }}
+        </mat-option>
+        <mat-option
+          *ngIf="filteredDefendants.length === 0 && defendantInputValue"
+          disabled
+        >
+          No results found
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- ✅ Chips Outside Input -->
+    <div class="chip-wrapper">
+      <mat-chip
+        *ngFor="let defendant of selectedDefendant"
+        [removable]="true"
+        (removed)="removeDefandant(defendant)"
+        [matTooltip]="defendant"
+      >
+        {{ defendant }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+  </mat-expansion-panel>
+</div>
+
 
       <!-- Industry -->
       <div class="panel-wrapper">
@@ -239,7 +305,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': industryPanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Industry </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label></mat-label>
+          <mat-label>Search</mat-label>
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeIndustry(industry)">
             {{ industry }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -259,89 +325,212 @@
       </mat-expansion-panel>
       </div>
 
-      <!-- Tech Category -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #techcategoryPanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="carde" [ngClass]="{ 'active-title': techcategoryPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Tech Category </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let category of selectedTechCategory" (removed)="removeCategory(category)">
-            {{ category }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input type="text" [(ngModel)]="techCategoryInputValue" (input)="filterTechCategory()" matNativeControl
-            style="width: 100%;" />
-        </mat-form-field>
-        <section class="example-section">
-          <mat-checkbox [checked]="selectedTechCategory.has(techCategory)" (change)="onCheckboxTechCategoryChange($event.checked, techCategory)"
-            *ngFor="let techCategory of filteredTechCategory">
-            {{ techCategory }}
-          </mat-checkbox>
-          <div *ngIf="filteredTechCategory.length === 0 && techCategoryInputValue" class="no-results">
-            No results found
-          </div>
-        </section>
-      </mat-expansion-panel>
-      </div>
+<!-- Tech Category -->
+<div class="panel-wrapper">
+  <mat-expansion-panel #techcategoryPanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        class="carde"
+        [ngClass]="{ 'active-title': techcategoryPanel.expanded }"
+        style="font-size: 14px; font-weight: bolder;"
+      >
+        Tech Category
+      </mat-panel-title>
+    </mat-expansion-panel-header>
 
-      <!-- Technology Keywords -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #technologykeyPanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="carde" [ngClass]="{ 'active-title': technologykeyPanel.expanded }" style="font-size: 14px; font-weight: bolder;">Technology Keywords</mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let keyword of selectedTechnologyKeywords" (removed)="removeKeyword(keyword)">
-            {{ keyword }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input matInput [(ngModel)]="technologyKeywordInputValue"
-            (focus)="filterTechnologyKeywords()" (input)="filterTechnologyKeywords()"
-            placeholder="Search Technology Keywords" style="width: 100%;" />
-        </mat-form-field>
-        <div class="example-section">
-          <mat-checkbox *ngFor="let keyword of filteredTechnologyKeywords"
-            [checked]="selectedTechnologyKeywords.has(keyword)"
-            (change)="onTechnologyKeywordChanged(keyword, $event.checked)">
-            {{ keyword }}
-          </mat-checkbox>
-          <div *ngIf="filteredTechnologyKeywords.length === 0 && technologyKeywordInputValue" class="no-results">
-            No results found
-          </div>
-        </div>
-      </mat-expansion-panel>
-      </div>
+    <!-- ✅ Input Field -->
+    <mat-form-field appearance="outline" style="width: 100%;">
+      <mat-label>Search</mat-label>
 
-      <!-- Court Name -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #courtnamePanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="wrap-text2"  [ngClass]="{ 'active-title': courtnamePanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Court Name </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let court of selectedCourtName" (removed)="removeKeyword(court)">
-            {{ court }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input matInput [(ngModel)]="courtNameInputValue"
-            (focus)="onSearchCourtNamesInput(courtNameInputValue)"
-            (input)="onSearchCourtNamesInput(courtNameInputValue)" placeholder="" />
-        </mat-form-field>
-        <section class="example-section">
-          <mat-checkbox [checked]="selectedCourtName.has(courtName)"
-            (change)="onCheckboxCourtNameChange($event.checked, courtName)" *ngFor="let courtName of filteredCourtName">
-            {{ courtName }}
-          </mat-checkbox>
-          <div *ngIf="filteredCourtName.length === 0 && courtNameInputValue" class="no-results">
-            No results found
-          </div>
-        </section>
-      </mat-expansion-panel>
+      <input
+        type="text"
+        matInput
+        [(ngModel)]="techCategoryInputValue"
+        (input)="filterTechCategory()"
+        placeholder="Search tech categories"
+      />
+
+      <!-- ✅ Clear button -->
+      <button
+        *ngIf="techCategoryInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="techCategoryInputValue = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- ✅ Chips displayed outside the input -->
+    <div class="chip-wrapper">
+      <mat-chip
+        *ngFor="let category of selectedTechCategory"
+        [removable]="true"
+        (removed)="removeCategory(category)"
+        [matTooltip]="category"
+      >
+        {{ category }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+
+    <!-- ✅ Checkbox list -->
+    <section class="example-section scrollable-checkbox-list">
+      <mat-checkbox
+        *ngFor="let techCategory of filteredTechCategory"
+        [checked]="selectedTechCategory.has(techCategory)"
+        (change)="onCheckboxTechCategoryChange($event.checked, techCategory)"
+      >
+        {{ techCategory }}
+      </mat-checkbox>
+
+      <div *ngIf="filteredTechCategory.length === 0 && techCategoryInputValue" class="no-results">
+        No results found
       </div>
+    </section>
+  </mat-expansion-panel>
+</div>
+
+
+<!-- Technology Keywords -->
+<div class="panel-wrapper">
+  <mat-expansion-panel #technologykeyPanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        class="carde"
+        [ngClass]="{ 'active-title': technologykeyPanel.expanded }"
+        style="font-size: 14px; font-weight: bolder;"
+      >
+        Technology Keywords
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <!-- ✅ Input Field -->
+    <mat-form-field appearance="outline" style="width: 100%">
+      <mat-label>Search</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="technologyKeywordInputValue"
+        (focus)="filterTechnologyKeywords()"
+        (input)="filterTechnologyKeywords()"
+        placeholder="Search Technology Keywords"
+      />
+
+      <!-- ✅ Clear Button -->
+      <button
+        *ngIf="technologyKeywordInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="technologyKeywordInputValue = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- ✅ Chips shown outside input -->
+    <div class="chip-wrapper">
+      <mat-chip
+        *ngFor="let keyword of selectedTechnologyKeywords"
+        [removable]="true"
+        (removed)="removeKeyword(keyword)"
+        [matTooltip]="keyword"
+      >
+        {{ keyword }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+
+    <!-- ✅ Checkbox List -->
+    <div class="example-section scrollable-checkbox-list">
+      <mat-checkbox
+        *ngFor="let keyword of filteredTechnologyKeywords"
+        [checked]="selectedTechnologyKeywords.has(keyword)"
+        (change)="onTechnologyKeywordChanged(keyword, $event.checked)"
+      >
+        {{ keyword }}
+      </mat-checkbox>
+
+      <div
+        *ngIf="filteredTechnologyKeywords.length === 0 && technologyKeywordInputValue"
+        class="no-results"
+      >
+        No results found
+      </div>
+    </div>
+  </mat-expansion-panel>
+</div>
+
+
+<!-- Court Name -->
+<div class="panel-wrapper">
+  <mat-expansion-panel #courtnamePanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        class="wrap-text2"
+        [ngClass]="{ 'active-title': courtnamePanel.expanded }"
+        style="font-size: 14px; font-weight: bolder;"
+      >
+        Court Name
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <!-- ✅ Input Field -->
+    <mat-form-field appearance="outline" style="width: 100%">
+      <mat-label>Search</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="courtNameInputValue"
+        (focus)="onSearchCourtNamesInput(courtNameInputValue)"
+        (input)="onSearchCourtNamesInput(courtNameInputValue)"
+        placeholder="Type court name"
+      />
+
+      <!-- Optional Clear Button -->
+      <button
+        *ngIf="courtNameInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="courtNameInputValue = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <!-- ✅ Chips Below Input -->
+    <div class="chip-wrapper">
+      <mat-chip
+        *ngFor="let court of selectedCourtName"
+        [removable]="true"
+        (removed)="removeKeyword(court)"
+        [matTooltip]="court"
+      >
+        {{ court }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+
+    <!-- ✅ Checkbox Options -->
+    <section class="example-section scrollable-checkbox-list">
+      <mat-checkbox
+        [checked]="selectedCourtName.has(courtName)"
+        (change)="onCheckboxCourtNameChange($event.checked, courtName)"
+        *ngFor="let courtName of filteredCourtName"
+      >
+        {{ courtName }}
+      </mat-checkbox>
+
+      <div *ngIf="filteredCourtName.length === 0 && courtNameInputValue" class="no-results">
+        No results found
+      </div>
+    </section>
+  </mat-expansion-panel>
+</div>
+
 
       <!-- Acquisition Type -->
       <div class="panel-wrapper">
@@ -373,60 +562,148 @@
       </mat-expansion-panel>
       </div>
 
-      <!-- Patent No. -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #patentnumPanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="carde" [ngClass]="{ 'active-title': patentnumPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Patent No. </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let patentNo of selectedpatentNo" (removed)="removePatentNo(patentNo)">
-            {{ patentNo }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input type="text" matInput [(ngModel)]="patentNoInputValue"
-            [matAutocomplete]="autoSearchPatentNo" (input)="onSearchPatentNoInput(patentNoInputValue)"
-            placeholder="eg. 1104721, etc." />
-          <mat-autocomplete #autoSearchPatentNo="matAutocomplete"
-            (optionSelected)="selectPatentNo($event.option.value)">
-            <mat-option *ngFor="let patentNo of filteredPatentNos" [value]="patentNo">
-              {{ patentNo }}
-            </mat-option>
-            <mat-option *ngIf="filteredPatentNos.length === 0 && patentNoInputValue" disabled>
-              No results found
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </mat-expansion-panel>
-      </div>
+<!-- Patent No. -->
+<div class="panel-wrapper">
+  <mat-expansion-panel #patentnumPanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        class="carde"
+        [ngClass]="{ 'active-title': patentnumPanel.expanded }"
+        style="font-size: 14px; font-weight: bolder;"
+      >
+        Patent No.
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" style="width: 100%">
+      <mat-label>Search</mat-label>
+
+      <!-- Just the input here -->
+      <input
+        type="text"
+        matInput
+        [(ngModel)]="patentNoInputValue"
+        [matAutocomplete]="autoSearchPatentNo"
+        (input)="onSearchPatentNoInput(patentNoInputValue)"
+        placeholder="e.g. 1104721, etc."
+      />
+
+      <!-- Optional clear button -->
+      <button
+        *ngIf="patentNoInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="patentNoInputValue = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <mat-autocomplete
+        #autoSearchPatentNo="matAutocomplete"
+        (optionSelected)="selectPatentNo($event.option.value)"
+      >
+        <mat-option
+          *ngFor="let patentNo of filteredPatentNos"
+          [value]="patentNo"
+        >
+          {{ patentNo }}
+        </mat-option>
+        <mat-option
+          *ngIf="filteredPatentNos.length === 0 && patentNoInputValue"
+          disabled
+        >
+          No results found
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- ✅ Chips shown below input with scroll -->
+    <div class="chip-wrapper">
+      <mat-chip
+        *ngFor="let patentNo of selectedpatentNo"
+        [removable]="true"
+        (removed)="removePatentNo(patentNo)"
+        [matTooltip]="patentNo"
+      >
+        {{ patentNo }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+  </mat-expansion-panel>
+</div>
+
 
       <!-- Cause of Action -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #causeofactionPanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="carde" [ngClass]="{ 'active-title': causeofactionPanel.expanded }"  style="font-size: 14px; font-weight: bolder;">Cause of Action</mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let action of selectedCauseOfAction" (removed)="removeactions(action)">
-            {{ action }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input matInput [(ngModel)]="causeOfActionInputValue"
-            [matAutocomplete]="autoSearchCauseOfAction" (input)="onSearchCauseOfActionInput(causeOfActionInputValue)" />
-          <mat-autocomplete #autoSearchCauseOfAction="matAutocomplete"
-            (optionSelected)="selectCauseOfAction($event.option.value)">
-            <mat-option *ngFor="let causeOfAction of filteredCauseOfActions" [value]="causeOfAction">
-              {{ causeOfAction }}
-            </mat-option>
-            <mat-option *ngIf="filteredCauseOfActions.length === 0 && causeOfActionInputValue" disabled>
-              No results found
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
-      </mat-expansion-panel>
-      </div>
+<!-- Cause of Action -->
+<div class="panel-wrapper">
+  <mat-expansion-panel #causeofactionPanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        class="carde"
+        [ngClass]="{ 'active-title': causeofactionPanel.expanded }"
+        style="font-size: 14px; font-weight: bolder;"
+      >
+        Cause of Action
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" style="width: 100%">
+      <mat-label>Search</mat-label>
+
+      <!-- Just input here -->
+      <input
+        matInput
+        [(ngModel)]="causeOfActionInputValue"
+        [matAutocomplete]="autoSearchCauseOfAction"
+        (input)="onSearchCauseOfActionInput(causeOfActionInputValue)"
+      />
+
+      <!-- Optional clear button -->
+      <button
+        *ngIf="causeOfActionInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="causeOfActionInputValue = ''"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <mat-autocomplete
+        #autoSearchCauseOfAction="matAutocomplete"
+        (optionSelected)="selectCauseOfAction($event.option.value)"
+      >
+        <mat-option
+          *ngFor="let causeOfAction of filteredCauseOfActions"
+          [value]="causeOfAction"
+        >
+          {{ causeOfAction }}
+        </mat-option>
+        <mat-option
+          *ngIf="filteredCauseOfActions.length === 0 && causeOfActionInputValue"
+          disabled
+        >
+          No results found
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- ✅ Chips outside input -->
+    <div class="chip-wrapper">
+      <mat-chip
+        *ngFor="let action of selectedCauseOfAction"
+        [removable]="true"
+        (removed)="removeactions(action)"
+        [matTooltip]="action"
+      >
+        {{ action }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+  </mat-expansion-panel>
+</div>
+
 
       <!-- Standard Essential Patent -->
       <div class="panel-wrapper">
@@ -540,12 +817,12 @@
           </mat-chip>
 
           <!-- Case Defendant Chip -->
-          <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeFilter('defendant', defendant)">
+          <!-- <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeFilter('defendant', defendant)">
             Defendant: {{ defendant }}
             <button matChipRemove [attr.aria-label]="'remove defendant'">
               <mat-icon>cancel</mat-icon>
             </button>
-          </mat-chip>
+          </mat-chip> -->
 
           <!-- Case Industry Chip -->
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeFilter('industry', industry)">
@@ -556,20 +833,20 @@
           </mat-chip>
 
           <!-- Tech Category Chip -->
-          <mat-chip *ngFor="let techCategory of selectedTechCategory" (removed)="removeFilter('techCategory', techCategory)">
+          <!-- <mat-chip *ngFor="let techCategory of selectedTechCategory" (removed)="removeFilter('techCategory', techCategory)">
             Tech Category: {{ techCategory }}
             <button matChipRemove [attr.aria-label]="'remove techCategory'">
               <mat-icon>cancel</mat-icon>
             </button>
-          </mat-chip>
+          </mat-chip> -->
 
           <!-- Technology Keywords Chip -->
-          <mat-chip *ngFor="let technologyKeywords of selectedTechnologyKeywords" (removed)="removeFilter('technologyKeywords', technologyKeywords)">
+          <!-- <mat-chip *ngFor="let technologyKeywords of selectedTechnologyKeywords" (removed)="removeFilter('technologyKeywords', technologyKeywords)">
             Technology Keywords: {{ technologyKeywords }}
             <button matChipRemove [attr.aria-label]="'remove technologyKeywords'">
               <mat-icon>cancel</mat-icon>
             </button>
-          </mat-chip>
+          </mat-chip> -->
 
           <!-- Court Names Chip -->
           <mat-chip *ngFor="let courtNames of selectedCourtName" (removed)="removeFilter('courtNames', courtNames)">
@@ -667,6 +944,7 @@
               </span>
             </div>
             <!-- Table -->
+             <!-- <div style="border-bottom: 1px solid black;"> -->
             <table
               mat-table
               *ngIf="!loader && tabledata.length > 0"
@@ -674,7 +952,7 @@
               class="mat-elevation-z8"
               style="
                 display: block;
-                height: 62.55vh;
+                height: 63.55vh;
                 overflow-y: auto;
                 overflow-x: scroll;
                 margin: 0;
@@ -684,21 +962,21 @@
             >
               <!-- Sr. No. Column -->
               <ng-container matColumnDef="srNo">
-                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header col-sno">Sr. No.</th>
+                <th mat-header-cell *matHeaderCellDef  class="no-wrap sticky-header col-sno brown-header" style="background-color: grey;">Sr. No.</th>
                 <td mat-cell *matCellDef="let element; let i = index" class="no-wrap col-sno">
                   {{ (paginator.pageIndex * paginator.pageSize) + i + 1 }}
                 </td>
               </ng-container>
               <!-- Case Date Column -->
               <ng-container matColumnDef="caseComplaintDate">
-                <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Date</th>
+                <th mat-header-cell *matHeaderCellDef class="sticky-header brown-header">Case Date</th>
                 <td mat-cell *matCellDef="let element" class="no-wrap">
                   {{ formatDate(convertToDate(element.complaint_date)) }}
                 </td>
               </ng-container>
               <!-- Case Number Column -->
               <ng-container matColumnDef="caseNumber">
-                <th mat-header-cell *matHeaderCellDef class="sticky-header">Case Number</th>
+                <th mat-header-cell *matHeaderCellDef class="sticky-header brown-header">Case Number</th>
                 <td mat-cell *matCellDef="let element" class="no-wrap">
                   <a
                     (click)="onSelectCaseNumber(element.case_no); $event.stopPropagation()"
@@ -711,7 +989,7 @@
               </ng-container>
               <!-- Case Name Column -->
               <ng-container matColumnDef="caseName">
-                <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Case Name</th>
+                <th mat-header-cell *matHeaderCellDef class="no-text sticky-header brown-header">Case Name</th>
                 <td
                   mat-cell
                   *matCellDef="let element"
@@ -721,58 +999,74 @@
               </ng-container>
               <!-- Status Column -->
               <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef class="sticky-header col-status">Status</th>
+                <th mat-header-cell *matHeaderCellDef class="sticky-header col-status brown-header">Status</th>
                 <td mat-cell *matCellDef="let element" class="no-wrap col-status">
                   {{ element.case_status || "NA" }}
                 </td>
               </ng-container>
               <!-- Court Column -->
               <ng-container matColumnDef="court_name">
-                <th mat-header-cell *matHeaderCellDef class="no-text sticky-header">Court Name</th>
+                <th mat-header-cell *matHeaderCellDef class="no-text sticky-header brown-header">Court Name</th>
                 <td mat-cell *matCellDef="let element" class="wrap-text2">
                   {{ element.court_name || "NA" }}
                 </td>
               </ng-container>
               <!-- Venue Column -->
               <ng-container matColumnDef="venue">
-                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Litigation Venues</th>
+                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header brown-header">Litigation <br> Venues</th>
                 <td mat-cell *matCellDef="let element" class="no-wrap">
                   {{ element.litigation_venues || "NA" }}
                 </td>
               </ng-container>
               <!-- Win Prediction Column -->
               <ng-container matColumnDef="winningPrediction">
-                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header">Win Prediction</th>
-                <td mat-cell *matCellDef="let element" class="no-wrap win-prediction-cell">
-                  <div
-                    style="
-                      position: relative;
-                      width: 32px;
-                      height: 32px;
-                      display: flex;
-                      align-items: center;
-                      justify-content: center;
-                    "
-                  >
-                    <mat-progress-spinner
-                      [diameter]="32"
-                      [mode]="'determinate'"
-                      [value]="100"
-                      color="accent"
-                      style="position: absolute"
-                    ></mat-progress-spinner>
-                    <mat-progress-spinner
-                      [diameter]="32"
-                      [mode]="'determinate'"
-                      [value]="winningPercentage || 0"
-                      color="primary"
-                      style="position: absolute"
-                    ></mat-progress-spinner>
-                    <span style="position: absolute; font-size: 10px; font-weight: 500">
-                      {{ (winningPercentage || 0) | number:'1.0-0' }}%
-                    </span>
-                  </div>
-                </td>
+                <th mat-header-cell *matHeaderCellDef class="no-wrap sticky-header brown-header">Win Prediction</th>
+                <td
+  mat-cell
+  *matCellDef="let element"
+  class="win-prediction-cell"
+  style="padding: 12px; text-align: center; vertical-align: middle;"
+>
+  <div
+    style="
+      width: 50px;
+      height: 50px;
+      position: relative;
+      margin: auto;
+    "
+  >
+    <mat-progress-spinner
+      [diameter]="50"
+      [mode]="'determinate'"
+      [value]="100"
+      color="accent"
+      style="position: absolute; top: 0; left: 0;"
+    ></mat-progress-spinner>
+
+    <mat-progress-spinner
+      [diameter]="50"
+      [mode]="'determinate'"
+      [value]="winningPercentage || 0"
+      color="primary"
+      style="position: absolute; top: 0; left: 0;"
+    ></mat-progress-spinner>
+
+    <span
+      style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 9px;
+        
+      "
+    >
+      {{ (winningPercentage || 0) | number:'1.0-0' }}%
+    </span>
+  </div>
+</td>
+
+
               </ng-container>
               <!-- Related Cases Column -->
               <ng-container matColumnDef="relatedCases">
@@ -780,7 +1074,7 @@
                   mat-header-cell
                   *matHeaderCellDef
                   style="font-size: 14px; font-weight: bolder; position: sticky; top: 0; background-color: var(--content-bg); z-index: 1;"
-                  class="wrap-text2"
+                  class="wrap-text2 brown-header"
                 >Similar Cases</th>
                 <td mat-cell *matCellDef="let element" class="no-wrap">
                   <ng-container *ngIf="element.similar_cases && element.similar_cases.length > 0; else noCases">
@@ -811,6 +1105,7 @@
               <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="sticky-header-row"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>
+          <!-- </div> -->
           </div>
         
           <mat-paginator [pageSize]="20" showFirstLastButtons [length]="totalCount"></mat-paginator>

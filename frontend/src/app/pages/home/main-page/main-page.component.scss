@@ -2141,7 +2141,7 @@ mat-cell.wrap-text2 {
   font-family: 'Tenorite', sans-serif; /* Tenorite font */
   font-weight: bolder;
   cursor: pointer;
-  color: #090909; /* Dark Black */ 
+  color: #6600FF; /* Dark Black */ 
   transition: color 0.3s, transform 0.2s;
 
   &:hover {
@@ -2284,7 +2284,7 @@ th.mat-header-cell {
 }
 
 ::ng-deep .mat-mdc-tab-labels {
-  margin-bottom: 13px;
+  margin-bottom: 5px;
 }
 
 :host ::ng-deep {
@@ -2336,7 +2336,7 @@ tr.mat-row:hover {
 
 ::ng-deep mat-expansion-panel:not(:last-of-type) {
   margin-bottom: 0px !important;
-  border-bottom: none !important;
+  border-bottom: 1px solid black !important;
 }
 
 /* Remove thin line below header */
@@ -2371,7 +2371,7 @@ tr.mat-row:hover {
 :host ::ng-deep .mat-mdc-text-field-wrapper {
   width: 20%;
   // z-index: 0;
-  border: 1px solid Black; /* Accenture purple */
+  // border: 1px solid Black; /* Accenture purple */
   // margin-left: 2rem;
   width: 104%;
   z-index: 900;
@@ -2446,7 +2446,7 @@ th, td {
 .responsive-search-input {
   width: 100%;
   max-width: 400px;
-  padding: 8px 35px 8px 10px;
+  padding: 8px 12px ;
   font-size: 14px;
   border: 1px solid black;
   border-radius: 4px;
@@ -2491,13 +2491,13 @@ th, td {
 
 
 .filter-toolbar {
-  padding: 8px 100px;
+  padding: 10px 120px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 0px;
 }
 
 /* Search input */
@@ -2572,4 +2572,169 @@ th, td {
 
 ::ng-deep .mdc-data-table__row:last-child .mat-mdc-cell {
   border-bottom: 1px solid black;
+}
+
+
+.header-color{
+  background-color: grey;
+}
+
+
+.brown-header {                                                                    
+  background-color:rgb(45, 39, 39) !important;
+  color: white; /* optional, for better contrast */
+}
+                                                                                                                        
+
+
+.scrollable-checkbox-list {
+  max-height: 180px; /* Approx height for 5 checkboxes */
+  overflow-y: auto;
+  padding-right: 8px; /* For scrollbar spacing */
+}
+
+
+
+.scroll-section {
+  max-height: 180px;        /* roughly 5 items visible */
+  overflow-y: auto;
+  padding-right: 6px;       /* to avoid scrollbar overlap */
+  margin-top: 8px;
+}
+
+/* Chip styling fix: prevent chip label overflow */
+::ng-deep .mat-mdc-chip-action-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Ensure chip list grows with multiple items */
+::ng-deep .mat-chip-list-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: none;
+  overflow: hidden;
+  gap: 6px;
+}
+
+html {
+  --mdc-circular-progress-active-indicator-color: #28a745; /* Green */
+}
+
+
+
+// .example-section
+.example-section::-webkit-scrollbar {
+  width: 6px;
+}
+.example-section::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+
+.example-section {
+  max-height: 120px; /* Reduced from 180px to 120px */
+  overflow-y: auto; /* Ensure vertical scrolling */
+  padding-right: 6px; /* Avoid scrollbar overlap */
+  background: var(--content-bg); /* Match theme */
+}
+
+/* Customize scrollbar */
+.example-section::-webkit-scrollbar {
+  width: 6px; /* Slim scrollbar */
+}
+
+.example-section::-webkit-scrollbar-thumb {
+  background-color: grey; /* Match your theme */
+  border-radius: 3px;
+}
+
+.example-section::-webkit-scrollbar-track {
+  background: var(--content-bg); /* Match background */
+}
+
+
+
+
+
+::ng-deep .mat-mdc-chip-listbox {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+::ng-deep .mat-mdc-standard-chip {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+
+
+.chip-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 80px;
+  overflow-y: auto;
+  margin-top: 6px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+
+.chip-wrapper mat-chip {
+  display: flex;
+  align-items: center;
+  max-width: 200px; /* or 100%, whatever fits */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 24px; // Give space for cross icon
+  position: relative;
+}
+
+
+
+.chip-wrapper mat-icon[matChipRemove] {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;  // Optional for contrast
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+mdc-data-table__row:last-child .mat-mdc-cell {
+  border-bottom: 1px solid black;
+}
+
+
+
+::ng-deep .mat-table .last-row {
+  border-bottom: 1px solid black;
+}
+
+
+.chip-wrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 4px;
+  padding-top: 8px;
+  margin-bottom: 6px;
+}
+
+mat-chip {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

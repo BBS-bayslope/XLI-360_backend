@@ -134,7 +134,7 @@ export class TimelineComponent implements OnChanges {
     // Clear previous chart
     d3.select(this.timelineContainer.nativeElement).selectAll("*").remove();
 
-    const margin = { top: 0, right: 30, bottom: 0, left: 30 };
+    const margin = { top: 0, right: 0, bottom: 0, left: 30 };
     const minSpacing = 80; // Min spacing between points
 
     // Dynamic width based on number of data points
@@ -142,12 +142,17 @@ export class TimelineComponent implements OnChanges {
     const width = Math.max(grouped.length * minSpacing, 900);
     const height = 100 - margin.top - margin.bottom;
 
-    const svg = d3.select(this.timelineContainer.nativeElement)
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    const svgElement = d3
+      .select(this.timelineContainer.nativeElement)
+      .append('svg')
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom)
+      .style('margin-left', '-6%'); // 👈 Add this line
+
+    const svg = svgElement
+      .append('g')
+      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+  
 
     const xScale = d3.scaleTime()
       .domain([this.startDate, this.endDate])

@@ -442,7 +442,7 @@
   <div class="details">
     <h5>Activity Timeline</h5>
     <div class="row d-flex justify-content-center w-100">
-      <div class="col-12 d-flex align-items-center">
+      <div class="col-12 d-flex align-items-center" style="margin-left: 1px;">
         <ng-container *ngIf="activity_timeline.length > 0; else noData">
           <app-timeline [data]="activity_timeline"></app-timeline>
         </ng-container>

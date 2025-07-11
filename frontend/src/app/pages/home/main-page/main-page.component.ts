@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   inject,
   OnDestroy,
   OnInit,
@@ -9,6 +10,16 @@ import {
   ViewChild,
 } from '@angular/core';
 import dayjs from 'dayjs';
+// import { Subject } from 'rxjs';
+import {  distinctUntilChanged } from 'rxjs/operators';
+
+// import { MatChipsModule } from '@angular/material/chips';
+// import { MatIconModule } from '@angular/material/icon';
+// import { MatFormFieldModule } from '@angular/material/form-field';
+// import { MatInputModule } from '@angular/material/input';
+// import { MatAutocompleteModule } from '@angular/material/autocomplete';
+// import { FormsModule } from '@angular/forms';
+// import { CommonModule } from '@angular/common';
 
 import { DarkModeService } from 'angular-dark-mode';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -34,8 +45,8 @@ import { HeaderComponent } from '../../../core/header/header.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { MatInputModule } from '@angular/material/input';
-import { MatChipsModule } from '@angular/material/chips';
+import { MatInput, MatInputModule } from '@angular/material/input';
+import { MatChipListbox, MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
 import { ApiService } from '../../../services/api.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -48,10 +59,13 @@ import { debounce } from 'lodash';
 import { MatTooltipModule } from '@angular/material/tooltip';
 // import { DarkModeService } from 'angular-dark-mode';
 // import { MatTableModule } from '@angular/material/table';
+// import { MatChipsModule } from '@angular/material/chips';
+// import { CommonModule } from '@angular/common';
+
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 import {
-  // CaseNameHighlightPipe,
-  // DarkModeService,
   collection,
   DocumentData,
   Firestore,
@@ -76,13 +90,18 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
 import { CaseNameHighlightPipe } from '../../../case-name-highlight.pipe';
 import { ReportsComponent } from './reports/reports.component';
 import { log } from 'console';
+import { MatChipInputEvent } from '@angular/material/chips';
+// import { MatChips/Module } from '@angular/material/chips';
 
 @Component({
   selector: 'app-main-page',
   standalone: true,
   imports: [
+    MatListModule,
+    MatIconModule,
+    MatInputModule,
+    MatChipsModule,
     MatProgressSpinnerModule,
-
     ReportsComponent,
     MatIconModule,
     MatTooltipModule,
@@ -90,6 +109,7 @@ import { log } from 'console';
     MatTableModule,
     CommonModule,
     NgCircleProgressModule,
+    // MatChipListboxChange,
     NgCircleProgressModule,
     NgCircleProgressModule,
     MatProgressBarModule,
@@ -129,11 +149,14 @@ import { log } from 'console';
     // AnalyticsComponent,
   ],
   templateUrl: './main-page.component.html',
-  styleUrl: './main-page.component.scss',
+  styleUrls: ['./main-page.component.scss'],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
+  searchInputChanged: Subject<string> = new Subject<string>();
+  searchTextChanged = new Subject<string>();
+
   getRange(length: number): number[] {
     return Array(Math.ceil(length / 2))
       .fill(0)
@@ -217,21 +240,52 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   currentPage: number = 1;
   loader: boolean = false;
   winningPercentage: any = 50;
+
   constructor(
+    
     private cdr: ChangeDetectorRef,
     private firestore: Firestore,
     public darkModeService: DarkModeService
-  ) {}
+  ) {
+    this.searchInputChanged
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((searchText: string) => {
+        this.triggerSearch(searchText);
+      });
+  }
+
+  // constructor() {
+  //   this.searchInputChanged
+  //     .pipe(
+  //       debounceTime(300),
+  //       distinctUntilChanged()
+  //     )
+  //     .subscribe((searchText: string) => {
+  //       this.triggerSearch(searchText);
+  //     });
+  // }
+
 
   ngOnInit(): void {
     console.log('fetchdata', this.fetchData);
-    this.darkModeService.darkMode$.subscribe((isDarkMode) => {
-      if (isDarkMode) {
-        document.body.classList.add('dark-mode');
-      } else {
-        document.body.classList.remove('dark-mode');
-      }
-    });
+    // this.searchInputChanged
+    //   .pipe(
+    //     debounceTime(400),
+    //     distinctUntilChanged() // 400ms rukega
+    //   )
+    //   .subscribe((searchText) => {
+    //     this.triggerSearch(searchText); // actual search function call
+    //   });
+
+
+    // this.isLoadingFilters = true;
+    // this.darkModeService.darkMode$.subscribe((isDarkMode) => {
+    //   if (isDarkMode) {
+    //     document.body.classList.add('dark-mode');
+    //   } else {
+    //     document.body.classList.remove('dark-mode');
+    //   }
+    // });
     // this.isLoading = true;
     this.fetchData();
     this.fetchFilterData();
@@ -263,6 +317,28 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  triggerSearch(searchText: string): void {
+    this.payload.case_no = [];
+    this.payload.case_name = '';
+    this.payload.case_number = '';
+
+    const fullCaseNumberRegex = /^\d{1}:\d{2}-[A-Z]{2}-\d{5}$/i;
+    const last3DigitsRegex = /^\d{3}$/;
+
+    if (fullCaseNumberRegex.test(searchText)) {
+      this.payload.case_no = [searchText];
+    } else if (last3DigitsRegex.test(searchText)) {
+      this.payload.case_number = searchText;
+    } else if (!isNaN(Number(searchText))) {
+      // if user types any number not matching full pattern or 3-digit, treat as case_number fallback
+      this.payload.case_number = searchText;
+    } else {
+      this.payload.case_name = searchText;
+    }
+
+    this.fetchData(); // Your actual API call
+  }
+
   fileTypes = [
     { types: ['application/pdf'], label: 'PDF' },
     {
@@ -285,9 +361,11 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   fetchFilterData(): void {
+    this.isLoadingFilters = true;
     this.loader = true;
     this.api.getFilterData().subscribe(
       (response: any) => {
+        console.log('Filter API response:', response.case_no);
         this.litigationVenueOptions = response.litigation_venues;
         this.industryArrays = response.industry;
         this.caseStatusOptions = response.case_status;
@@ -304,12 +382,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.causeOfActionArrays = response.cause_of_action;
         this.standardEssentialPatentArrays = response.standard_patent;
         this.semiconductorPatentArrays = response.semiconductor_patent;
+        this.isLoadingFilters = false;
         this.loader = false;
         this.cdr.detectChanges(); // Force UI to update
       },
       (error) => {
         this.loader = false;
         console.error('Error fetching data', error);
+        this.isLoadingFilters = false;
       }
     );
   }
@@ -335,66 +415,34 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   noDataFound: boolean = false;
   //ye mera code hai
   fetchData(): void {
+    console.log('Fetching with payload:', this.payload);
     this.loader = true;
+    this.isLoadingFilters = true;
 
     this.api.getTableData(this.payload).subscribe(
       (response: any) => {
-        this.tabledata = response.data.map((item: any) => ({
-          ...item,
-          case_no: item.case_no || item.caseNumber || '',
-          case_name: item.case_name || item.caseName || '',
-          similar_cases: item.similar_cases || [],
-        }));
-
-        // Apply litigation venues filter only if specific venues are selected
-        if (
-          this.selectedSources.size > 0 &&
-          this.selectedSources.size < this.litigationVenueOptions.length
-        ) {
-          this.tabledata = this.tabledata.filter((item) =>
-            this.selectedSources.has(item.litigation_venues)
-          );
+        console.log('Raw API response:', response);
+        if (!response.data || !Array.isArray(response.data)) {
+          console.error('Invalid data format:', response);
+          this.tabledata = [];
+        } else {
+          this.tabledata = [...response.data];
+          this.totalCount = response.total_count || 0;
         }
-
-        if (this.payload.year) {
-          this.tabledata = this.tabledata.filter((item) => {
-            const year = dayjs(item.complaint_date).year().toString();
-            return year === this.payload.year;
-          });
-        }
-
-        // Check if any search filter was applied
-        const searchValue = (
-          this.payload.case_no ||
-          this.payload.case_name ||
-          ''
-        ).toLowerCase();
-
-        if (searchValue) {
-          this.tabledata = this.tabledata.filter(
-            (item) =>
-              item.case_no?.toLowerCase().includes(searchValue) ||
-              item.case_name?.toLowerCase().includes(searchValue)
-          );
-        }
-
-        // Set table data and status flags
-        this.totalCount = response.total_count;
-        this.dataSource.data = this.tabledata;
+        this.dataSource.data = this.tabledata; // Sync with dataSource
         this.noDataFound = this.tabledata.length === 0;
-
         this.loader = false;
+        this.isLoadingFilters = false;
         this.cdr.detectChanges();
       },
       (error) => {
-        console.error('Error fetching data', error);
-
-        // On error, reset data
+        console.error('Error fetching data:', error);
         this.tabledata = [];
         this.dataSource.data = [];
         this.noDataFound = true;
-
+        this.totalCount = 0;
         this.loader = false;
+        this.isLoadingFilters = false;
         this.cdr.detectChanges();
       }
     );
@@ -427,16 +475,54 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private debounceTimer: any;
+  searchInputText = '';
+  debounceTimer: any;
+
+  // private debounceTimer: any;
 
   onSearchInputText(searchText: string): void {
+    // this.searchInputChanged.next(searchText);
+
     clearTimeout(this.debounceTimer);
-    this.debounceTimer = setTimeout(() => {
-      this.onSearchInputTextDebounced(searchText);
-    }, 300);
+
+    // Store text
+    this.searchInputChanged.next(searchText);
+
+    // Set new debounce timer (300ms after last key press)
+    // this.debounceTimer = setTimeout(() => {
+    //   this.triggerSearch(searchText);
+    // }, 300);
+
+    // this.isFiltering = !!searchText;
+    // this.searchQuery = searchText;
+
+    // // Clear previous values
+    // this.payload.case_no = [];
+    // this.payload.case_name = '';
+    // this.payload.case_number = '';
+
+    // const fullCaseNumberRegex = /^\d{1}:\d{2}-[A-Z]{2}-\d{5}$/i; // e.g. 1:24-CV-00523
+    // const last3DigitsRegex = /^\d{3}$/;
+    // const onlyDigitsRegex = /^\d+$/;
+
+    // if (fullCaseNumberRegex.test(searchText)) {
+    //   this.payload.case_no = [searchText]; // exact match case number
+    // } else if (last3DigitsRegex.test(searchText)) {
+    //   this.payload.case_number = searchText; // last 3 digits
+    // } else if (onlyDigitsRegex.test(searchText)) {
+    //   this.payload.case_number = searchText; // purely numeric = case_number
+    // } else {
+    //   this.payload.case_name = searchText; // otherwise, case name
+    // }
+
+    // // 🧠 Debounced call only
+    // clearTimeout(this.debounceTimer);
+    // this.debounceTimer = setTimeout(() => {
+    //   this.fetchData(); // Only one API call here
+    // }, 300);
   }
 
-  private async onSearchInputTextDebounced(searchText: string): Promise<void> {
+  async onSearchInputTextDebounced(searchText: string): Promise<void> {
     this.isFiltering = !!searchText.trim();
     this.searchQuery = searchText.trim();
     this.searchInputText = this.searchQuery;
@@ -450,6 +536,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       case_no: '',
       case_date: '',
     };
+
+    // Apply backend-like logic
+    if (searchText.trim().length === 3 && /^\d+$/.test(searchText.trim())) {
+      this.payload.case_number = searchText.trim(); // 3-digit number
+    } else {
+      this.payload.case_name = searchText.trim(); // Default search
+    }
 
     // If searchText is a 3-digit number, search by case_no (last 3 digits)
     // Always search by case_name, even if it's numeric
@@ -467,6 +560,11 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const trimmedSearchText = this.searchQuery.toLowerCase();
     const isNumeric = /^\d+$/.test(trimmedSearchText);
+    if (/^\d+:[A-Z]{2}-\d{5}$/.test(trimmedSearchText) || isNumeric) {
+      this.payload.case_no = trimmedSearchText;
+    } else {
+      this.payload.case_name = trimmedSearchText;
+    }
     const isLast3DigitSearch = trimmedSearchText.length === 3 && isNumeric;
 
     if (isLast3DigitSearch) {
@@ -1017,51 +1115,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   caseStatusOptions: string[] = [];
 
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
-  //
-  //
-  //
-  //
-  //
-
   max: number = 5;
   min: number = 0;
   showTicks = false;
@@ -1090,9 +1143,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedClosedEndDate: Date | null = null;
   defendantInputValue: string = '';
   technologyKeywordInputValue!: string;
-  standardEPInputValue!: string;
 
-  searchInputText: string = '';
+  // searchInputText: string = '';
   // selectedSearchField: string = 'caseDetails.caseNumber';
   filteredSearchInputData: any[] = [];
 
@@ -1490,6 +1542,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   clearSearchTextInput() {
     try {
       this.searchInputText = ''; // Reset search input text
+      delete this.payload.case_no;
       this.payload.case_name = '';
       this.payload.case_no = '';
       this.fetchData();
@@ -1879,11 +1932,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectPlaintiff(plaintiff: string) {
     if (!this.selectedPlaintiff.has(plaintiff)) {
-      this.selectedPlaintiff.add(plaintiff); // Add to selection if not already selected
+      this.selectedPlaintiff.add(plaintiff);
       this.payload.plaintiff = Array.from(this.selectedPlaintiff);
       this.fetchData();
     }
+
+    // ✅ Clear the input once
     this.plaintiffInputValue = '';
+
     console.log(
       'Currently selected plaintiff:',
       Array.from(this.selectedPlaintiff)
@@ -1891,10 +1947,31 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyFilters();
   }
 
+  // removePlaintiff(plaintiff: string) {
+  //   this.selectedPlaintiff.delete(plaintiff);
+  //   this.payload.plaintiff = Array.from(this.selectedPlaintiff);
+  //   this.fetchData();
+  // }
+
+  @ViewChild('plaintiffInput') plaintiffInput!: ElementRef;
+
   removePlaintiff(plaintiff: string) {
     this.selectedPlaintiff.delete(plaintiff);
     this.payload.plaintiff = Array.from(this.selectedPlaintiff);
+
+    // ✅ Set removed name back into input
+    this.plaintiffInputValue = plaintiff;
+
+    // ✅ Call filter logic if needed
+    this.onSearchPlaintiffInput(plaintiff);
+
     this.fetchData();
+
+    // ✅ Focus input and select the text so user can overwrite
+    setTimeout(() => {
+      this.plaintiffInput?.nativeElement.focus();
+      this.plaintiffInput?.nativeElement.select();
+    });
   }
 
   removeDefandant(defendant: string) {
@@ -2071,9 +2148,11 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectCaseNumber(caseNo: string) {
     console.log(caseNo);
+    console.log('Before update:', { payload: this.payload });
     if (!this.selectedCaseNumbers.has(caseNo)) {
       this.selectedCaseNumbers.add(caseNo); // Add to selection if not already selected
       this.payload.case_no = Array.from(this.selectedCaseNumbers);
+      console.log('After update:', { payload: this.payload });
       this.fetchData();
     }
     this.caseNumberInputValue = '';
@@ -2379,15 +2458,12 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   // Select case number
   onCaseNumberSelected(caseNumber: string) {
-    this.caseNumberInputValue = caseNumber;
-    this.payload.case_no = caseNumber;
-    this.fetchData();
-    // Filter the table data to show only the selected case number
-    this.dataSource.data = this.excelData.filter(
-      (item) => item.data.caseDetails?.caseNumber === caseNumber
-    );
-
-    console.log(`Selected Case Number: ${caseNumber}`);
+    if (!this.selectedCaseNumbers.has(caseNumber)) {
+      this.selectedCaseNumbers.add(caseNumber);
+      this.payload.case_no = Array.from(this.selectedCaseNumbers);
+      this.fetchData();
+    }
+    this.caseNumberInputValue = '';
   }
 
   // Clear the search box for case number
@@ -2642,6 +2718,31 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredSemiconductorPatents = Array.from(
       new Set(this.filteredSemiconductorPatents)
     );
+  }
+
+  applySearch(searchText: string): void {
+    this.isFiltering = !!searchText;
+    this.searchQuery = searchText;
+
+    this.payload.case_no = [];
+    this.payload.case_name = '';
+    this.payload.case_number = '';
+
+    const fullCaseRegex = /^\d{1}:\d{2}-[A-Z]{2}-\d{5}$/i;
+    const onlyThreeDigits = /^\d{3}$/;
+    const onlyDigits = /^\d+$/;
+
+    if (fullCaseRegex.test(searchText)) {
+      this.payload.case_no = [searchText];
+    } else if (onlyThreeDigits.test(searchText)) {
+      this.payload.case_number = searchText;
+    } else if (onlyDigits.test(searchText)) {
+      this.payload.case_number = searchText; // 1 digit, 2 digit bhi yahi jayega
+    } else {
+      this.payload.case_name = searchText;
+    }
+
+    this.fetchData(); // ab ek hi baar call hoga
   }
 
   // Select semiconductor patent
