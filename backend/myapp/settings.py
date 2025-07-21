@@ -136,17 +136,31 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 
 
 # Database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME', 'LitigationDb'),
+#         'USER': os.getenv('DB_USER', 'Sarita'),
+#         'PASSWORD': os.getenv('DB_PASSWORD', 'Bayslope_23'),
+#         'HOST': os.getenv('DB_HOST', 'restored-db-april29-newlitigation-july-25.cd842y2iqcq8.us-east-2.rds.amazonaws.com'),
+#         'PORT': os.getenv('DB_PORT', '5432'),
+#         'CONN_MAX_AGE': 0,  # Close connections after each request to prevent exhaustion
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'LitigationDb'),
-        'USER': os.getenv('DB_USER', 'Sarita'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'Bayslope_23'),
-        'HOST': os.getenv('DB_HOST', 'restored-db-april29-newlitigation-july-25.cd842y2iqcq8.us-east-2.rds.amazonaws.com'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-        'CONN_MAX_AGE': 0,  # Close connections after each request to prevent exhaustion
+        'NAME': 'litigation_db',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        'CONN_MAX_AGE': 0,
     }
 }
+
+
 
 # REST Framework and JWT settings
 REST_FRAMEWORK = {
