@@ -164,7 +164,10 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get("DATABASE_URL"))
+    'default': dj_database_url.parse(
+        "postgresql://xli360_db_user:kZFDzQxViQIWZAIOhBapMwoPMSIFuXHw@dpg-d1v4c3juibrs73923ilg-a/xli360_db",
+        conn_max_age=600
+    )
 }
 
 # REST Framework and JWT settings
