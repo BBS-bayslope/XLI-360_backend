@@ -56,7 +56,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.1.0",
-    "@angular/cli": "^18.1.0",
+    "@angular/cli": "^18.2.20",
     "@angular/compiler-cli": "^18.1.0",
     "@babel/plugin-proposal-export-default-from": "^7.25.9",
     "@types/canvasjs": "^1.9.11",
