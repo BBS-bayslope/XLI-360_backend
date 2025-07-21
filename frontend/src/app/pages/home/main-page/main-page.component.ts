@@ -23,7 +23,7 @@ import { MatChipsModule } from '@angular/material/chips';
 // import { CommonModule } from '@angular/common';
 // import {  ViewChild } from '@angular/core';
 import { MatAutocomplete,MatOption } from '@angular/material/autocomplete';
-import { DarkModeService } from 'angular-dark-mode';
+// import { DarkModeService } from 'angular-dark-mode';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -250,8 +250,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private cdr: ChangeDetectorRef,
-    private firestore: Firestore,
-    public darkModeService: DarkModeService
+    private firestore: Firestore
   ) {
     this.searchInputChanged
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -399,11 +398,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   toggleDarkMode() {
     console.log('Toggling dark mode...');
-    this.darkModeService.toggle();
-    // Manual workaround
-    this.darkModeService.darkMode$.subscribe((isDarkMode) => {
-      document.body.classList.toggle('dark-mode', isDarkMode);
-    });
+    
   }
   selectYear(year: string): void {
     this.selectedYear = year;
