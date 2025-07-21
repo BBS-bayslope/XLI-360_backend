@@ -139,3 +139,10 @@ app-root {
   white-space: nowrap;
   max-width: 100%;
 }
+
+.mat-mdc-standard-chip .mat-mdc-chip-action-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+

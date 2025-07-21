@@ -9,18 +9,20 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
+import { MatExpansionPanel } from '@angular/material/expansion'; // Import MatExpansionPanel
 import dayjs from 'dayjs';
 // import { Subject } from 'rxjs';
 import {  distinctUntilChanged } from 'rxjs/operators';
 
-// import { MatChipsModule } from '@angular/material/chips';
+import { MatChipsModule } from '@angular/material/chips';
 // import { MatIconModule } from '@angular/material/icon';
 // import { MatFormFieldModule } from '@angular/material/form-field';
 // import { MatInputModule } from '@angular/material/input';
 // import { MatAutocompleteModule } from '@angular/material/autocomplete';
 // import { FormsModule } from '@angular/forms';
 // import { CommonModule } from '@angular/common';
-
+// import {  ViewChild } from '@angular/core';
+import { MatAutocomplete,MatOption } from '@angular/material/autocomplete';
 import { DarkModeService } from 'angular-dark-mode';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -46,7 +48,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatInput, MatInputModule } from '@angular/material/input';
-import { MatChipListbox, MatChipListboxChange, MatChipsModule } from '@angular/material/chips';
+import { MatChipListbox, MatChipListboxChange } from '@angular/material/chips';
 import { ApiService } from '../../../services/api.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -144,6 +146,8 @@ import { MatChipInputEvent } from '@angular/material/chips';
     MatCardModule,
     MatProgressSpinnerModule,
     AnalyticsComponent,
+    MatChipsModule,
+    MatIconModule
     // dayjs,
 
     // AnalyticsComponent,
@@ -161,6 +165,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     return Array(Math.ceil(length / 2))
       .fill(0)
       .map((_, i) => i);
+  }
+  get selectedCauseOfActionArray(): string[] {
+    return Array.from(this.selectedCauseOfAction || []);
   }
 
   splitCaseName(name: string): { before: string; v: string; after: string } {
@@ -242,7 +249,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   winningPercentage: any = 50;
 
   constructor(
-    
     private cdr: ChangeDetectorRef,
     private firestore: Firestore,
     public darkModeService: DarkModeService
@@ -265,7 +271,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   //     });
   // }
 
-
   ngOnInit(): void {
     console.log('fetchdata', this.fetchData);
     // this.searchInputChanged
@@ -276,7 +281,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     //   .subscribe((searchText) => {
     //     this.triggerSearch(searchText); // actual search function call
     //   });
-
 
     // this.isLoadingFilters = true;
     // this.darkModeService.darkMode$.subscribe((isDarkMode) => {
@@ -1974,10 +1978,21 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  clearSearch() {
+    this.searchInputText = '';
+    this.onSearchInputText('');
+
+  }
+  
+  @ViewChild('autoSearchDefendant') defandantAutoComplete: MatAutocomplete | null = null;
   removeDefandant(defendant: string) {
     this.selectedDefendant.delete(defendant);
     this.payload.defendants = Array.from(this.selectedDefendant);
+    this.defendantInputValue = ''; // Clear the input value
+  this.filteredDefendants = [];
     this.fetchData();
+    
+    this.cdr.detectChanges();
   }
 
   selectDefendant(defendant: string) {
@@ -2133,9 +2148,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   removeCaseNo(no: string) {
-    this.selectedCaseNumbers.delete(no); // Add to selection if not already selected
-    this.payload.case_no = Array.from(this.selectedCaseNumbers);
-    this.fetchData();
+    this.selectedCaseNumbers.delete(no); // Remove from selected set
+    this.payload.case_no = Array.from(this.selectedCaseNumbers); // Update payload
+    this.caseNumberInputValue = ''; // Clear the input value
+    this.filteredCaseNumbers = []; // Clear the filtered suggestions
+    this.fetchData(); // Refresh the data
+    if (this.caseNumberAutoComplete) {
+      this.caseNumberAutoComplete.options.forEach((option: MatOption) => option.deselect()); // Deselect any selected options
+    }
+    this.cdr.detectChanges(); // Ensure UI updates
   }
 
   // function for  selectedCaseNumber
@@ -2179,6 +2200,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   removeIndustry(industry: string) {
     this.selectedIndustry.delete(industry); // Remove selected industry
+    this.payload.industry = Array.from(this.selectedIndustry);
+
+    this.fetchData();
+    this.industryInputValue = ''; // Clear the input value (optional)
+  this.filteredIndustry = [...this.industryArrays];
+    this.cdr.detectChanges();
+
   }
 
   onCheckboxIndustryChange(isChecked: boolean, industry: string) {
@@ -2445,16 +2473,20 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
+  @ViewChild('autoSearchCaseNumber') caseNumberAutoComplete: MatAutocomplete | null = null;
   // Logic for case number search
   onSearchCaseNumberInput(caseNumberText: string) {
-    const lowerCaseTerm = caseNumberText.toLowerCase();
-    this.filteredCaseNumbers = [];
-    this.filteredCaseNumbers = this.caseNumbers.filter((item) =>
-      item.toLowerCase().includes(lowerCaseTerm)
-    );
-    // Remove duplicates
-    this.filteredCaseNumbers = Array.from(new Set(this.filteredCaseNumbers));
+    if (!caseNumberText) {
+      this.filteredCaseNumbers = [];
+    } else {
+      const lowerCaseTerm = caseNumberText.toLowerCase();
+      this.filteredCaseNumbers = this.caseNumbers.filter((item) =>
+        item.toLowerCase().includes(lowerCaseTerm)
+      );
+      // Remove duplicates
+      this.filteredCaseNumbers = Array.from(new Set(this.filteredCaseNumbers));
+    }
+    this.cdr.detectChanges();
   }
   // Select case number
   onCaseNumberSelected(caseNumber: string) {
@@ -2510,6 +2542,13 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredPlaintiff = [];
     this.selectedPlaintiff.clear();
     this.applyFilters();
+    // this.plaintiffInputValue = ''; // Clear input value
+  // this.selectedPlaintiff.clear(); // Clear all selected plaintiffs
+  // this.payload.plaintiff = []; // Clear payload
+  // this.filteredPlaintiff = []; // Reset filtered options
+  // this.fetchData(); // Refresh data based on updated payload
+  // this.applyFilters(); // Reapply filters to ensure UI reflects changes
+  this.cdr.detectChanges(); // Force UI update
   }
 
   // Logic for searching Defendants
@@ -2541,15 +2580,25 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     //   `Selected Defendant: ${defendant.defendant}, Case Number: ${defendant.caseNumber}`
     // );
   }
-
+  @ViewChild('autoSearchDefendant') autoComplete: MatAutocomplete | null = null;
   // Clear the search box for defendant
+
   clearDefendantSearch() {
-    this.payload.defendants = '';
-    this.fetchData();
     this.defendantInputValue = '';
-    this.filteredDefendants = [];
     this.selectedDefendant.clear();
-    this.applyFilters();
+    this.payload.defendants = [];
+    this.filteredDefendants = [];
+    const tempAutoComplete = this.autoComplete;
+    this.autoComplete = null; // Temporarily clear the reference
+    setTimeout(() => {
+      this.autoComplete = tempAutoComplete; // Restore the reference
+      if (this.autoComplete) {
+        this.autoComplete.options.forEach(option => option.deselect());
+      }
+      this.fetchData();
+      this.applyFilters();
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   // Select technology keyword
@@ -2596,13 +2645,16 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // );
     // this.dataSource.data = selectedData; // Update the data source or handle it as required
   }
-
+  @ViewChild('courtnamePanel') courtnamePanel: MatExpansionPanel | null = null;
   // Clear the search box for court names
   clearCourtNamesSearch() {
     this.courtNameInputValue = ''; // Reset the input value
+    this.selectedCourtName.clear();
     this.filteredCourtName = []; // Clear the suggestions
-    delete this.payload.court_name;
+    this.payload.court_name=[];
     this.fetchData();
+    
+    this.cdr.detectChanges();
   }
 
   // Logic for searching Patent Number
@@ -2624,21 +2676,51 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   //   this.fetchData()
 
   // }
+
+  onPatentNoChange(isChecked: boolean, patentNo: string) {
+    if (isChecked) {
+      this.selectedpatentNo.add(patentNo);
+    } else {
+      this.selectedpatentNo.delete(patentNo);
+    }
+    this.payload.patent_no = Array.from(this.selectedpatentNo);
+    this.fetchData();
+    this.cdr.detectChanges();
+  }
+
   removePatentNo(patentNo: string) {
     this.selectedpatentNo.delete(patentNo);
     this.payload.patent_no = Array.from(this.selectedpatentNo);
+    this.patentNoInputValue = ''; // Clear input after chip removal
+    this.filteredPatentNos = []; // Clear suggestions
     this.fetchData();
+    if (this.patentNoAutoComplete) {
+      this.patentNoAutoComplete.options.forEach(option => option.deselect());
+    }
+    this.cdr.detectChanges();
   }
+  @ViewChild('autoSearchPatentNo') patentNoAutoComplete: MatAutocomplete | null = null;
 
   // Clear the search box for patent numbers
   clearPatentNoSearch() {
+    
     this.patentNoInputValue = ''; // Reset the input value
     // this.payload.patent_no = '';
     // this.fetchData();
     this.filteredPatentNos = []; // Clear the suggestions
+    this.searchInputText = '';
 
     // Optionally reset the data source to show all data again
-    this.dataSource.data = this.excelData; // Show all data if that's the desired behavior
+    this.dataSource.data = [...this.excelData]; // Show all data if that's the desired behavior
+    // this.patentNoInputValue = ''; // Reset the input value
+  this.selectedpatentNo.clear(); // Clear all selected patent numbers
+  this.payload.patent_no = Array.from(this.selectedpatentNo); // Update payload to empty array
+  this.fetchData(); // Refresh the data with the cleared filter
+  if (this.patentNoAutoComplete) {
+    this.patentNoAutoComplete.options.forEach(option => option.deselect());
+  }
+  this.filteredPatentNos = []; // Clear the suggestions
+  this.cdr.detectChanges(); // Ensure UI updates
   }
 
   // Logic for searching Cause of Action
@@ -2664,9 +2746,11 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   // Clear the search box for cause of action
   clearCauseOfActionSearch() {
     this.causeOfActionInputValue = ''; // Reset the input value
+    this.selectedCauseOfAction.clear();
     this.filteredCauseOfActions = []; // Clear the suggestions
     this.payload.causeOfaction = '';
     this.fetchData();
+    this.cdr.detectChanges();
     // Optionally reset the data source to show all data again
   }
 

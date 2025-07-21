@@ -2685,7 +2685,9 @@ html {
   padding: 4px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  // overflow: hidden;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
 }
 
 
@@ -2723,19 +2725,228 @@ mdc-data-table__row:last-child .mat-mdc-cell {
   border-bottom: 1px solid black;
 }
 
-
 .chip-wrapper {
+  margin-top: 10px;
+  border: none;
+  padding: 0;
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  gap: 4px;
-  padding-top: 8px;
-  margin-bottom: 6px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
+
 mat-chip {
-  max-width: 200px;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  margin: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  background-color: #e0e0e0;
+}
+
+.chip-text {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  padding-right: 6px;
+}
+
+
+
+
+::ng-deep .mat-mdc-standard-chip {
+  display: flex;
+  align-items: center;
+  max-width: 240px;  /* Set a max width */
+  overflow: hidden;
+  padding-right: 32px; /* Space for X button */
+  border-radius: 20px;
+  background-color: #e0e0e0;
+}
+
+::ng-deep .mat-mdc-chip-action-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+::ng-deep .mat-chip-remove {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+
+/* Target the Cause of Action panel and its chip wrapper */
+#causeofactionPanel .panel-wrapper .chip-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 80px;
+  overflow-y: auto;
+  margin-top: 6px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden !important;
+}
+
+/* Forcefully style the chips in Cause of Action */
+#causeofactionPanel .panel-wrapper .chip-wrapper ::ng-deep .mat-mdc-standard-chip {
+  display: flex;
+  align-items: center;
+  max-width: 200px !important; /* Enforce max width */
+  overflow: hidden !important; /* Force hidden overflow */
+  text-overflow: ellipsis !important; /* Ensure ellipsis */
+  white-space: nowrap !important; /* Prevent wrapping */
+  padding: 4px 24px 4px 8px !important; /* Space for remove icon */
+  background-color: #e0e0e0;
+  font-family: 'Tenorite', sans-serif !important;
+  font-size: 12px !important;
+}
+
+/* Target the chip label text */
+#causeofactionPanel .panel-wrapper .chip-wrapper ::ng-deep .mat-mdc-standard-chip .mat-mdc-chip-action-label {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  max-width: 100% !important;
+  font-family: 'Tenorite', sans-serif !important;
+}
+
+/* Position the remove icon */
+#causeofactionPanel .panel-wrapper .chip-wrapper ::ng-deep .mat-mdc-standard-chip mat-icon[matChipRemove] {
+  position: absolute !important;
+  right: 4px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: white !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  overflow: hidden !important;
+}
+
+
+
+
+
+
+
+
+::ng-deep .mat-mdc-standard-chip .mat-mdc-chip-action-label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+
+.input-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px; // Limit width for better control
+  margin-left:26%;
+}
+
+.responsive-search-input {
+  width: 100%;
+  padding: 8px 35px 8px 10px; // Increased right padding for button
+  height: 45px;
+  font-size: 14px;
+  border: 1px solid black;
+  border-radius: 4px;
+  box-sizing: border-box;
+  outline: none;
+  font-family: 'Tenorite', sans-serif; // Match your theme
+}
+
+.clear-btn2 {
+  position: absolute;
+  right: 10px; // Position inside input
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  z-index: 2; // Ensure it stays above input
+}
+
+/* Ensure input container is the positioning context */
+.quick-search-wrapper {
+  position: relative;
+  margin-top: 17vh; // Keep your existing margin
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .responsive-search-input {
+    max-width: 350px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-search-input {
+    max-width: 389px;
+  }
+}
+
+@media (max-width: 600px) {
+  .responsive-search-input {
+    width: 100%;
+    max-width: 100%;
+  }
+  .input-container {
+    max-width: 100%;
+  }
+}
+
+
+
+
+mat-form-field {
+  width: 100%; // Ensure the form field takes full width
+  .mat-chip-list-wrapper {
+    overflow: hidden; // Prevent chips from overflowing
+    max-width: 100%; // Limit the chip list width
+  }
+  input {
+    width: 100%; // Ensure input takes full available width
+    overflow: hidden; // Prevent text from spilling out
+    text-overflow: ellipsis; // Show ellipsis if text overflows
+    white-space: nowrap; // Prevent text from wrapping
+    box-sizing: border-box; // Include padding and border in width calculation
+    padding-right: 30px; // Add space for the clear button
+  }
+  .mat-form-field-suffix {
+    position: absolute; // Position the clear button absolutely
+    right: 0; // Align to the right
+    top: 50%; // Center vertically
+    transform: translateY(-50%); // Adjust for centering
+    display: flex; // Ensure proper alignment
+    align-items: center; // Center items vertically
+    padding: 0 8px; // Add padding for better spacing
+  }
+  .mat-form-field-infix {
+    width: 100%; // Ensure the infix (input container) takes full width
+    display: flex; // Use flex to manage layout
+    align-items: center; // Align items vertically
+  }
 }

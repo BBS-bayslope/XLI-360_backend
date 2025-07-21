@@ -1,17 +1,31 @@
-<!-- 🔄 Combine into single row wrapper -->
 <div class="filter-toolbar d-flex justify-content-between align-items-center flex-wrap">
-  
   <!-- Left: Search input -->
   <div class="quick-search-wrapper">
-    <input
-      type="text"
-      [(ngModel)]="searchInputText"
-      (input)="onSearchInputText(searchInputText)"
-      placeholder=" Search"
-      class="responsive-search-input"
-      style="height: 45px;"
-    />
+    <div class="input-container">
+      <input
+        type="text"
+        [(ngModel)]="searchInputText"
+        (input)="onSearchInputText(searchInputText)"
+        placeholder="Search"
+        class="responsive-search-input"
+      />
+      <button
+        *ngIf="searchInputText"
+        class="clear-btn2"
+        (click)="clearSearch()"
+        aria-label="Clear"
+      >
+        ×
+      </button>
+    </div>
   </div>
+  <!-- Right: Placeholder for additional elements -->
+  <!-- <div class="additional-filters"></div> -->
+<!-- </div> -->
+  <!-- Right: Placeholder for additional elements -->
+  <!-- <div class="additional-filters"></div> -->
+<!-- </div> -->
+  
 
   <!-- Right: Year buttons -->
   <div class="year-filters d-flex flex-wrap gap-2">
@@ -103,13 +117,16 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': casenumberPanel.expanded }"  style="font-size: 14px; font-weight: bolder;"> Case Number </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let no of selectedCaseNumbers" (removed)="removeCaseNo(no)">
             {{ no }}
-            <mat-icon matChipRemove>cancel</mat-icon>
+            <mat-icon matChipRemove >cancel</mat-icon>
           </mat-chip>
           <input matInput [(ngModel)]="caseNumberInputValue"
             [matAutocomplete]="autoSearchCaseNumber" [disabled]="isLoadingFilters"  (input)="onSearchCaseNumberInput(caseNumberInputValue)" />
+            <button *ngIf="caseNumberInputValue" matSuffix mat-icon-button aria-label="Clear" (click)="clearSearchCaseNumber()">
+              <mat-icon>close</mat-icon>
+            </button>
           <mat-autocomplete #autoSearchCaseNumber="matAutocomplete"
             (optionSelected)="selectCaseNumber($event.option.value)">
             <mat-option *ngFor="let caseNumber of filteredCaseNumbers" [value]="caseNumber">
@@ -199,9 +216,10 @@
     matSuffix
     mat-icon-button
     aria-label="Clear"
-    (click)="plaintiffInputValue = ''"
+    (click)="clearPlaintiffSearch()"
+    style="overflow:hidden; z-index:1000 !important"
     >
-    <mat-icon>close</mat-icon>
+    <mat-icon style="overflow:hidden; z-index:1000 !important">close</mat-icon>
   </button>
         
           <mat-autocomplete #autoSearchPlaintiff="matAutocomplete"
@@ -220,7 +238,7 @@
           <mat-chip *ngFor="let plaintiff of selectedPlaintiff" [removable]="true"
             (removed)="removePlaintiff(plaintiff)">
             {{ plaintiff }}
-            <mat-icon matChipRemove>cancel</mat-icon>
+            <mat-icon matChipRemove style="z-index:1000 !important; text-overflow: hidden; overflow: hidden;">cancel</mat-icon>
           </mat-chip>
         </div>
         
@@ -261,7 +279,7 @@
         matSuffix
         mat-icon-button
         aria-label="Clear"
-        (click)="defendantInputValue = ''"
+        (click)="clearDefendantSearch()"
       >
         <mat-icon>close</mat-icon>
       </button>
@@ -294,7 +312,7 @@
         [matTooltip]="defendant"
       >
         {{ defendant }}
-        <mat-icon matChipRemove>cancel</mat-icon>
+        <mat-icon matChipRemove style="z-index:1000 !important; text-overflow: ellipsis; overflow: hidden;white-space: nowrap;">cancel</mat-icon>
       </mat-chip>
     </div>
   </mat-expansion-panel>
@@ -308,7 +326,7 @@
           <mat-panel-title class="carde" [ngClass]="{ 'active-title': industryPanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Industry </mat-panel-title>
         </mat-expansion-panel-header>
         <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label>Search</mat-label>
+          <mat-label></mat-label>
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeIndustry(industry)">
             {{ industry }}
             <mat-icon matChipRemove>cancel</mat-icon>
@@ -346,6 +364,8 @@
       <mat-label>Search</mat-label>
 
       <input
+      style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;"
         type="text"
         matInput
         [(ngModel)]="techCategoryInputValue"
@@ -355,6 +375,7 @@
 
       <!-- ✅ Clear button -->
       <button
+      style="z-index:1000 !important;"
         *ngIf="techCategoryInputValue"
         matSuffix
         mat-icon-button
@@ -372,9 +393,12 @@
         [removable]="true"
         (removed)="removeCategory(category)"
         [matTooltip]="category"
+        style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;"
       >
         {{ category }}
-        <mat-icon matChipRemove>cancel</mat-icon>
+        <mat-icon matChipRemove style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;z-index:1000 !important;">cancel</mat-icon>
       </mat-chip>
     </div>
 
@@ -442,7 +466,7 @@
         [matTooltip]="keyword"
       >
         {{ keyword }}
-        <mat-icon matChipRemove>cancel</mat-icon>
+        <mat-icon matChipRemove style="z-index:1000 !important; text-overflow: ellipsis; overflow: hidden;">cancel</mat-icon>
       </mat-chip>
     </div>
 
@@ -490,17 +514,20 @@
         (focus)="onSearchCourtNamesInput(courtNameInputValue)"
         (input)="onSearchCourtNamesInput(courtNameInputValue)"
         placeholder="Type court name"
+        style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;z-index:1000 !important;"
       />
 
       <!-- Optional Clear Button -->
       <button
-        *ngIf="courtNameInputValue"
+        
         matSuffix
         mat-icon-button
         aria-label="Clear"
-        (click)="courtNameInputValue = ''"
+        (click)="clearCourtNamesSearch()"
+        style="text-overflow: ellipsis; overflow: hidden;"
       >
-        <mat-icon>close</mat-icon>
+        <mat-icon style="z-index:1000 !important; text-overflow: ellipsis; overflow: hidden;">close</mat-icon>
       </button>
     </mat-form-field>
 
@@ -509,11 +536,13 @@
       <mat-chip
         *ngFor="let court of selectedCourtName"
         [removable]="true"
-        (removed)="removeKeyword(court)"
+        (click)="clearCourtNamesSearch()"
         [matTooltip]="court"
+        style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;z-index:1000 !important;"
       >
         {{ court }}
-        <mat-icon matChipRemove>cancel</mat-icon>
+        <mat-icon (click)="clearCourtNamesSearch()"  matChipRemove style="z-index:1000 !important; text-overflow:ellipsis; overflow: hidden; white-space:nowrap">cancel</mat-icon>
       </mat-chip>
     </div>
 
@@ -589,6 +618,7 @@
         [matAutocomplete]="autoSearchPatentNo"
         (input)="onSearchPatentNoInput(patentNoInputValue)"
         placeholder="e.g. 1104721, etc."
+        style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis"
       />
 
       <!-- Optional clear button -->
@@ -597,7 +627,7 @@
         matSuffix
         mat-icon-button
         aria-label="Clear"
-        (click)="patentNoInputValue = ''"
+        (click)="clearPatentNoSearch()"
       >
         <mat-icon>close</mat-icon>
       </button>
@@ -634,7 +664,7 @@
       </mat-chip>
     </div>
   </mat-expansion-panel>
-</div>
+</div>     
 
 
       <!-- Cause of Action -->
@@ -651,58 +681,52 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <mat-form-field appearance="outline" style="width: 100%">
+    <mat-form-field appearance="outline" style="width: 100% ;">
       <mat-label>Search</mat-label>
-
-      <!-- Just input here -->
       <input
         matInput
         [(ngModel)]="causeOfActionInputValue"
         [matAutocomplete]="autoSearchCauseOfAction"
         (input)="onSearchCauseOfActionInput(causeOfActionInputValue)"
+        style="overflow:hidden"
       />
-
-      <!-- Optional clear button -->
       <button
         *ngIf="causeOfActionInputValue"
         matSuffix
-        mat-icon-button
+        mat-icon-button          
         aria-label="Clear"
-        (click)="causeOfActionInputValue = ''"
+        (click)="clearCauseOfActionSearch()"
+        
       >
         <mat-icon>close</mat-icon>
       </button>
-
-      <mat-autocomplete
+      <mat-autocomplete style="overflow:hidden"
         #autoSearchCauseOfAction="matAutocomplete"
         (optionSelected)="selectCauseOfAction($event.option.value)"
       >
-        <mat-option
-          *ngFor="let causeOfAction of filteredCauseOfActions"
-          [value]="causeOfAction"
-        >
+        <mat-option *ngFor="let causeOfAction of filteredCauseOfActions" [value]="causeOfAction">
           {{ causeOfAction }}
         </mat-option>
-        <mat-option
-          *ngIf="filteredCauseOfActions.length === 0 && causeOfActionInputValue"
-          disabled
-        >
+        <mat-option *ngIf="filteredCauseOfActions.length === 0 && causeOfActionInputValue" disabled>
           No results found
         </mat-option>
       </mat-autocomplete>
     </mat-form-field>
 
-    <!-- ✅ Chips outside input -->
+    <!-- ✅ Chips with mat-chip-list for better overflow control -->
     <div class="chip-wrapper">
-      <mat-chip
-        *ngFor="let action of selectedCauseOfAction"
-        [removable]="true"
-        (removed)="removeactions(action)"
-        [matTooltip]="action"
-      >
-        {{ action }}
-        <mat-icon matChipRemove>cancel</mat-icon>
-      </mat-chip>
+      <!-- <mat-chip-list> -->
+        <mat-chip
+          *ngFor="let action of selectedCauseOfAction"
+          [removable]="true"
+          (removed)="removeactions(action)"
+          [matTooltip]="action"
+          style="overflow:hidden"
+        >
+          {{ action }}
+          <mat-icon matChipRemove style="z-index:1000 !important; text-overflow: ellipsis; overflow: hidden;">cancel</mat-icon>
+        </mat-chip>
+      <!-- </mat-chip-list> -->
     </div>
   </mat-expansion-panel>
 </div>
@@ -804,7 +828,7 @@
           </mat-chip>
 
           <!-- Case Number Chip -->
-          <mat-chip *ngFor="let caseNumber of selectedCaseNumbers" (removed)="removeFilter('caseNumber', caseNumber)">
+          <mat-chip style="overflow:hidden;text-overflow:ellipsis;white-space: nowrap;" *ngFor="let caseNumber of selectedCaseNumbers" (removed)="removeFilter('caseNumber', caseNumber)">
             Case Number: {{ caseNumber }}
             <button matChipRemove [attr.aria-label]="'remove caseNumber'">
               <mat-icon>cancel</mat-icon>
@@ -815,17 +839,17 @@
           <mat-chip *ngFor="let plaintiffOrPetitioner of selectedPlaintiff" (removed)="removeFilter('plaintiffOrPetitioner', plaintiffOrPetitioner)">
             Plaintiff: {{ plaintiffOrPetitioner }}
             <button matChipRemove [attr.aria-label]="'remove plaintiffOrPetitioner'">
-              <mat-icon>cancel</mat-icon>
+              <mat-icon style="z-index:1000 !important; text-overflow: ellipsis; overflow: hidden;">cancel</mat-icon>
             </button>
           </mat-chip>
 
           <!-- Case Defendant Chip -->
-          <!-- <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeFilter('defendant', defendant)">
+          <mat-chip *ngFor="let defendant of selectedDefendant" (removed)="removeFilter('defendant', defendant)">
             Defendant: {{ defendant }}
             <button matChipRemove [attr.aria-label]="'remove defendant'">
               <mat-icon>cancel</mat-icon>
             </button>
-          </mat-chip> -->
+          </mat-chip>
 
           <!-- Case Industry Chip -->
           <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeFilter('industry', industry)">
@@ -836,26 +860,29 @@
           </mat-chip>
 
           <!-- Tech Category Chip -->
-          <!-- <mat-chip *ngFor="let techCategory of selectedTechCategory" (removed)="removeFilter('techCategory', techCategory)">
+          <mat-chip style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;" *ngFor="let techCategory of selectedTechCategory" (removed)="removeFilter('techCategory', techCategory)">
             Tech Category: {{ techCategory }}
-            <button matChipRemove [attr.aria-label]="'remove techCategory'">
-              <mat-icon>cancel</mat-icon>
+            <button style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;" matChipRemove [attr.aria-label]="'remove techCategory'" >
+              <mat-icon style="overflow:hidden;text-overflow: ellipsis;
+  white-space: nowrap;">cancel</mat-icon>
             </button>
-          </mat-chip> -->
+          </mat-chip>
 
-          <!-- Technology Keywords Chip -->
-          <!-- <mat-chip *ngFor="let technologyKeywords of selectedTechnologyKeywords" (removed)="removeFilter('technologyKeywords', technologyKeywords)">
+          <!-- Technology Keywords Chip  tableupper-->
+          <mat-chip *ngFor="let technologyKeywords of selectedTechnologyKeywords" (removed)="removeFilter('technologyKeywords', technologyKeywords)">
             Technology Keywords: {{ technologyKeywords }}
             <button matChipRemove [attr.aria-label]="'remove technologyKeywords'">
               <mat-icon>cancel</mat-icon>
             </button>
-          </mat-chip> -->
+          </mat-chip>
 
           <!-- Court Names Chip -->
           <mat-chip *ngFor="let courtNames of selectedCourtName" (removed)="removeFilter('courtNames', courtNames)">
             CourtNames: {{ courtNames }}
-            <button matChipRemove [attr.aria-label]="'remove courtNames'">
-              <mat-icon>cancel</mat-icon>
+            <button style="z-index:1000 !important" matChipRemove [attr.aria-label]="'remove courtNames'">
+              <mat-icon style="z-index:1000 !important">cancel</mat-icon>
             </button>
           </mat-chip>
 
@@ -884,12 +911,36 @@
           </mat-chip>
 
           <!-- Cause of Action Chip -->
-          <mat-chip *ngFor="let causeOfAction of selectedCauseOfAction" (removed)="removeFilter('causeOfAction', causeOfAction)">
+          <!-- <mat-chip *ngFor="let causeOfAction of selectedCauseOfAction" (removed)="removeFilter('causeOfAction', causeOfAction)">
             Cause Of Action: {{ causeOfAction }}
             <button matChipRemove [attr.aria-label]="'remove causeOfAction'">
               <mat-icon>cancel</mat-icon>
             </button>
-          </mat-chip>
+          </mat-chip> -->
+
+
+            <!-- Only show if there's at least one selected item -->
+<!-- ✅ Only show chip box if there are selected items -->
+
+
+
+<div class="chip-wrapper" *ngIf="selectedCauseOfActionArray.length > 0">
+  <mat-chip
+    *ngFor="let action of selectedCauseOfActionArray"
+    [removable]="true"
+    (removed)="removeactions(action)"
+    [matTooltip]="action"
+  >
+    <span class="chip-text">{{ action }}</span>
+    <mat-icon matChipRemove>cancel</mat-icon>
+  </mat-chip>
+</div>
+
+
+
+
+        
+
 
           <!-- Standard Essential Patent Chip -->
           <mat-chip *ngFor="let standardEssentialPatent of selectedStandardEssentialPatent" (removed)="removeFilter('standardEssentialPatent', standardEssentialPatent)">
@@ -906,7 +957,7 @@
               <mat-icon>cancel</mat-icon>
             </button>
           </mat-chip>
-        </p>
+        <!-- </p> -->
       </div>
     </div>
 
