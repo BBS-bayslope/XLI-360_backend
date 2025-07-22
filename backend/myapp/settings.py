@@ -165,7 +165,7 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.parse(
-        "postgresql://xli360_db_user:kZFDzQxViQIWZAIOhBapMwoPMSIFuXHw@dpg-d1v4c3juibrs73923ilg-a/xli360_db",
+        "postgresql://litigation_db:bWPZ9UGKDcnPLBXjR20WfJZDwIuweL8G@dpg-d1vn2jbuibrs739if36g-a/litigation_db",
         conn_max_age=600
     )
 }
