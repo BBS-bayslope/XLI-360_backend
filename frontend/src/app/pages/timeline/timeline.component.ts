@@ -296,7 +296,7 @@ export class TimelineComponent implements OnChanges {
     d3.select(this.timelineContainer.nativeElement).selectAll('*').remove();
 
     const margin = { top: 10, right: 30, bottom: 30, left: 30 };
-    const minSpacing = 100;
+    const minSpacing = 150;
 
     const grouped = d3.groups(this.data, (d) => d3.timeFormat('%Y-%m')(d.date));
     const containerWidth = this.timelineContainer.nativeElement.offsetWidth;
@@ -325,7 +325,7 @@ export class TimelineComponent implements OnChanges {
       .range([0, width]);
 
     const xAxis = d3.axisBottom(xScale)
-      .ticks(d3.timeYear.every(2)) // every 2 years
+      .ticks(d3.timeYear.every(1)) // every 2 years
       .tickFormat((d: Date | d3.NumberValue) =>
         d instanceof Date ? d3.timeFormat('%Y')(d) : ''
       );

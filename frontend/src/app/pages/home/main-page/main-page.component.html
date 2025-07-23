@@ -318,33 +318,56 @@
   </mat-expansion-panel>
 </div>
 
-
-      <!-- Industry -->
-      <div class="panel-wrapper">
-      <mat-expansion-panel #industryPanel="matExpansionPanel">
-        <mat-expansion-panel-header>
-          <mat-panel-title class="carde" [ngClass]="{ 'active-title': industryPanel.expanded }" style="font-size: 14px; font-weight: bolder;"> Industry </mat-panel-title>
-        </mat-expansion-panel-header>
-        <mat-form-field appearance="outline" style="width: 100%;">
-          <mat-label></mat-label>
-          <mat-chip *ngFor="let industry of selectedIndustry" (removed)="removeIndustry(industry)">
-            {{ industry }}
-            <mat-icon matChipRemove>cancel</mat-icon>
-          </mat-chip>
-          <input type="search" [(ngModel)]="industryInputValue" (input)="filterIndustry()" matNativeControl
-            style="width: 100%;" />
-        </mat-form-field>
-        <section class="example-section">
-          <mat-checkbox [checked]="selectedIndustry.has(industry)"
-            (change)="onCheckboxIndustryChange($event.checked, industry)" *ngFor="let industry of filteredIndustry">
-            {{ industry }}
-          </mat-checkbox>
-          <div *ngIf="filteredIndustry.length === 0 && industryInputValue" class="no-results">
-            No results found
-          </div>
-        </section>
-      </mat-expansion-panel>
-      </div>
+<div class="panel-wrapper">
+  <mat-expansion-panel #industryPanel="matExpansionPanel">
+    <mat-expansion-panel-header>
+      <mat-panel-title class="carde" [ngClass]="{ 'active-title': industryPanel.expanded }" style="font-size: 14px; font-weight: bolder;">
+        Industry
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-form-field appearance="outline" style="width: 100%;">
+      <mat-label>Search Industries</mat-label>
+      <input
+        matInput
+        [(ngModel)]="industryInputValue"
+        [matAutocomplete]="autoIndustry"
+        (input)="filterIndustry()"
+        placeholder="Search industries"
+      />
+      <!-- <button
+        *ngIf="industryInputValue"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="clearIndustrySearch()"
+      >
+        <mat-icon>close</mat-icon>
+      </button> -->
+      <mat-autocomplete #autoIndustry="matAutocomplete" (optionSelected)="selectIndustry($event.option.value)">
+        <mat-option *ngFor="let industry of filteredIndustry" [value]="industry">
+          {{ industry }}
+        </mat-option>
+        <mat-option *ngIf="filteredIndustry.length === 0 && industryInputValue" disabled>
+          No results found
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+    <!-- Chips displayed below input -->
+    <div class="chip-wrapper">
+      <mat-chip *ngFor="let industry of selectedIndustry" [removable]="true" (removed)="removeIndustry(industry)">
+        {{ industry }}
+        <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+    </div>
+    <!-- Optional checkbox list (if still needed) -->
+    <section class="example-section" *ngIf="showCheckboxes">
+      <mat-checkbox [checked]="selectedIndustry.has(industry)" (change)="onCheckboxIndustryChange($event.checked, industry)"
+        *ngFor="let industry of filteredIndustry">
+        {{ industry }}
+      </mat-checkbox>
+    </section>
+  </mat-expansion-panel>
+</div>
 
 <!-- Tech Category -->
 <div class="panel-wrapper">
@@ -380,7 +403,7 @@
         matSuffix
         mat-icon-button
         aria-label="Clear"
-        (click)="techCategoryInputValue = ''"
+        (click)="clearTechCategoryFilter()"
       >
         <mat-icon>close</mat-icon>
       </button>
@@ -440,7 +463,7 @@
       <input
         matInput
         [(ngModel)]="technologyKeywordInputValue"
-        (focus)="filterTechnologyKeywords()"
+        
         (input)="filterTechnologyKeywords()"
         placeholder="Search Technology Keywords"
       />
@@ -451,7 +474,7 @@
         matSuffix
         mat-icon-button
         aria-label="Clear"
-        (click)="technologyKeywordInputValue = ''"
+        (click)="clearTechnologyKeywords()"
       >
         <mat-icon>close</mat-icon>
       </button>

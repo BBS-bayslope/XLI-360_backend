@@ -9,6 +9,7 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
+// import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionPanel } from '@angular/material/expansion'; // Import MatExpansionPanel
 import dayjs from 'dayjs';
 // import { Subject } from 'rxjs';
@@ -147,7 +148,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
     MatProgressSpinnerModule,
     AnalyticsComponent,
     MatChipsModule,
-    MatIconModule
+    MatIconModule,
     // dayjs,
 
     // AnalyticsComponent,
@@ -186,6 +187,11 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   @ViewChild(MatTabGroup) tabGroup!: MatTabGroup;
+  showCheckboxes: boolean = false;
+  clearIndustrySearch() {
+    this.industryInputValue = '';
+    this.filterIndustry();
+  }
 
   tabIndex: number = 0; // Default to the first tab
   years = ['2025', '2024', '2023', '']; // '' = All
@@ -248,10 +254,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   loader: boolean = false;
   winningPercentage: any = 50;
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private firestore: Firestore
-  ) {
+  constructor(private cdr: ChangeDetectorRef, private firestore: Firestore) {
     this.searchInputChanged
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((searchText: string) => {
@@ -398,7 +401,6 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   toggleDarkMode() {
     console.log('Toggling dark mode...');
-    
   }
   selectYear(year: string): void {
     this.selectedYear = year;
@@ -1976,17 +1978,17 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   clearSearch() {
     this.searchInputText = '';
     this.onSearchInputText('');
-
   }
-  
-  @ViewChild('autoSearchDefendant') defandantAutoComplete: MatAutocomplete | null = null;
+
+  @ViewChild('autoSearchDefendant')
+  defandantAutoComplete: MatAutocomplete | null = null;
   removeDefandant(defendant: string) {
     this.selectedDefendant.delete(defendant);
     this.payload.defendants = Array.from(this.selectedDefendant);
     this.defendantInputValue = ''; // Clear the input value
-  this.filteredDefendants = [];
+    this.filteredDefendants = [];
     this.fetchData();
-    
+
     this.cdr.detectChanges();
   }
 
@@ -2149,7 +2151,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredCaseNumbers = []; // Clear the filtered suggestions
     this.fetchData(); // Refresh the data
     if (this.caseNumberAutoComplete) {
-      this.caseNumberAutoComplete.options.forEach((option: MatOption) => option.deselect()); // Deselect any selected options
+      this.caseNumberAutoComplete.options.forEach((option: MatOption) =>
+        option.deselect()
+      ); // Deselect any selected options
     }
     this.cdr.detectChanges(); // Ensure UI updates
   }
@@ -2187,21 +2191,49 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
+  // selectIndustry(industry: string) {
+  //   this.selectedIndustry.add(industry); // Add selected industry
+  //   this.industryInputValue = ''; // Clear input after selection
+  //   this.filteredIndustry = this.industryArrays; // Reset filtered list
+  // }
+
   selectIndustry(industry: string) {
-    this.selectedIndustry.add(industry); // Add selected industry
-    this.industryInputValue = ''; // Clear input after selection
-    this.filteredIndustry = this.industryArrays; // Reset filtered list
+    if (!this.selectedIndustry.has(industry)) {
+      this.selectedIndustry.add(industry);
+      this.payload.industry = Array.from(this.selectedIndustry);
+      this.fetchData();
+    }
+    this.industryInputValue = ''; // Reset input after selection
+    this.filterIndustry(); // Refresh filtered list
+    this.applyFilters();
   }
 
+  @ViewChild('industryInput') industryInput!: ElementRef<HTMLInputElement>; // Add this at the top with other @ViewChild declarations
+
   removeIndustry(industry: string) {
-    this.selectedIndustry.delete(industry); // Remove selected industry
+    // Remove the specific industry
+    this.selectedIndustry.delete(industry);
+
+    // Optionally deselect all if you want complete reset (uncomment if needed)
+    // this.selectedIndustry.clear();
+
+    // Update payload
     this.payload.industry = Array.from(this.selectedIndustry);
 
-    this.fetchData();
-    this.industryInputValue = ''; // Clear the input value (optional)
-  this.filteredIndustry = [...this.industryArrays];
-    this.cdr.detectChanges();
+    // Reset input and filtered list
+    this.industryInputValue = '';
+    this.filteredIndustry = [...this.industryArrays]; // Reset to full list
 
+    // Clear autocomplete and focus
+    if (this.industryInput) {
+      this.industryInput.nativeElement.value = ''; // Force clear input value
+      this.industryInput.nativeElement.blur(); // Remove focus
+    }
+
+    // Refresh data and filters
+    this.fetchData();
+    this.applyFilters();
+    this.cdr.detectChanges(); // Force UI update
   }
 
   onCheckboxIndustryChange(isChecked: boolean, industry: string) {
@@ -2220,6 +2252,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedTechCategory.delete(category);
     this.payload.tech_category = Array.from(this.selectedTechCategory);
     this.fetchData();
+    this.cdr.detectChanges();
   }
   // function for  selectedTechCategory
   filterTechCategory() {
@@ -2227,6 +2260,23 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredTechCategory = this.techCategoryArrays.filter(
       (techCategory) => techCategory.toLowerCase().includes(searchTerm) // Filter based on the input
     );
+  }
+  clearTechCategoryFilter(): void {
+    this.techCategoryInputValue = '';
+    this.selectedTechCategory.clear();
+    // this.filteredTechCategory = [...this.techCategoryOptions]; // Reset list
+    this.payload.tech_category = Array.from(this.selectedTechCategory);
+    this.fetchData(); // Optional: update results
+    this.cdr.detectChanges();
+  }
+
+  clearTechCategory() {
+    this.techCategoryInputValue = ''; // Clear input
+    this.selectedTechCategory.clear(); // Clear selection
+    this.payload.tech_category = []; // Reset payload
+    this.filteredTechCategory = [...this.techCategoryArrays]; // Reset suggestions
+    this.fetchData();
+    this.applyFilters();
   }
 
   onCheckboxTechCategoryChange(isChecked: boolean, techCategory: string) {
@@ -2236,6 +2286,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedTechCategory.delete(techCategory); // Remove from selection
     }
     this.payload.tech_category = Array.from(this.selectedTechCategory);
+    this.filterTechCategory();
     this.fetchData();
     this.applyFilters();
   }
@@ -2468,7 +2519,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-  @ViewChild('autoSearchCaseNumber') caseNumberAutoComplete: MatAutocomplete | null = null;
+  @ViewChild('autoSearchCaseNumber')
+  caseNumberAutoComplete: MatAutocomplete | null = null;
   // Logic for case number search
   onSearchCaseNumberInput(caseNumberText: string) {
     if (!caseNumberText) {
@@ -2538,12 +2590,12 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedPlaintiff.clear();
     this.applyFilters();
     // this.plaintiffInputValue = ''; // Clear input value
-  // this.selectedPlaintiff.clear(); // Clear all selected plaintiffs
-  // this.payload.plaintiff = []; // Clear payload
-  // this.filteredPlaintiff = []; // Reset filtered options
-  // this.fetchData(); // Refresh data based on updated payload
-  // this.applyFilters(); // Reapply filters to ensure UI reflects changes
-  this.cdr.detectChanges(); // Force UI update
+    // this.selectedPlaintiff.clear(); // Clear all selected plaintiffs
+    // this.payload.plaintiff = []; // Clear payload
+    // this.filteredPlaintiff = []; // Reset filtered options
+    // this.fetchData(); // Refresh data based on updated payload
+    // this.applyFilters(); // Reapply filters to ensure UI reflects changes
+    this.cdr.detectChanges(); // Force UI update
   }
 
   // Logic for searching Defendants
@@ -2588,7 +2640,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.autoComplete = tempAutoComplete; // Restore the reference
       if (this.autoComplete) {
-        this.autoComplete.options.forEach(option => option.deselect());
+        this.autoComplete.options.forEach((option) => option.deselect());
       }
       this.fetchData();
       this.applyFilters();
@@ -2616,6 +2668,16 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.technologyKeywordInputValue = '';
     delete this.payload.tech_keyword;
     this.fetchData();
+  }
+  clearTechnologyKeywords() {
+    this.technologyKeywordInputValue = '';
+    this.selectedTechnologyKeywords.clear();
+    this.payload.technology_keywords = [];
+    // this.filteredTechnologyKeywords = [...this.technologyKeywordArray];
+    this.payload.tech_keyword = Array.from(this.selectedTechnologyKeywords);
+    this.fetchData();
+    this.applyFilters();
+    this.cdr.detectChanges();
   }
 
   // Logic for searching Court Names
@@ -2646,9 +2708,9 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.courtNameInputValue = ''; // Reset the input value
     this.selectedCourtName.clear();
     this.filteredCourtName = []; // Clear the suggestions
-    this.payload.court_name=[];
+    this.payload.court_name = [];
     this.fetchData();
-    
+
     this.cdr.detectChanges();
   }
 
@@ -2690,15 +2752,15 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filteredPatentNos = []; // Clear suggestions
     this.fetchData();
     if (this.patentNoAutoComplete) {
-      this.patentNoAutoComplete.options.forEach(option => option.deselect());
+      this.patentNoAutoComplete.options.forEach((option) => option.deselect());
     }
     this.cdr.detectChanges();
   }
-  @ViewChild('autoSearchPatentNo') patentNoAutoComplete: MatAutocomplete | null = null;
+  @ViewChild('autoSearchPatentNo')
+  patentNoAutoComplete: MatAutocomplete | null = null;
 
   // Clear the search box for patent numbers
   clearPatentNoSearch() {
-    
     this.patentNoInputValue = ''; // Reset the input value
     // this.payload.patent_no = '';
     // this.fetchData();
@@ -2708,14 +2770,14 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     // Optionally reset the data source to show all data again
     this.dataSource.data = [...this.excelData]; // Show all data if that's the desired behavior
     // this.patentNoInputValue = ''; // Reset the input value
-  this.selectedpatentNo.clear(); // Clear all selected patent numbers
-  this.payload.patent_no = Array.from(this.selectedpatentNo); // Update payload to empty array
-  this.fetchData(); // Refresh the data with the cleared filter
-  if (this.patentNoAutoComplete) {
-    this.patentNoAutoComplete.options.forEach(option => option.deselect());
-  }
-  this.filteredPatentNos = []; // Clear the suggestions
-  this.cdr.detectChanges(); // Ensure UI updates
+    this.selectedpatentNo.clear(); // Clear all selected patent numbers
+    this.payload.patent_no = Array.from(this.selectedpatentNo); // Update payload to empty array
+    this.fetchData(); // Refresh the data with the cleared filter
+    if (this.patentNoAutoComplete) {
+      this.patentNoAutoComplete.options.forEach((option) => option.deselect());
+    }
+    this.filteredPatentNos = []; // Clear the suggestions
+    this.cdr.detectChanges(); // Ensure UI updates
   }
 
   // Logic for searching Cause of Action
