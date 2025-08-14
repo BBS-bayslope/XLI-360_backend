@@ -1245,7 +1245,12 @@ class FileUploadViewNew(APIView):
             with transaction.atomic():
                 RawData.objects.bulk_create(raw_data_records, batch_size=200)
                 logger.info(f"Inserted {len(raw_data_records)} rows into RawData")
-                sync_all_data_task.delay()
+                # sync_all_data_task.delay()
+                 # Celery ke bajaye stored procedure ko seedhe call karein
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT process_raw_data()")
+
+
 
             total_time = time.time() - start_time
             return Response(
@@ -1269,3 +1274,6 @@ class FileUploadViewNew(APIView):
                 {"success": False, "error": f"An unexpected error occurred: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+
