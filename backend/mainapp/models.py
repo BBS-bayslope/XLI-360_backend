@@ -142,8 +142,8 @@ class CaseDetails(models.Model):
     no_of_defendents=models.TextField(blank=True, null=True)
     activity_timeline=models.TextField(blank=True, null=True)
     chances_of_winning=models.TextField(blank=True, null=True)
-    plaintiff_type_and_size = models.CharField(max_length=255, blank=True)  # Added
-    defendent_type_and_size = models.CharField(max_length=255, blank=True)
+    plaintiff_type_and_size = models.CharField(max_length=255, blank=True,null=True)  # Added
+    defendent_type_and_size = models.CharField(max_length=255, blank=True,null=True)
     
 class Patent(models.Model):
     patent_no = models.CharField(max_length=255, unique=True)

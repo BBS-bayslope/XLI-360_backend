@@ -165,10 +165,19 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.parse(
-        "postgresql://litigation_db:bWPZ9UGKDcnPLBXjR20WfJZDwIuweL8G@dpg-d1vn2jbuibrs739if36g-a/litigation_db",
+        "postgresql://litigation_db:bWPZ9UGKDcnPLBXjR20WfJZDwIuweL8G@dpg-d1vn2jbuibrs739if36g-a.oregon-postgres.render.com/litigation_db",
         conn_max_age=600
     )
 }
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata' # Ya aapka timezone
+
 
 # REST Framework and JWT settings
 REST_FRAMEWORK = {

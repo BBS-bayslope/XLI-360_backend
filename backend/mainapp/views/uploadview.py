@@ -41,6 +41,18 @@ class FileUploadView(APIView):
             'Defendant Type', 'Defendant Size', 'Number of Defendants', 'Stage', 'Chances of Winning'
         ]
 
+        # --- CORRECTION STARTS HERE ---
+    # Validate headers for the entire chunk, not for each row
+        if rows:
+            header_row = rows[0]
+            missing_columns = [col for col in required_columns if col not in header_row]
+            if missing_columns:
+            # Raise the exception here so it can be caught in the `post` method
+                raise ValueError(
+                f"The uploaded file is missing the following required columns: {', '.join(missing_columns)}"
+            )
+        # --- CORRECTION ENDS HERE ---
+
         for row in rows:
             try:
                 missing_columns = [col for col in required_columns if col not in row]
@@ -48,8 +60,7 @@ class FileUploadView(APIView):
                     raise KeyError(f"Missing columns: {', '.join(missing_columns)}")
 
                 is_valid = bool(row.get('Case Number')) and bool(row.get('Case Complaint Date')) and bool(row['Case Name']) and bool(row['Patent No']) and bool(row['Plaintiff/Petitioner']) and bool(row['Defendant'])
-        
-                
+
                 complaint_date = pd.to_datetime(row.get('Case Complaint Date'), errors='coerce')
                 case_closed_date = pd.to_datetime(row.get('Case Closed Date'), errors='coerce')
                 issue_date = pd.to_datetime(row.get('Patent Issued Date'), errors='coerce')
@@ -138,7 +149,7 @@ class FileUploadView(APIView):
         return Response({"message":"Success"})
         # except Exception as e:
         #     return Response({'error': f'Error processing file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
     def post(self, request):
         file = request.FILES.get('file')
         if file:
@@ -163,7 +174,6 @@ class FileUploadView(APIView):
                 with transaction.atomic():
                     RawData.objects.bulk_create(records_to_create, batch_size=5000)
 
-                
                 # Call the stored procedure to process data
                 with connection.cursor() as cursor:
                     cursor.execute("SELECT process_raw_data()")
@@ -418,7 +428,7 @@ def create_stored_procedure():
 #                     defendant_attorney_name=clean_value(row.get('DA Name 1')),
 #                     defendant_phone=clean_value(row.get('DA Phone 1')),
 #                     defendant_email=clean_value(row.get('DA Email 1'))
-#                 )) 
+#                 ))
 #             except Case.DoesNotExist:
 #                 print(f"Case with case_no {row.get('Case Number')} in defendant does not exist. Skipping.")
 #         return defendants
@@ -438,7 +448,7 @@ def create_stored_procedure():
 #                 total_assignments = int(total_assignments)  # Convert safely
 
 #             assignments = []
-#             for i in range(1, total_assignments + 1):  
+#             for i in range(1, total_assignments + 1):
 #                 execution_date = row.get(f'Execution_Date_{i}', None)
 #                 assignor = row.get(f'Assignors_{i}', None)
 #                 assignee = row.get(f'Assignee_{i}', None)
@@ -478,7 +488,7 @@ def create_stored_procedure():
 #         return Response({"message":"Success"})
 #         # except Exception as e:
 #         #     return Response({'error': f'Error processing file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
 
 #     def post(self, request):
 #         file = request.FILES.get('file')
@@ -509,8 +519,8 @@ def create_stored_procedure():
 #                 # Step 1: Insert RawData and trigger stored procedure to create Case records
 #                 with transaction.atomic():
 #                     RawData.objects.bulk_create(records_to_create, batch_size=500)
-                
-                
+
+
 #                 with connection.cursor() as cursor:
 #                     cursor.execute("SELECT process_raw_data()")  # Ensure Case records are created
 
@@ -533,29 +543,26 @@ def create_stored_procedure():
 #                 # with transaction.atomic():
 #                 #     PlaintiffDetails.objects.bulk_create(plaintiffs_to_create, batch_size=500)
 #                 #     DefendantDetails.objects.bulk_create(defendants_to_create, batch_size=500)
-                     
+
 #                 # # print("2nd step completed")
 #                 # timeline_chunks = [assignee_rows[i:i + chunk_size] for i in range(0, len(assignee_rows), chunk_size)]
 #                 # with ThreadPoolExecutor(max_workers=4) as executor:
 #                 #     assignee_futures = [executor.submit(self.process_AssigneeChunk, chunk) for chunk in timeline_chunks]
-                    
+
 #                 #     assignee_to_update = []
 #                 #     for future in as_completed(assignee_futures):
 #                 #         assignee_to_update.extend(future.result())
-                        
+
 #                 # with transaction.atomic():
-#                 #     Patent.objects.bulk_update(assignee_to_update, ['assignee_timeline']) 
-                    
-                
+#                 #     Patent.objects.bulk_update(assignee_to_update, ['assignee_timeline'])
+
+
 #                 return Response({'message': 'File processed and data inserted successfully!'}, status=status.HTTP_200_OK)
 
 #             except Exception as e:
 #                 return Response({'error': f'Error processing file: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #         return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
 
 
 # import pandas as pd
@@ -578,7 +585,7 @@ def create_stored_procedure():
 
 # # from .sync_module import sync_raw_to_case
 
-# from mainapp.models import RawData, Case, Patent, CasePatent 
+# from mainapp.models import RawData, Case, Patent, CasePatent
 # logger = logging.getLogger(__name__)
 
 # class FileUploadViewNew(APIView):
@@ -685,7 +692,7 @@ def create_stored_procedure():
 #     #     logger.info(f"Total RawData valid rows: {RawData.objects.filter(is_valid=True).count()}")
 #     #     logger.info(f"Total unsynced rows: {RawData.objects.filter(is_valid=True, is_synced=False).count()}")
 
-#     #     valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)  
+#     #     valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)
 #     #     for r in valid_raws:
 #     #         case_obj, _ = Case.objects.get_or_create(
 #     #             case_no=r.case_no,
@@ -833,8 +840,6 @@ def create_stored_procedure():
 #             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
 from django.db import transaction, connection
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -848,6 +853,8 @@ from mainapp.models import RawData, Case, Patent, CasePatent, CaseDetails
 from django.db.models import Q
 
 logger = logging.getLogger(__name__)
+# from mainapp.management.commands.run_sync_all import sync_all_data_task
+from mainapp.tasks import sync_all_data_task
 
 class FileUploadViewNew(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -968,139 +975,297 @@ class FileUploadViewNew(APIView):
                 continue
         return records
 
-    def sync_all_data(self):
-        logger.info("Starting sync: RawData → Case/Patent/CasePatent/CaseDetails...")
-        valid_raws = RawData.objects.filter(is_valid=True, is_synced=False)
-        logger.info(f"Found {valid_raws.count()} valid unsynced rows")
+    import logging
+    from django.db import transaction
+    from mainapp.models import RawData, Case, Patent, CasePatent, CaseDetails
 
-        case_patent_to_create = []
-        case_details_to_create = []
-        batch_to_update = []
+    logger = logging.getLogger(__name__)
 
-        with transaction.atomic():
-            for raw_data in valid_raws.iterator(chunk_size=50):
-                try:
-                    # Sync Case
-                    case_obj, _ = Case.objects.get_or_create(
-                        case_no=raw_data.case_no.strip(),
-                        defaults={
-                            'complaint_date': raw_data.complaint_date,
-                            'case_name': raw_data.case_name,
-                            'case_status': raw_data.case_status,
-                            'court_name': raw_data.court_name,
-                            'litigation_venues': raw_data.litigation_venues,
-                        }
-                    )
+    # def sync_all_data(self):
+    #     logger.info("Starting sync: RawData → Case/Patent/CasePatent/CaseDetails...")
 
-                    # Sync Patent (Handle comma-separated patent_no)
-                    if raw_data.patent_no and raw_data.patent_no not in ['0', '00:00:00', 'REDACTED', '']:
-                        patent_nos = [p.strip() for p in raw_data.patent_no.split(',')]
-                        for patent_no in patent_nos:
-                            if patent_no:
-                                patent_obj, _ = Patent.objects.get_or_create(
-                                    patent_no=patent_no,
-                                    defaults={
-                                        'patent_title': raw_data.patent_title,
-                                        'tech_category': raw_data.tech_category.strip().lower() if raw_data.tech_category else '',
-                                        'patent_type': raw_data.patent_type,
-                                        'original_assignee': raw_data.original_assignee,
-                                        'current_assignee': raw_data.current_assignee,
-                                        'issue_date': raw_data.issue_date,
-                                        'expiry_date': raw_data.expiry_date,
-                                        'single_or_multiple': raw_data.single_or_multiple,
-                                        'standard_patent': raw_data.standard_patent,
-                                        'semiconductor_patent': raw_data.semiconductor_patent,
-                                        'tech_center': raw_data.tech_center,
-                                        'art_unit': raw_data.art_unit,
-                                        'acquisition_type': raw_data.acquisition_type,
-                                        'assignee_timeline': raw_data.assignee_timeline,
-                                        'industry': raw_data.industry,
-                                        'technology_keywords': raw_data.technology_keywords,
-                                        'reason_of_allowance': raw_data.reason_of_allowance,
-                                    }
-                                )
-                                if not CasePatent.objects.filter(case=case_obj, patent=patent_obj).exists():
-                                    case_patent_to_create.append(CasePatent(case=case_obj, patent=patent_obj))
+    #     # Batch size ko 100 tak badhaya gaya hai taki bulk operations optimize ho sake
+    #     batch_size = 100
 
-                    # Sync CaseDetails
-                    if not CaseDetails.objects.filter(case=case_obj).exists():
-                        plaintiff = raw_data.plaintiff.strip().lower().split('vectair systems')[0].strip() if raw_data.plaintiff else ''
-                        defendant = raw_data.defendant.strip().lower() if raw_data.defendant else ''
-                        judge = raw_data.assigned_judge.strip().lower() if raw_data.assigned_judge else ''
-                        case_details_to_create.append(
-                            CaseDetails(
-                                case=case_obj,
-                                plaintiff=plaintiff,
-                                defendant=defendant,
-                                judge=judge,
-                                related_cases=raw_data.related_cases,
-                                case_closed_date=raw_data.case_closed_date,
-                                cause_of_action=raw_data.cause_of_action,
-                                accused_product=raw_data.accused_product,
-                                number_of_infringed_claims=raw_data.number_of_infringed_claims,
-                                third_party_funding_involved=raw_data.third_party_funding_involved,
-                                type_of_infringement=raw_data.type_of_infringement or '',
-                                case_strength_level=raw_data.case_strength_level,
-                                recent_action=raw_data.recent_action,
-                                winning_amount=raw_data.winning_amount,
-                                winning_party=raw_data.winning_party,
-                                other_possible_infringer=raw_data.other_possible_infringer,
-                                list_of_prior_art=raw_data.list_of_prior_art,
-                                plaintiff_type_and_size=raw_data.plaintiff_type_and_size,
-                                defendent_type_and_size=raw_data.defendent_type_and_size,
-                            )
-                        )
+    #     while True:
+    #         # Har iteration mein 100 valid aur unsynced rows ko fetch karein
+    #         valid_raws = list(RawData.objects.filter(is_valid=True, is_synced=False)[:batch_size])
 
-                    raw_data.is_synced = True
-                    batch_to_update.append(raw_data)
+    #         if not valid_raws:
+    #             logger.info("No more valid unsynced rows found. Sync completed.")
+    #             break
 
-                except Exception as e:
-                    logger.error(f"Error syncing RawData ID {raw_data.id}: {str(e)}")
-                    continue
+    #         logger.info(f"Processing a batch of {len(valid_raws)} rows...")
 
-            if case_patent_to_create:
-                CasePatent.objects.bulk_create(case_patent_to_create, ignore_conflicts=True)
-            if case_details_to_create:
-                CaseDetails.objects.bulk_create(case_details_to_create, ignore_conflicts=True)
-            if batch_to_update:
-                RawData.objects.bulk_update(batch_to_update, ['is_synced'], batch_size=100)
+    #         case_patent_to_create = []
+    #         case_details_to_create = []
+    #         batch_to_update = []
 
-        logger.info("Sync completed: Case, Patent, CasePatent, CaseDetails")
-        return True
+    #         # Har batch ke liye ek alag transaction
+    #         with transaction.atomic():
+    #             for raw_data in valid_raws:
+    #                 try:
+    #                     # Sync Case
+    #                     case_obj, _ = Case.objects.get_or_create(
+    #                         case_no=raw_data.case_no.strip(),
+    #                         defaults={
+    #                             'complaint_date': raw_data.complaint_date,
+    #                             'case_name': raw_data.case_name,
+    #                             'case_status': raw_data.case_status,
+    #                             'court_name': raw_data.court_name,
+    #                             'litigation_venues': raw_data.litigation_venues,
+    #                         }
+    #                     )
+
+    #                     # Sync Patent
+    #                     if raw_data.patent_no and raw_data.patent_no not in ['0', '00:00:00', 'REDACTED', '']:
+    #                         patent_nos = [p.strip() for p in raw_data.patent_no.split(',')]
+    #                         for patent_no in patent_nos:
+    #                             if patent_no:
+    #                                 patent_obj, _ = Patent.objects.get_or_create(
+    #                                     patent_no=patent_no,
+    #                                     defaults={
+    #                                         'patent_title': raw_data.patent_title,
+    #                                         'tech_category': raw_data.tech_category.strip().lower() if raw_data.tech_category else '',
+    #                                         'patent_type': raw_data.patent_type,
+    #                                         'original_assignee': raw_data.original_assignee,
+    #                                         'current_assignee': raw_data.current_assignee,
+    #                                         'issue_date': raw_data.issue_date,
+    #                                         'expiry_date': raw_data.expiry_date,
+    #                                         'single_or_multiple': raw_data.single_or_multiple,
+    #                                         'standard_patent': raw_data.standard_patent,
+    #                                         'semiconductor_patent': raw_data.semiconductor_patent,
+    #                                         'tech_center': raw_data.tech_center,
+    #                                         'art_unit': raw_data.art_unit,
+    #                                         'acquisition_type': raw_data.acquisition_type,
+    #                                         'assignee_timeline': raw_data.assignee_timeline,
+    #                                         'industry': raw_data.industry,
+    #                                         'technology_keywords': raw_data.technology_keywords,
+    #                                         'reason_of_allowance': raw_data.reason_of_allowance,
+    #                                     }
+    #                                 )
+    #                                 if not CasePatent.objects.filter(case=case_obj, patent=patent_obj).exists():
+    #                                     case_patent_to_create.append(CasePatent(case=case_obj, patent=patent_obj))
+
+    #                     # Sync CaseDetails
+    #                     if not CaseDetails.objects.filter(case=case_obj).exists():
+    #                         plaintiff = raw_data.plaintiff.strip().lower().split('vectair systems')[0].strip() if raw_data.plaintiff else ''
+    #                         defendant = raw_data.defendant.strip().lower() if raw_data.defendant else ''
+    #                         judge = raw_data.assigned_judge.strip().lower() if raw_data.assigned_judge else ''
+    #                         case_details_to_create.append(
+    #                             CaseDetails(
+    #                                 case=case_obj,
+    #                                 plaintiff=plaintiff,
+    #                                 defendant=defendant,
+    #                                 judge=judge,
+    #                                 related_cases=raw_data.related_cases,
+    #                                 case_closed_date=raw_data.case_closed_date,
+    #                                 cause_of_action=raw_data.cause_of_action,
+    #                                 accused_product=raw_data.accused_product,
+    #                                 number_of_infringed_claims=raw_data.number_of_infringed_claims,
+    #                                 third_party_funding_involved=raw_data.third_party_funding_involved,
+    #                                 type_of_infringement=raw_data.type_of_infringement or '',
+    #                                 case_strength_level=raw_data.case_strength_level,
+    #                                 recent_action=raw_data.recent_action,
+    #                                 winning_amount=raw_data.winning_amount,
+    #                                 winning_party=raw_data.winning_party,
+    #                                 other_possible_infringer=raw_data.other_possible_infringer,
+    #                                 list_of_prior_art=raw_data.list_of_prior_art,
+    #                                 plaintiff_type_and_size=raw_data.plaintiff_type_and_size,
+    #                                 defendent_type_and_size=raw_data.defendent_type_and_size,
+    #                             )
+    #                         )
+
+    #                     raw_data.is_synced = True
+    #                     batch_to_update.append(raw_data)
+
+    #                 except Exception as e:
+    #                     logger.error(f"Error syncing RawData ID {raw_data.id}: {str(e)}")
+    #                     continue
+
+    #             # Bulk operations for the current batch
+    #             if case_patent_to_create:
+    #                 CasePatent.objects.bulk_create(case_patent_to_create, ignore_conflicts=True)
+    #             if case_details_to_create:
+    #                 CaseDetails.objects.bulk_create(case_details_to_create, ignore_conflicts=True)
+    #             if batch_to_update:
+    #                 RawData.objects.bulk_update(batch_to_update, ['is_synced'], batch_size=batch_size)
+
+    #     logger.info("Final sync completed.")
+    #     return True
+
+    # def post(self, request):
+    #     file = request.FILES.get('file')
+    #     if not file:
+    #         return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #     try:
+    #         chunk_size = 200
+    #         start_time = time.time()
+    #         logger.info("Starting file processing")
+
+    #         df = pd.read_excel(file, dtype=str)
+    #         if df.empty:
+    #             return Response({'success': False, 'error': 'The uploaded file is empty.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    #         rows = df.to_dict('records')
+    #         chunks = [rows[i:i + chunk_size] for i in range(0, len(rows), chunk_size)]
+    #         total_rows_processed = 0
+    #         raw_data_records = []
+
+    #         with ThreadPoolExecutor(max_workers=4) as executor:
+    #             futures = [executor.submit(self.process_chunk, chunk) for chunk in chunks]
+    #             for future in as_completed(futures):
+    #                 raw_data_records.extend(future.result())
+    #                 total_rows_processed += len(future.result())
+
+    #         with transaction.atomic():
+    #             RawData.objects.bulk_create(raw_data_records, batch_size=200)
+    #             logger.info(f"Inserted {len(raw_data_records)} rows into RawData")
+    #             # self.sync_all_data()
+    #             sync_all_data_task.delay()
+
+    #         total_time = time.time() - start_time
+    #         return Response({
+    #             'message': f'Upload complete. {total_rows_processed} rows processed.',
+    #             'duration': f"{total_time:.2f} seconds"
+    #         }, status=status.HTTP_200_OK)
+
+    #     except Exception as e:
+    #         logger.error(f"Upload failed: {str(e)}")
+    #         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
-        file = request.FILES.get('file')
+        file = request.FILES.get("file")
         if not file:
-            return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"success": False, "error": "No file provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
-            chunk_size = 200
             start_time = time.time()
             logger.info("Starting file processing")
 
+            # Read the Excel file and handle empty file case
             df = pd.read_excel(file, dtype=str)
-            rows = df.to_dict('records')
-            chunks = [rows[i:i + chunk_size] for i in range(0, len(rows), chunk_size)]
-            total_rows_processed = 0
+            if df.empty:
+                return Response(
+                    {"success": False, "error": "The uploaded file is empty."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            rows = df.to_dict("records")
+
+            # **Critical Improvement:** Validate headers here before proceeding
+            required_columns = [
+                "Case Number",
+                "Case Name",
+                "Case Status",
+                "Court Names",
+                "Litigation Venues & Judicial Authorities",
+                "Related/Originating Cases",
+                "Cause of Action",
+                "Accused Product",
+                "Judge",
+                "Number of Infringed Claims",
+                "3rd Party Funding Involved",
+                "Case Strength Level",
+                "Recent Action",
+                "Winning Amount",
+                "Winning Party",
+                "Other Possible Infringer",
+                "List of Prior Art",
+                "Patent No",
+                "Type of Patent",
+                "Title",
+                "Original Assignee",
+                "Current Assignee",
+                "Single Patent or Family Involved?",
+                "Standard Essential Patent",
+                "Semiconductor Patent",
+                "Tech Centre",
+                "Art Unit",
+                "Acquired Patent or Organic patent?",
+                "Assignee Timeline",
+                "Industry",
+                "Technology Keywords",
+                "Tech Category",
+                "Reason of Allowance",
+                "Plaintiff/Petitioner",
+                "Number of Plaintiff/petitioners",
+                "Plaintiff Type",
+                "Plaintiff Size",
+                "Defendant",
+                "Defendant Type",
+                "Defendant Size",
+                "Number of Defendants",
+                "Stage",
+                "Chances of Winning",
+            ]
+
+            uploaded_columns = set(rows[0].keys())
+            missing_columns = [
+                col for col in required_columns if col not in uploaded_columns
+            ]
+
+            if missing_columns:
+                error_msg = f"The uploaded file is missing the following required columns: {', '.join(missing_columns)}"
+                logger.error(error_msg)
+                return Response(
+                    {"success": False, "error": error_msg},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            chunk_size = 200
+            chunks = [rows[i : i + chunk_size] for i in range(0, len(rows), chunk_size)]
+
             raw_data_records = []
 
             with ThreadPoolExecutor(max_workers=4) as executor:
-                futures = [executor.submit(self.process_chunk, chunk) for chunk in chunks]
+                futures = [
+                    executor.submit(self.process_chunk, chunk) for chunk in chunks
+                ]
                 for future in as_completed(futures):
-                    raw_data_records.extend(future.result())
-                    total_rows_processed += len(future.result())
+                    # Catch and re-raise any exceptions from the worker threads
+                    try:
+                        raw_data_records.extend(future.result())
+                    except ValueError as e:
+                        raise e  # Propagate the validation error
+
+            if not raw_data_records:
+                return Response(
+                    {
+                        "success": False,
+                        "error": "The file was processed but no valid data rows were found.",
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             with transaction.atomic():
                 RawData.objects.bulk_create(raw_data_records, batch_size=200)
                 logger.info(f"Inserted {len(raw_data_records)} rows into RawData")
-                self.sync_all_data()
+                sync_all_data_task.delay()
 
             total_time = time.time() - start_time
-            return Response({
-                'message': f'Upload complete. {total_rows_processed} rows processed.',
-                'duration': f"{total_time:.2f} seconds"
-            }, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "success": True,
+                    "message": f"Upload complete. {len(raw_data_records)} rows processed and queued for sync.",
+                    "duration": f"{total_time:.2f} seconds",
+                },
+                status=status.HTTP_202_ACCEPTED,
+            )  # Use 202 Accepted for background tasks
+
+        except ValueError as e:
+            logger.error(f"Upload failed: {str(e)}")
+            return Response(
+                {"success": False, "error": str(e)}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         except Exception as e:
-            logger.error(f"Upload failed: {str(e)}")
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            logger.error(f"Upload failed with an unexpected error: {str(e)}")
+            return Response(
+                {"success": False, "error": f"An unexpected error occurred: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

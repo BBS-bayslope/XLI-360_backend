@@ -686,7 +686,7 @@
     <p id="downloadMessage"></p>
 </div>
 
-<script>
+{% comment %} <script>
     function uploadFile() {
         let fileInput = document.getElementById('fileInput');
         let file = fileInput.files[0];
@@ -725,6 +725,93 @@
     }
 
     function downloadExcel() {
+        let loader = document.getElementById("downloadLoader");
+        let messageElem = document.getElementById("downloadMessage");
+
+        loader.style.display = "block";
+        messageElem.textContent = "Generating file...";
+        messageElem.style.color = "#6600FF";
+
+        fetch("/api/case-entity-list/", { method: "GET" })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "case_entity_list.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            messageElem.textContent = "Download complete!";
+            messageElem.style.color = "green";
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            messageElem.textContent = "Download failed!";
+            messageElem.style.color = "red";
+        })
+        .finally(() => {
+            loader.style.display = "none";
+        });
+    }
+</script> {% endcomment %}
+
+<script>
+    function uploadFile() {
+        let fileInput = document.getElementById('fileInput');
+        let file = fileInput.files[0];
+        let messageElem = document.getElementById("message");
+
+        if (!file) {
+            alert("Please select an Excel file to upload.");
+            return;
+        }
+
+        messageElem.textContent = "Uploading...";
+        messageElem.style.color = "#6600FF";
+
+        let formData = new FormData();
+        formData.append("file", file);
+
+        fetch("/api/uploadNew/", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                // Handle non-200 responses as errors
+                return response.json().then(errorData => {
+                    throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Check the 'success' flag from the JSON response
+            if (data.success) {
+                messageElem.textContent = "Excel file uploaded successfully!";
+                messageElem.style.color = "green";
+            } else {
+                // If backend says it's not a success, show the backend's error message
+                messageElem.textContent = data.error || "Upload failed!";
+                messageElem.style.color = "red";
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            messageElem.textContent = error.message || "Upload failed!";
+            messageElem.style.color = "red";
+        });
+    }
+
+    function downloadExcel() {
+        // This function is already correct
         let loader = document.getElementById("downloadLoader");
         let messageElem = document.getElementById("downloadMessage");
 
