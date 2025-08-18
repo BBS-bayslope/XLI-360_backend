@@ -195,7 +195,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   tabIndex: number = 0; // Default to the first tab
   years = ['2025', '2024', '2023', '']; // '' = All
-  selectedYear = '';
+  // selectedYear = '';
+  selectedYear: string = '2025';
   displayedColumns: string[] = [
     'srNo',
     'caseComplaintDate',
@@ -275,6 +276,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     console.log('fetchdata', this.fetchData);
+    this.selectYear(this.selectedYear);
     // this.searchInputChanged
     //   .pipe(
     //     debounceTime(400),
@@ -372,9 +374,24 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
     this.api.getFilterData().subscribe(
       (response: any) => {
         console.log('Filter API response:', response.case_no);
-        this.litigationVenueOptions = response.litigation_venues;
+        // this.litigationVenueOptions = response.litigation_venues;
+        // normalize to uppercase & remove duplicates
+        this.litigationVenueOptions = Array.from(
+          new Set(
+            response.litigation_venues.map((v: string) =>
+              v?.trim().toUpperCase()
+            )
+          )
+        );
+
         this.industryArrays = response.industry;
-        this.caseStatusOptions = response.case_status;
+        // this.caseStatusOptions = response.case_status;
+        this.caseStatusOptions = Array.from(
+          new Set(
+            response.case_status.map((v: string) => v?.trim().toUpperCase())
+          )
+        );
+
         this.courtNameArrays = response.courtName;
         this.patent_types = response.patentType;
         this.acquisition_types = response.acquisition_type;
@@ -388,6 +405,8 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.causeOfActionArrays = response.cause_of_action;
         this.standardEssentialPatentArrays = response.standard_patent;
         this.semiconductorPatentArrays = response.semiconductor_patent;
+        // this.semiconductorPatentArrays = response.semiconductor_patent;
+
         this.isLoadingFilters = false;
         this.loader = false;
         this.cdr.detectChanges(); // Force UI to update
@@ -415,22 +434,168 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   noDataFound: boolean = false;
   //ye mera code hai
+  // fetchData(): void {
+  //   console.log('Fetching with payload:', this.payload);
+  //   this.loader = true;
+  //   this.isLoadingFilters = true;
+
+  //   this.api.getTableData(this.payload).subscribe(
+  //     (response: any) => {
+  //       console.log('Raw API response:', response);
+  //       if (!response.data || !Array.isArray(response.data)) {
+  //         console.error('Invalid data format:', response);
+  //         this.tabledata = [];
+  //       } else {
+  //         const monthOrder = [
+  //           'Jan',
+  //           'Feb',
+  //           'March',
+  //           'April',
+  //           'May',
+  //           'June',
+  //           'July',
+  //           'August',
+  //           'September',
+  //           'October',
+  //           'November',
+  //           'December',
+  //         ];
+  //         this.tabledata = [...response.data].sort((a, b) => {
+  //           // Assuming 'a' and 'b' have a 'month' property.
+  //           // If not, you might need to adjust this line.
+  //           return monthOrder.indexOf(a.month) - monthOrder.indexOf(b.month);
+  //         });
+  //         this.totalCount = response.total_count || 0;
+  //       }
+  //       this.dataSource.data = this.tabledata; // Sync with dataSource
+  //       this.noDataFound = this.tabledata.length === 0;
+  //       this.loader = false;
+  //       this.isLoadingFilters = false;
+  //       this.cdr.detectChanges();
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching data:', error);
+  //       this.tabledata = [];
+  //       this.dataSource.data = [];
+  //       this.noDataFound = true;
+  //       this.totalCount = 0;
+  //       this.loader = false;
+  //       this.isLoadingFilters = false;
+  //       this.cdr.detectChanges();
+  //     }
+  //   );
+  // }
+
+  // fetchData(): void {
+  //   console.log('Fetching with payload:', this.payload);
+  //   this.loader = true;
+  //   this.isLoadingFilters = true;
+
+  //   // Define the month order for sorting
+  //   const monthOrder = [
+  //     'Jan',
+  //     'Feb',
+  //     'Mar',
+  //     'Apr',
+  //     'May',
+  //     'Jun',
+  //     'Jul',
+  //     'Aug',
+  //     'Sep',
+  //     'Oct',
+  //     'Nov',
+  //     'Dec',
+  //   ];
+
+  //   this.api.getTableData(this.payload).subscribe(
+  //     (response: any) => {
+  //       console.log('Raw API response:', response);
+  //       if (!response.data || !Array.isArray(response.data)) {
+  //         console.error('Invalid data format:', response);
+  //         this.tabledata = [];
+  //       } else {
+  //         // Sort the data by year (descending) and then by month
+  //         this.tabledata = [...response.data].sort((a, b) => {
+  //           // Convert complaint_date to Date objects
+  //           const dateA = this.convertToDate(a.complaint_date);
+  //           const dateB = this.convertToDate(b.complaint_date);
+
+  //           // Handle invalid dates by pushing them to the end
+  //           if (!dateA) return 1;
+  //           if (!dateB) return -1;
+
+  //           // Extract year and month
+  //           const yearA = dateA.getFullYear();
+  //           const yearB = dateB.getFullYear();
+  //           const monthA = this.formatDate(dateA)
+  //             .split(' ')[1]
+  //             .replace(',', '');
+  //           const monthB = this.formatDate(dateB)
+  //             .split(' ')[1]
+  //             .replace(',', '');
+
+  //           // Sort by year (descending) first, then by month
+  //           if (yearA !== yearB) {
+  //             return yearB - yearA; // 2024 before 2023
+  //           }
+  //           return monthOrder.indexOf(monthA) - monthOrder.indexOf(monthB);
+  //         });
+
+  //         this.totalCount = response.total_count || 0;
+  //       }
+  //       this.dataSource.data = this.tabledata; // Sync with dataSource
+  //       this.noDataFound = this.tabledata.length === 0;
+  //       this.loader = false;
+  //       this.isLoadingFilters = false;
+  //       this.cdr.detectChanges();
+  //     },
+  //     (error) => {
+  //       console.error('Error fetching data:', error);
+  //       this.tabledata = [];
+  //       this.dataSource.data = [];
+  //       this.noDataFound = true;
+  //       this.totalCount = 0;
+  //       this.loader = false;
+  //       this.isLoadingFilters = false;
+  //       this.cdr.detectChanges();
+  //     }
+  //   );
+  // }
+
   fetchData(): void {
     console.log('Fetching with payload:', this.payload);
     this.loader = true;
     this.isLoadingFilters = true;
 
     this.api.getTableData(this.payload).subscribe(
-      (response: any) => {
+      (response: { data: any[]; total_count?: number }) => {
         console.log('Raw API response:', response);
         if (!response.data || !Array.isArray(response.data)) {
           console.error('Invalid data format:', response);
           this.tabledata = [];
         } else {
-          this.tabledata = [...response.data];
+          // 🔽 Sort by date DESC (latest first)
+          const sortedData = response.data.sort((a, b) => {
+            return (
+              new Date(a.complaint_date).getTime() -
+              new Date(b.complaint_date).getTime()
+            );
+          });
+
+          this.tabledata = sortedData;
           this.totalCount = response.total_count || 0;
+
+          console.log(
+            'Received dates:',
+            this.tabledata.map((item) => ({
+              complaint_date: item.complaint_date,
+              formatted: this.formatDate(
+                this.convertToDate(item.complaint_date)
+              ),
+            }))
+          );
         }
-        this.dataSource.data = this.tabledata; // Sync with dataSource
+        this.dataSource.data = this.tabledata;
         this.noDataFound = this.tabledata.length === 0;
         this.loader = false;
         this.isLoadingFilters = false;
