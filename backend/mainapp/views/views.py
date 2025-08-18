@@ -698,7 +698,8 @@ class CaseListView(APIView):
 
 
 
-
+# 👉 ORDER BY complaint_date DESC (new line)
+            queryset = queryset.order_by('complaint_date')
 
             offset = params_offset * params_limit
             total_count = queryset.count()

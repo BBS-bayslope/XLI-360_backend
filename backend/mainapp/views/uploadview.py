@@ -1246,7 +1246,7 @@ class FileUploadViewNew(APIView):
                 RawData.objects.bulk_create(raw_data_records, batch_size=200)
                 logger.info(f"Inserted {len(raw_data_records)} rows into RawData")
                 # sync_all_data_task.delay()
-                 # Celery ke bajaye stored procedure ko seedhe call karein
+                # Celery ke bajaye stored procedure ko seedhe call karein
             with connection.cursor() as cursor:
                 cursor.execute("SELECT process_raw_data()")
 

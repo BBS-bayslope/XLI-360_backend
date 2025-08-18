@@ -44,10 +44,19 @@ class CaseStatisticsView(APIView):
             }
 
             # Fetch top tech areas
+            # Fetch top tech areas → UNIQUE cases per tech_category and drop blanks
             tech_areas = (
-                Patent.objects.values("tech_category")
-                .annotate(case_count=Count("cases"))
-                .order_by("-case_count")
+                Patent.objects
+                    .exclude(tech_category__isnull=True)   # remove null
+                    .exclude(tech_category='')             # remove empty strings
+                    .values("tech_category")
+                    .annotate(case_count=Count("cases", distinct=True))
+                    .order_by("-case_count")
+                )
+
+            print(tech_areas)
+            print(
+                "Sum of tech total:", sum([entry["case_count"] for entry in tech_areas])
             )
 
             # Fetch top plaintiffs and their law firms
@@ -145,6 +154,9 @@ class CaseStatisticsView(APIView):
                 {"error": f"Error processing request: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+
 class PlaintiffTypeCountView(APIView):
     permission_classes=[IsAuthenticated]
     
@@ -236,7 +248,7 @@ class IndustryStats(APIView):
             )
 
 # class CaseEntityListing(APIView):
-    
+
 #     def get(self,request):
 #     # Create an Excel workbook
 #         try:
@@ -299,7 +311,7 @@ class IndustryStats(APIView):
 #                 {"error": f"Error processing request: {str(e)}"},
 #                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
 #             )
-            
+
 
 class CaseEntityListing(APIView):
     permission_classes=[AllowAny]
@@ -363,7 +375,6 @@ class CaseEntityListing(APIView):
                 {"error": f"Error processing request: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
 
 
 @api_view(['GET'])
