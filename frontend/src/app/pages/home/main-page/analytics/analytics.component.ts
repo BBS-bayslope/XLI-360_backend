@@ -239,11 +239,19 @@ export class AnalyticsComponent
     // Forcefully set all charts as selected, overriding any saved value
     this.selectedCharts = this.availableCharts.map((chart) => chart.key);
     this.saveSelectedCharts(); // Save all charts to localStorage
+    console.log('Selected Charts in ngOnInit:', this.selectedCharts);
     this.fetchCaseStats();
     this.fetchPlaintiffTypeStats();
     this.fetchIndustryStats();
     this.cdRef.detectChanges();
     console.log('Selected Charts:', this.selectedCharts); // Debug log
+    // this.visibleSections = {
+    //   techCategory: true,
+    //   topPlaintiff: true,
+    //   topDefendants: true,
+    //   topPlaintiffLawFirm: true,
+    //   topDefendantLawFirm: true,
+    // };
   }
 
   excelDataAnalytics: any[] = [];
@@ -399,6 +407,7 @@ export class AnalyticsComponent
           );
 
           let total_tech_areas = response.data?.tech_area.slice(0, 10);
+          console.log('Tech Area Data:');
           const categories = total_tech_areas.map(
             (item: any) => item.tech_category
           );
