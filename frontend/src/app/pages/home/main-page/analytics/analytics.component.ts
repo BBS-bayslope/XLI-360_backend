@@ -179,55 +179,71 @@ export class AnalyticsComponent
     Chart.register(this.drawTextPlugin); // Register the custom plugin
   }
 
+  // ngOnInit(): void {
+  //   // console.log(this.filterDataForAnalytics, this.excelData);
+  //   const savedCharts = localStorage.getItem('selectedCharts');
+  //   if (savedCharts) {
+  //     this.selectedCharts = JSON.parse(savedCharts);
+  //   } else {
+  //     // Default selection
+  //     this.selectedCharts = [
+  //       'totalLitigation',
+  //       'plaintiffType',
+  //       'defendantType',
+  //     ];
+  //     this.saveSelectedCharts();
+  //   }
+  //   // console.dir(this.excelData);
+  //   this.fetchCaseStats();
+  //   this.fetchPlaintiffTypeStats();
+  //   this.fetchIndustryStats();
+  //   this.cdRef.detectChanges();
+  //   // this.getAllPlaintiff();
+  //   // this.getAllDefendent();
+  //   // // this.totalCasesDataArrays= [];
+  //   // this.calculateTotalCasesByStatus(); // Call the method to count Total case number .
+  //   // this.storeUniquePlaintiffTypeAndSize(); // Call the method to count unique plaintiffTypeSize.
+  //   // this.storeUniqueDefendantTypeAndSize(); // Call the method to count unique  defendantTypeSize.
+  //   // this.countCaseByOc(); // Call the method to count unique  case of Oc.
+  //   // this.storeUniqueTechCategories(); // Call the method to count unique  tech category.
+  //   // this.storeUniqueIndustry(); // Call the method to count unique  industry.
+  //   // this.storeUniqueMostSuedTechAreas();
+  //   // this.storeUniqueTotalCaseOfPlaintiff();
+  //   // this.storeUniqueTotalCaseOfDefendent();
+  //   // Trigger change detection
+  //   // this.onItemsToShowChangeInTopPlaitiff();
+  //   // this.onItemsToShowChangeInAllDefendent();
+  //   // this.getAllOriginalAndCurrentAssigne();
+  //   // console.log(this.originalAssignee);
+  //   // console.log(this.currentAssignee);
+  //   // this.onItemsToShowChangeInTopPlaitiff();
+  //   // this.getTopPlaintiffLawFirm();
+  //   // this.getTopDefendantLawFirm();
+  //   // this.getOverlappingLawFirm();
+  //   // this.getCasesTransferredFromOCToNPE();
+  //   // this.updateMostSuedCompaniesChart();
+  //   // let chart = new CanvasJS.Chart("BarContainer", {
+  //   //   title: { text: "Bar Chart Example" },
+  //   //   data: [{ type: "column", dataPoints: [{ label: "A", y: 10 }, { label: "B", y: 20 }] }]
+  //   // });
+  //   // chart.render();
+  //   // this.cdRef.detectChanges();
+  //   this.cdRef.detectChanges();
+  // }
+
   ngOnInit(): void {
-    // console.log(this.filterDataForAnalytics, this.excelData);
     const savedCharts = localStorage.getItem('selectedCharts');
     if (savedCharts) {
       this.selectedCharts = JSON.parse(savedCharts);
-    } else {
-      // Default selection
-      this.selectedCharts = [
-        'totalLitigation',
-        'plaintiffType',
-        'defendantType',
-      ];
-      this.saveSelectedCharts();
     }
-    // console.dir(this.excelData);
+    // Forcefully set all charts as selected, overriding any saved value
+    this.selectedCharts = this.availableCharts.map((chart) => chart.key);
+    this.saveSelectedCharts(); // Save all charts to localStorage
     this.fetchCaseStats();
     this.fetchPlaintiffTypeStats();
     this.fetchIndustryStats();
-    // this.getAllPlaintiff();
-    // this.getAllDefendent();
-    // // this.totalCasesDataArrays= [];
-    // this.calculateTotalCasesByStatus(); // Call the method to count Total case number .
-    // this.storeUniquePlaintiffTypeAndSize(); // Call the method to count unique plaintiffTypeSize.
-    // this.storeUniqueDefendantTypeAndSize(); // Call the method to count unique  defendantTypeSize.
-    // this.countCaseByOc(); // Call the method to count unique  case of Oc.
-    // this.storeUniqueTechCategories(); // Call the method to count unique  tech category.
-    // this.storeUniqueIndustry(); // Call the method to count unique  industry.
-    // this.storeUniqueMostSuedTechAreas();
-    // this.storeUniqueTotalCaseOfPlaintiff();
-    // this.storeUniqueTotalCaseOfDefendent();
-    // Trigger change detection
-    // this.onItemsToShowChangeInTopPlaitiff();
-    // this.onItemsToShowChangeInAllDefendent();
-    // this.getAllOriginalAndCurrentAssigne();
-    // console.log(this.originalAssignee);
-    // console.log(this.currentAssignee);
-    // this.onItemsToShowChangeInTopPlaitiff();
-    // this.getTopPlaintiffLawFirm();
-    // this.getTopDefendantLawFirm();
-    // this.getOverlappingLawFirm();
-    // this.getCasesTransferredFromOCToNPE();
-    // this.updateMostSuedCompaniesChart();
-    // let chart = new CanvasJS.Chart("BarContainer", {
-    //   title: { text: "Bar Chart Example" },
-    //   data: [{ type: "column", dataPoints: [{ label: "A", y: 10 }, { label: "B", y: 20 }] }]
-    // });
-    // chart.render();
-    // this.cdRef.detectChanges();
     this.cdRef.detectChanges();
+    console.log('Selected Charts:', this.selectedCharts); // Debug log
   }
 
   excelDataAnalytics: any[] = [];
@@ -429,7 +445,6 @@ export class AnalyticsComponent
               },
             ],
           };
-          
 
           const defendants_n = response.data?.top_defendants.map(
             (item: any) => item.defendant
@@ -1087,6 +1102,9 @@ export class AnalyticsComponent
       tooltip: {
         enabled: true,
       },
+      datalabels: {
+        display: false,
+      },
     },
   };
   public barChartTypeTopPlaintiffs: 'bar' = 'bar';
@@ -1135,6 +1153,9 @@ export class AnalyticsComponent
       },
       tooltip: {
         enabled: true,
+      },
+      datalabels: {
+        display: false,
       },
     },
   };
@@ -1185,6 +1206,9 @@ export class AnalyticsComponent
       tooltip: {
         enabled: true,
       },
+      datalabels: {
+        display: false,
+      },
     },
   };
   public barChartTypeTopPlaintiffFirm: 'bar' = 'bar';
@@ -1233,6 +1257,9 @@ export class AnalyticsComponent
       },
       tooltip: {
         enabled: true,
+      },
+      datalabels: {
+        display: false,
       },
     },
   };

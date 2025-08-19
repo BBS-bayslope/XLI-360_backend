@@ -55,19 +55,19 @@ export class StackedBarChartComponent implements OnChanges {
           layout: 'horizontal',
           position: 'bottom',
         },
-        label: {
-          position: 'middle',
-          layout: [
-            { type: 'interval-adjust-position' },
-            { type: 'interval-hide-overlap' },
-            { type: 'adjust-color' },
-          ],
-          style: {
-            fontWeight: 'bold',
-            fill: '#000',
-            fontSize: 12,
-          },
-        },
+        // label: {
+        //   position: 'middle',
+        //   layout: [
+        //     { type: 'interval-adjust-position' },
+        //     { type: 'interval-hide-overlap' },
+        //     { type: 'adjust-color' },
+        //   ],
+        //   style: {
+        //     fontWeight: 'bold',
+        //     fill: '#000',
+        //     fontSize: 5,
+        //   },
+        // },
         yAxis: {
           label: {
             style: {

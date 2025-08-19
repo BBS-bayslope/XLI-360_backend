@@ -196,7 +196,7 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
   tabIndex: number = 0; // Default to the first tab
   years = ['2025', '2024', '2023', '']; // '' = All
   // selectedYear = '';
-  selectedYear: string = '2025';
+  selectedYear: string = '2024';
   displayedColumns: string[] = [
     'srNo',
     'caseComplaintDate',

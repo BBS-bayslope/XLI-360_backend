@@ -27,6 +27,7 @@ export class PieChartComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data.length > 0) {
+      console.log('PieChart me mila hua data:', this.data);
       this.renderChart();
     }
   }
