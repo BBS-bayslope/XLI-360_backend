@@ -403,8 +403,46 @@ export class MainPageComponent implements OnInit, AfterViewInit, OnDestroy {
         this.techCategoryArrays = response.tech_categories;
         this.courtNameArrays = response.courtName;
         this.causeOfActionArrays = response.cause_of_action;
-        this.standardEssentialPatentArrays = response.standard_patent;
-        this.semiconductorPatentArrays = response.semiconductor_patent;
+        // this.standardEssentialPatentArrays = response.standard_patent;
+        this.standardEssentialPatentArrays = response.standard_patent
+          // saare items lowercase + trim
+          .map((item: string) => item.trim().toLowerCase())
+          // duplicates hata do
+          .filter(
+            (value: string, index: number, self: string[]) =>
+              self.indexOf(value) === index
+          )
+          // proper casing wapas do
+          .map((item: string) => {
+            if (item === 'not available') return 'Not Available';
+            if (item === 'yes') return 'Yes';
+            if (item === 'no') return 'No';
+            return item;
+          });
+
+        // Order fix kar lo
+        this.standardEssentialPatentArrays = ['Not Available', 'Yes', 'No'];
+
+        // this.semiconductorPatentArrays = response.semiconductor_patent;
+        this.semiconductorPatentArrays = response.semiconductor_patent
+          // trim + lowercase
+          .map((item: string) => item.trim().toLowerCase())
+          // duplicates remove
+          .filter(
+            (value: string, index: number, self: string[]) =>
+              self.indexOf(value) === index
+          )
+          // proper casing
+          .map((item: string) => {
+            if (item === 'not available') return 'Not Available';
+            if (item === 'yes') return 'Yes';
+            if (item === 'no') return 'No';
+            return item;
+          });
+
+        // fix final order
+        this.semiconductorPatentArrays = ['Not Available', 'Yes', 'No'];
+
         // this.semiconductorPatentArrays = response.semiconductor_patent;
 
         this.isLoadingFilters = false;
