@@ -494,7 +494,7 @@ export class CaseListComponent implements OnInit, OnChanges {
   // }
 
   goBack(): void {
-    this.router.navigate(['/']); // Navigate back to the list of cases
+    this.router.navigate(['/app-main-page']); // Navigate back to the list of cases
   }
 
   convertToDate(datese: any): Date {

@@ -26,34 +26,28 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
-    
   },
 
-  { path: 'login', component: LoginPageComponent },
+  { path: '', component: LoginPageComponent },
   { path: 'sign-up', component: SignupPageComponent },
   { path: 'forgot-password', component: ForgotPageComponent },
-
-  { path: '', component: MainPageComponent  },
+  { path: 'app-main-page', component: MainPageComponent },
   { path: 'case-list', component: CaseListComponent },
   {
     path: 'subscriptions',
     component: SubscriptionsComponent,
-    
   },
   {
     path: 'account-settings',
     component: AccountSettingsComponent,
-    
   },
   {
     path: 'app-reports',
     component: ReportsComponent,
-    
   },
   {
     path: 'admin-upload',
     component: AdminUploadComponent,
-    
   },
   { path: 'ai', component: AimodelComponent, canActivate: [authGuard] },
 

@@ -67,7 +67,7 @@ export class LoginPageComponent {
       .login({ email: this.email, password: this.password })
       .subscribe({
         next: () => {
-          this.router.navigate(['/']); // ✅ will only work if guard lets you
+          this.router.navigate(['/app-main-page']); // ✅ will only work if guard lets you
         },
         error: (error) => {
           this.incorrectPassword = true;
