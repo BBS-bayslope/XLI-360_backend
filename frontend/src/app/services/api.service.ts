@@ -48,8 +48,8 @@ interface Report {
 })
 export class ApiService {
   // private baseUrl = 'http://18.220.232.127'; // Base API URL
-  private baseUrl = 'http://127.0.0.1:8000';
-  // private baseUrl='https://xli-360-backend-1.onrender.com'
+  // private baseUrl = 'http://127.0.0.1:8000';
+  private baseUrl='https://xli-360-backend-1.onrender.com'
   private tokenKey: string = 'access'; // Key to store token in localStorage
   allCases!: ExcelData[];
   selectedCase!: ExcelData;
