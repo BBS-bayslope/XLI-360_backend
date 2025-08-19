@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   title = 'litigation99';
   showHeaderFooter: boolean = true;
 
-  hiddenPaths: string[] = ['/login', '/sign-up', '/forgot-password'];
+  hiddenPaths: string[] = ['/', '/sign-up', '/forgot-password'];
 
   constructor(private auth: AuthService, private router: Router) {}
 
