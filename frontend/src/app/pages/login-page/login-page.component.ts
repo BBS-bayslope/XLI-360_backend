@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { MainPageComponent } from '../home/main-page/main-page.component';
+import { log } from 'console';
 @Component({
   selector: 'app-login-page',
   standalone: true,
@@ -66,8 +67,20 @@ export class LoginPageComponent {
     this.authService
       .login({ email: this.email, password: this.password })
       .subscribe({
-        next: () => {
-          this.router.navigate(['/app-main-page']); // ✅ will only work if guard lets you
+        next: (response) => {
+          if (response && response.access) {
+             localStorage.setItem('access', response.access);
+             this.authService.setCurrentUser(
+               response.user || { email: this.email, access: response.access }
+             );
+            //  this.router.navigate(['/app-main-page']);
+            this.router.navigate(['/app-main-page']);
+            console.log("it is logged in");
+          } else {
+            // This block handles cases where the API returns a 200 but no token.
+            this.incorrectPassword = true;
+            console.error('Login failed: Token not found in response.');
+          }
         },
         error: (error) => {
           this.incorrectPassword = true;
@@ -95,7 +108,7 @@ export class LoginPageComponent {
     this.authService.googleLogin().subscribe({
       next: (user) => {
         console.log('Google login successful:', user?.email);
-        this.router.navigate(['/']);
+        this.router.navigate(['/app-main-page']);
       },
       error: (error) => console.error('Google login failed:', error),
     });

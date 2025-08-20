@@ -98,8 +98,11 @@ export class AuthService {
     'excelDataMedium',
     'excelDataLow',
   ];
+
   private userSubject: BehaviorSubject<User | null> =
     new BehaviorSubject<User | null>(null);
+
+  private currentUserSubject = new BehaviorSubject<any>(null);
 
   constructor(
     private http: HttpClient,
@@ -114,7 +117,7 @@ export class AuthService {
   }
   // private baseUrl = 'http://18.220.232.127'; // Base API URL
   // private baseUrl = 'http://127.0.0.1:8000';
-  private baseUrl = 'https://xli-360-backend-1.onrender.com'; //Base APi Url 
+  private baseUrl = 'https://xli-360-backend-1.onrender.com'; //Base APi Url
   // Get the current user as an Observable
   getUserState(): Observable<User | null> {
     return this.userSubject.asObservable();
@@ -308,6 +311,14 @@ export class AuthService {
     return this.userSubject.value;
   }
 
+  setCurrentUser(user: any) {
+    this.currentUserSubject.next(user);
+  }
+
+  // getCurrentUser(): Observable<any> {
+  //   return this.currentUserSubject.asObservable();
+  // }
+
   // Register new user
   // register(email: string, password: string): Observable<User | null> {
   //   return from(
@@ -379,6 +390,11 @@ export class AuthService {
 
   // Logout
   logout(): Observable<void> {
+    // Clear JWT tokens from localStorage
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    
+    // Also sign out from Firebase if needed
     return from(signOut(this.auth));
   }
 
