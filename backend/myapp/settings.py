@@ -162,13 +162,25 @@ WSGI_APPLICATION = 'myapp.wsgi.application'
 # }
 
 
+# DATABASES = {
+#     'default': dj_database_url.parse(
+#         "postgresql://litigation_db:bWPZ9UGKDcnPLBXjR20WfJZDwIuweL8G@dpg-d1vn2jbuibrs739if36g-a.oregon-postgres.render.com/litigation_db",
+#         conn_max_age=600
+#     )
+# }
+
 
 DATABASES = {
-    'default': dj_database_url.parse(
-        "postgresql://litigation_db:bWPZ9UGKDcnPLBXjR20WfJZDwIuweL8G@dpg-d1vn2jbuibrs739if36g-a.oregon-postgres.render.com/litigation_db",
-        conn_max_age=600
-    )
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",  # supabase ka db name (default postgres hi hota hai)
+        "USER": "postgres.hqqieessuouiyablhoie",  # tumhara Supabase ka user
+        "PASSWORD": "Admins@123_",  # tumhara password
+        "HOST": "aws-1-ap-southeast-1.pooler.supabase.com",
+        "PORT": "5432",
+    }
 }
+
 
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'

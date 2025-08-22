@@ -156,7 +156,6 @@ class CaseStatisticsView(APIView):
             )
 
 
-
 class PlaintiffTypeCountView(APIView):
     permission_classes=[IsAuthenticated]
     
@@ -399,8 +398,53 @@ def top_plaintiffs(request):
     """Returns the top 25 plaintiffs and their law firms based on case count."""
     plaintiffs = PlaintiffDetails.objects.values('plaintiff').annotate(case_count=Count('case')).order_by('-case_count')[:25]
     law_firms = PlaintiffDetails.objects.values('plaintiff_law_firm').annotate(case_count=Count('case')).order_by('-case_count')[:25]
-    
+
     return Response({
         "top_plaintiffs": plaintiffs,
         "top_plaintiff_law_firms": law_firms
     })
+
+
+# @api_view(["GET"])
+# def top_courts(request):
+#     """Returns the top 5 courts based on case count"""
+#     courts = (
+#         Case.objects.values("court_name")
+#         .annotate(case_count=Count("id"))
+#         .order_by("-case_count")[:5]
+#     )
+#     return Response(courts)
+
+
+import logging
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.db.models import Count
+# from .models import Case
+
+# Logger setup
+logger = logging.getLogger(__name__)
+
+
+@api_view(["GET"])
+def top_courts(request):
+    """Returns the top 5 courts based on case count"""
+    try:
+        courts = (
+            Case.objects.values("court_name")
+            .annotate(case_count=Count("id"))
+            .order_by("-case_count")[:5]
+        )
+
+        # Log the query result
+        logger.info(f"Top courts fetched successfully: {list(courts)}")
+
+        return Response(courts)
+
+    except Exception as e:
+        # Log any error
+        logger.error(f"Error fetching top courts: {str(e)}", exc_info=True)
+        return Response({"error": "Something went wrong"}, status=500)
+
+
+
