@@ -243,7 +243,9 @@ export class AnalyticsComponent
     this.fetchCaseStats();
     this.fetchPlaintiffTypeStats();
     this.fetchIndustryStats();
+    this.fetchTopCourts();
     this.cdRef.detectChanges();
+    // this.fetchTopCourts();
     console.log('Selected Charts:', this.selectedCharts); // Debug log
     // this.visibleSections = {
     //   techCategory: true,
@@ -1220,6 +1222,66 @@ export class AnalyticsComponent
       },
     },
   };
+
+  // Chart Type
+  public barChartTypeTopCourts: ChartType = 'bar';
+
+  // Chart Data (empty initially, API se fill hoga)
+  public barChartDataTopCourts: ChartData<'bar'> = {
+    labels: [],
+    datasets: [
+      {
+        data: [],
+        backgroundColor: [
+          'rgba(64, 111, 232, 0.8)', // Blue (adjust if needed)
+        ],
+        borderColor: 'rgb(75, 192, 192)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  // Chart Options
+  // public barChartTypeTopCourts: string = 'bar';
+  public barChartOptionsTopCourts: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        // beginAtZero: true,
+        ticks: {
+          color: '#000',
+          font: {
+            weight: 'bold',
+            size: 14,
+          },
+        },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: '#000',
+          font: {
+            weight: 'bold',
+            size: 14,
+          },
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false,
+        // position: 'top',
+      },
+      tooltip: {
+        enabled: true,
+      },
+      datalabels: {
+        display: false,
+      },
+    },
+  };
+
   public barChartTypeTopPlaintiffFirm: 'bar' = 'bar';
   public barChartDataTopPlaintiffFirm: ChartData<'bar'> = {
     labels: [],
@@ -2353,5 +2415,67 @@ export class AnalyticsComponent
 
       return differenceCount;
     });
+  }
+
+  fetchTopCourts(): void {
+    // this.loaderr = true;
+    this.api.getTopCourts().subscribe(
+      (response: any) => {
+        if (response && Array.isArray(response) && response.length > 0) {
+          this.barChartDataTopCourts.labels = response
+            .slice(0, 5)
+            .map((item: any) => item.court_name || 'Unknown');
+          this.barChartDataTopCourts.datasets[0].data = response
+            .slice(0, 5)
+            .map((item: any) => item.case_count || 0);
+          console.log('Top Courts Data:', this.barChartDataTopCourts);
+        } else {
+          console.warn('No top courts data from API, using excelData fallback');
+          this.calculateTopCourts();
+        }
+        setTimeout(() => {
+          if (this.chart?.chart) {
+            this.chart.chart.update();
+            this.cdRef.detectChanges();
+          }
+        }, 200);
+        this.loaderr = false;
+        this.cdRef.detectChanges();
+      },
+      (error) => {
+        this.loaderr = false;
+        console.error('Error fetching top courts data:', error);
+        this.calculateTopCourts();
+        this.cdRef.detectChanges();
+      }
+    );
+  }
+  calculateTopCourts(): void {
+    const courtCounts: { [key: string]: number } = {};
+    this.excelData.forEach((item) => {
+      const court = item.court_name?.trim().toLowerCase() || 'unknown';
+      if (court && court !== 'unknown') {
+        courtCounts[court] = (courtCounts[court] || 0) + 1;
+      }
+    });
+
+    const sortedCourts = Object.entries(courtCounts)
+      .map(([court, count]) => ({ court, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    this.barChartDataTopCourts.labels = sortedCourts.length
+      ? sortedCourts.map((item) => item.court)
+      : ['No Data'];
+    this.barChartDataTopCourts.datasets[0].data = sortedCourts.length
+      ? sortedCourts.map((item) => item.count)
+      : [0];
+
+    setTimeout(() => {
+      if (this.chart?.chart) {
+        this.chart.chart.update();
+        this.cdRef.detectChanges();
+      }
+    }, 200);
   }
 }

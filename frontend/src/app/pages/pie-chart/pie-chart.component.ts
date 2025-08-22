@@ -35,12 +35,16 @@ export class PieChartComponent implements OnChanges {
   private renderChart() {
     const container = this.el.nativeElement.querySelector('.pie-chart-container');
 
+     const top10Data = [...this.data]
+       .sort((a, b) => b.qty - a.qty)
+       .slice(0, 10);
+
     if (this.piePlot) {
-      this.piePlot.changeData(this.data); // Update data if chart already exists
+      this.piePlot.changeData(top10Data); // Update data if chart already exists
     } else {
       this.piePlot = new Pie(container, {
         appendPadding: 10,
-        data: this.data,
+        data: top10Data,
         angleField: 'qty',
         colorField: 'region',
         radius: 0.7,

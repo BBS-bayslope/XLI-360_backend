@@ -15,12 +15,32 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { AdminDashboardComponent } from './pages/admin-dashboard/admin-dashboard.component';
 import { AdminUploadComponent } from './pages/admin-upload/admin-upload.component';
 import { AimodelComponent } from './aimodel/aimodel.component';
+import { HomepageComponent } from './homepage/homepage.component';
+import { AboutComponent } from './about/about.component';
+import { ContactComponent } from './contact/contact.component';
+import { Header1Component } from './header1/header1.component';
 
 export const routes: Routes = [
   // Public Routes (no guard needed)
-  { path: '', component: LoginPageComponent },
+  { path: 'login', component: LoginPageComponent },
   { path: 'sign-up', component: SignupPageComponent },
   { path: 'forgot-password', component: ForgotPageComponent },
+  {
+    path: '',
+    component: HomepageComponent,
+  },
+  {
+    path: 'about',
+    component: AboutComponent,
+  },
+  {
+    path: 'contact',
+    component: ContactComponent,
+  },
+  {
+    path:'header',
+    component: Header1Component,
+  },
 
   // Protected Routes (authGuard on the parent)
   {

@@ -112,7 +112,7 @@ export class HeaderComponent implements OnInit {
   logout(): void {
     console.log("It is clicked and log out ");
     this.authService.logout().subscribe(() => {
-      this.router.navigate(['/']).then(() => {
+      this.router.navigate(['/login']).then(() => {
         // Prevent back button
         history.pushState(null, '', location.href);
         window.onpopstate = () => {

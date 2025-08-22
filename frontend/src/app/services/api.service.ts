@@ -527,6 +527,22 @@ export class ApiService {
         })
       );
   }
+
+  getTopCourts(): Observable<any> {
+    const endpoint = `${this.baseUrl}/api/top-courts/`;
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(endpoint, { headers }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
+          return this.handleUnauthorizedError().pipe(
+            switchMap(() => this.getTopCourts())
+          );
+        }
+        console.error('Error fetching top courts:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }
 
 

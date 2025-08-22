@@ -17,6 +17,6 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 bootstrapApplication(AppComponent, {
   providers: [
     ...appConfig.providers,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, provideAnimationsAsync()
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, provideAnimationsAsync(), provideAnimationsAsync('noop')
   ]
 }).catch((err) => console.error(err));
