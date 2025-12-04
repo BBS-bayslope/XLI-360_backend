@@ -40,7 +40,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '=)6fvl-@-)f$%bwd@fsda(yp2p#&$-!_*o@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['18.216.104.19', '18.220.232.127', 'localhost', '127.0.0.1','xli-360-backend-1.onrender.com']
+ALLOWED_HOSTS = ['18.216.104.19', '18.220.232.127', 'localhost', '127.0.0.1','xli-360-backend-1.onrender.com','160.153.181.186']
 
 # Google OAuth credentials (use environment variables in production)
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '511014243371-d0q42ehfg2l40rc722t0n6oep2hl08pd.apps.googleusercontent.com')
@@ -88,6 +88,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com",
     "http://ec2-18-220-232-127.us-east-2.compute.amazonaws.com",
     "http://18.220.232.127", 
+    "http://68.178.163.122:3050"
 
 ]
 
@@ -235,7 +236,7 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+# STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Logging

@@ -35,7 +35,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-
 class RawData(models.Model):
     case_no = models.CharField(max_length=100,blank=True, null=True) 
     complaint_date = models.TextField(blank=True, null=True)
@@ -114,7 +113,7 @@ class Case(models.Model):
         return f"Case {self.case_no}: {self.case_name}"
 
 class CaseDetails(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE,unique=True)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE)
     related_cases = models.TextField(blank=True, null=True)
     case_closed_date = models.TextField(blank=True, null=True)
     cause_of_action = models.TextField(blank=True,null=True)
