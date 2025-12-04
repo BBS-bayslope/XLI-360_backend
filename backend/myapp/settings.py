@@ -89,7 +89,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://ec2-18-220-232-127.us-east-2.compute.amazonaws.com",
     "http://18.220.232.127",
     "http://68.178.163.122:3050", 
-    "http://160.153.181.186:4200",
+    "http://160.153.181.186:4201",
 ]
 
 CORS_ALLOW_HEADERS = [
