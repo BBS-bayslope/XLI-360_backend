@@ -274,3 +274,11 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100MB
 
 CORS_ALLOW_ALL_ORIGINS = True  # Safe for dev, restrict in prod
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "xli-cache",
+    }
+}
