@@ -36,6 +36,21 @@ import {
 import { user, User } from '@angular/fire/auth';
 import {Router} from '@angular/router';
 
+
+export interface ExternalDataRow {
+  applicationNumber: string | null;
+  patentNumber: string | null;
+  applicationType: string | null;
+  PublicationNumber: string | null;
+  PublicationType: string | null;
+  status: string | null;
+  entityStatus: string | null;
+  smallEntityStatus: string | null;
+  filingDate: string | null;
+  applicantName: string | null;
+  inventorBag: string | null;
+}
+
 // Define Report interface (same as in reports.component.ts)
 interface Report {
   id: number;
@@ -542,6 +557,11 @@ export class ApiService {
         console.error('Error fetching top courts:', error);
         return throwError(() => error);
       })
+    );
+  }
+  getFirst100(): Observable<ExternalDataRow[]> {
+    return this.http.get<ExternalDataRow[]>(
+      `${this.baseUrl}/api/external-data/`
     );
   }
 }

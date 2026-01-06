@@ -1031,3 +1031,28 @@ class ChatBotView(APIView):
         except Exception as e:
             logger.exception("Unexpected error:")
             return Response({'error': f"Unexpected error: {str(e)}"}, status=500)
+
+
+from django.http import JsonResponse
+from ..models import ExternalData
+
+
+def external_data_list(request):
+    qs = ExternalData.objects.values(
+        "applicationNumber",
+        "patentNumber",
+        "applicationType",
+        "PublicationNumber",
+        "PublicationType",
+        "status",
+        "entityStatus",
+        "smallEntityStatus",
+        "filingDate",
+        "applicantName",
+        "inventorBag",
+    )[
+        :100
+    ]  # sirf 100 rows
+
+    data = list(qs)
+    return JsonResponse(data, safe=False)

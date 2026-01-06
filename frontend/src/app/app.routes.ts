@@ -19,6 +19,7 @@ import { HomepageComponent } from './homepage/homepage.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 import { Header1Component } from './header1/header1.component';
+import { ExternalDataTableComponent } from './external-data-table/external-data-table.component';
 
 export const routes: Routes = [
   // Public Routes (no guard needed)
@@ -38,7 +39,7 @@ export const routes: Routes = [
     component: ContactComponent,
   },
   {
-    path:'header',
+    path: 'header',
     component: Header1Component,
   },
 
@@ -54,6 +55,10 @@ export const routes: Routes = [
       { path: 'account-settings', component: AccountSettingsComponent },
       { path: 'app-reports', component: ReportsComponent },
       { path: 'ai', component: AimodelComponent },
+      {
+        path: 'externaldata',
+        component: ExternalDataTableComponent
+      },
     ],
   },
 

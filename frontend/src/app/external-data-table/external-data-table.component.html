@@ -1,0 +1,52 @@
+<a (click)="goBack()" class="back-button">
+  <mat-icon>arrow_back</mat-icon> Back to Case
+</a>
+
+<div class="external-wrapper">
+  <h2 class="external-title">External Data</h2>
+
+  <div *ngIf="loading">Loading data...</div>
+
+  <div *ngIf="!loading && errorMessage" class="error">
+    Error: {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && rows.length === 0">
+    No data found.
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && rows.length > 0" class="external-table-card">
+    <table class="external-table">
+      <thead>
+        <tr>
+          <th>ApplicationNumber</th>
+          <th>PatentNumber</th>
+          <th>ApplicationType</th>
+          <th>PublicationNumber</th>
+          <th>PublicationType</th>
+          <th>Status</th>
+          <th>EntityStatus</th>
+          <th>SmallEntityStatus</th>
+          <th>FilingDate</th>
+          <th>ApplicantName</th>
+          <th>InventorBag</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td>{{ row.applicationNumber }}</td>
+          <td>{{ row.patentNumber }}</td>
+          <td>{{ row.applicationType }}</td>
+          <td>{{ row.PublicationNumber }}</td>
+          <td>{{ row.PublicationType }}</td>
+          <td>{{ row.status }}</td>
+          <td>{{ row.entityStatus }}</td>
+          <td>{{ row.smallEntityStatus }}</td>
+          <td>{{ row.filingDate }}</td>
+          <td>{{ row.applicantName }}</td>
+          <td>{{ row.inventorBag }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

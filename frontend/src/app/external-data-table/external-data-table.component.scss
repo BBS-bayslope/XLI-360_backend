@@ -1,0 +1,419 @@
+table th,
+table td {
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f5f5f5;
+}
+
+
+
+
+
+
+
+
+
+
+/* your-component.component.scss */
+:host {
+  font-family: 'Tenorite', sans-serif;
+}
+
+
+
+
+// // General wrapper styling with a subtle gradient background
+.caseList-wrapper {
+  max-width: 100%;
+  margin: 16px auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #f9fbff 0%, #ffffff 100%); // Gradient for a classy look
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08); // Deeper shadow for elegance
+  font-family: 'Tenorite', sans-serif; // Clean, modern font
+}
+
+// Header styling for case number and name
+.caseList-wrapper h4 {
+  font-family: 'Tenorite', serif; // Elegant font for headings
+  font-size: 20px;
+  font-weight: 700;
+  color: #6600FF; // Deep navy blue for a professional tone (already #6600FF)
+  margin-bottom: 30px;
+  text-align: left;
+  // border-bottom: 1px solid black; // Gold accent line replaced
+  // padding-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+// Back button styling with a premium look
+.back-button {
+  margin-top: 15vh;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  
+  color: Black; // Deep navy blue
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    color: #6600FF; // Gold on hover (already #6600FF)
+    transform: translateX(-5px); // Subtle slide effect
+  }
+
+  mat-icon {
+    color: #1a3c6d;
+    transition: color 0.3s ease;
+  }
+
+  &:hover mat-icon {
+    color: #6600FF; // Gold on hover (replaced)
+  }
+}
+
+// Section details styling with a luxurious touch
+.details {
+  margin: 30px;
+  background-color: #ffffff; // White background for contrast
+  // border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05); // Soft shadow for depth
+  // border-left: 4px solid #6600FF; // Gold accent on the left (replaced #d4af37)
+  transition: box-shadow 0.3s ease;
+  border-color: 1px solid black;
+
+  &:hover {
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1); // Enhanced shadow on hover
+  }
+}
+
+// Section heading styling with an elegant font
+.details h5 {
+  font-family: "Tenorite", serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #6600FF; // Deep navy blue
+  margin-bottom: 20px;
+  padding-left: 10px;
+  border-left: 4px solid #6600FF; // Blue accent for consistency (unchanged)
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+}
+
+// Flex container for case details
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+// Flex items with a light blue background and gold borders
+.flex-item {
+  flex: 1 1 calc(20% - 1px); // 5 items per row
+  min-width: 200px;
+  box-sizing: border-box;
+  background-color: #e6f0fa; // Light blue shade
+  border-bottom: 1px solid #6600FF; // Gold border (replaced #d4af37)
+  border-right: 1px solid #6600FF; // Gold border (replaced #d4af37)
+  padding: 15px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background-color: #d9e8ff; // Slightly darker blue on hover
+    transform: translateY(-3px); // Subtle lift effect
+  }
+}
+
+// Remove right border for every 5th item
+.flex-item:nth-child(5n) {
+  border-right: none;
+}
+
+// Remove bottom border for the last row
+.flex-item:last-child,
+.flex-item:nth-last-child(-n + 5):not(:nth-child(5n)) {
+  border-bottom: none;
+}
+
+// Ensure right border for items in the last row
+.flex-item:nth-last-child(-n + 5):not(:nth-child(5n)) {
+  border-right: 1px solid #6600FF; // Gold border (replaced #d4af37)
+  border-bottom: 1px solid #6600FF;
+}
+
+// Styling for labels and values
+.flex-item strong {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.95rem;
+  color: #1a3c6d; // Deep navy blue
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.flex-item span {
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  color: #333333; // Dark gray for values
+  word-wrap: break-word;
+  display: block;
+  line-height: 1.5;
+}
+
+// Table styling for Plaintiff/Defendant details with alternating rows
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+
+  thead {
+    background: linear-gradient(90deg, #1a3c6d 0%, #6600FF 100%); // Gradient header
+    color: #ffffff;
+    font-weight: 600;
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-family: "Roboto", sans-serif;
+      font-size: 0.95rem;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #e0e0e0;
+      background-color: Black;
+
+      &:nth-child(even) {
+        background-color: #f9fbff; // Alternating row color
+      }
+
+      &:hover {
+        background-color: #e6f0fa; // Light blue on hover
+        transition: background-color 0.3s ease;
+      }
+    }
+
+    td {
+      padding: 12px;
+      font-family: "Roboto", sans-serif;
+      font-size: 0.9rem;
+      color: #333333;
+    }
+  }
+}
+
+// Report section styling with a premium look
+.report-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 30px 0;
+}
+
+.report-container {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  width: 400px;
+  height: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #6600FF; // Gold border (replaced #d4af37)
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.02); // Subtle zoom on hover
+  }
+}
+
+.report-preview {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); // Darker overlay for contrast
+  z-index: 1;
+}
+
+.overlay-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  background: linear-gradient(90deg, #6600FF 0%, #6600FF 100%); // Gold gradient (replaced #d4af37 and #b8972e)
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  border: none;
+  transition: background 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(90deg, #6600FF 0%, #6600FF 100%); // Reverse gradient on hover (replaced #b8972e and #d4af37)
+    transform: translate(-50%, -55%); // Slight lift
+  }
+}
+
+// Error message styling
+.error {
+  color: #d32f2f;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .flex-item {
+    flex: 1 1 calc(50% - 1px); // 2 items per row
+  }
+
+  .report-container {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .flex-item {
+    flex: 1 1 100%; // 1 item per row
+  }
+
+  .caseList-wrapper h4 {
+    font-size: 1.5rem;
+  }
+
+  .details h5 {
+    font-size: 1.2rem;
+  }
+}
+
+
+.activity-wrapper {
+  max-width: 90%; // or any fixed value like 800px
+  margin: auto;
+}
+
+
+
+// External data wrapper + heading
+.external-wrapper {
+  margin: 24px auto;
+  max-width: 95%;
+}
+
+.external-title {
+  font-family: "Tenorite", serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #6600ff;
+  margin-bottom: 16px;
+}
+
+// Card style around table
+.external-table-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+// Table styling with #6600FF theme
+.external-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.85rem;
+  min-width: 900px; // zyada columns ke liye
+
+  thead {
+    background: linear-gradient(90deg, #1a3c6d 0%, #6600ff 100%);
+    color: black;
+
+    th {
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+      border-bottom: 2px solid #4b33cc;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #e0e0e0;
+      background-color: #ffffff;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+
+      &:nth-child(even) {
+        background-color: #f9fbff; // light theme row
+      }
+
+      &:hover {
+        background-color: #e6f0ff; // hover color in theme
+        transform: translateY(-1px);
+      }
+    }
+
+    td {
+      padding: 8px 12px;
+      color: #333333;
+      vertical-align: top;
+      max-width: 220px;
+      word-wrap: break-word;
+    }
+  }
+}
+
+// Optional: rounded top corners on header
+.external-table thead tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+.external-table thead tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+
+// Error text (already tumne use kiya hai)
+.error {
+  color: #d32f2f;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+// Responsive: mobile pe table scrollable card already hai
+@media (max-width: 768px) {
+  .external-table {
+    font-size: 0.8rem;
+    min-width: 700px;
+  }
+}

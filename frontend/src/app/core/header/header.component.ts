@@ -19,6 +19,7 @@ import { User } from '@angular/fire/auth';
 import { ApiService } from '../../services/api.service';
 import { LoginPageComponent } from '../../pages/login-page/login-page.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
+// import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -38,6 +39,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     ReactiveFormsModule,
     CommonModule,
     RouterLink,
+  
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -110,7 +112,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout(): void {
-    console.log("It is clicked and log out ");
+    console.log('It is clicked and log out ');
     this.authService.logout().subscribe(() => {
       this.router.navigate(['/login']).then(() => {
         // Prevent back button
@@ -120,5 +122,9 @@ export class HeaderComponent implements OnInit {
         };
       });
     });
+  }
+  goToBuyer1(): void {
+    this.router.navigate(['/externaldata']);
+    
   }
 }

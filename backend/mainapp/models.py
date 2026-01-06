@@ -99,7 +99,7 @@ class RawData(models.Model):
     defendent_type_and_size = models.CharField(max_length=255, null=True, blank=True)
     def __str__(self):
         return self.case_no
-    
+
 class Case(models.Model):
     case_no = models.CharField(max_length=100, unique=True)  
     complaint_date = models.TextField(blank=True, null=True)
@@ -143,7 +143,7 @@ class CaseDetails(models.Model):
     chances_of_winning=models.TextField(blank=True, null=True)
     plaintiff_type_and_size = models.CharField(max_length=255, blank=True,null=True)  # Added
     defendent_type_and_size = models.CharField(max_length=255, blank=True,null=True)
-    
+
 class Patent(models.Model):
     patent_no = models.CharField(max_length=255, unique=True)
     patent_type = models.TextField(blank=True, null=True)
@@ -212,3 +212,21 @@ class Report(models.Model):
         if self.file and hasattr(self.file, 'url'):
             return self.file.url
         return None
+
+
+class ExternalData(models.Model):
+    applicationNumber = models.CharField(max_length=255, null=True, blank=True)
+    patentNumber = models.CharField(max_length=255, null=True, blank=True)
+    applicationType = models.CharField(max_length=255, null=True, blank=True)
+    PublicationNumber = models.CharField(max_length=255, null=True, blank=True)
+    PublicationType = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=255, null=True, blank=True)
+    entityStatus = models.CharField(max_length=255, null=True, blank=True)
+    smallEntityStatus = models.CharField(max_length=255, null=True, blank=True)
+    filingDate = models.DateField(null=True, blank=True)
+    applicantName = models.CharField(max_length=255, null=True, blank=True)
+    inventorBag = models.TextField(null=True, blank=True)
+
+    class Meta:
+        db_table = "external_data"  # Supabase me jo table ka naam hai
+        managed = False
