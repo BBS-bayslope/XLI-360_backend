@@ -118,7 +118,7 @@ export class AuthService {
   // private baseUrl = 'http://18.220.232.127'; // Base API URL
   // private baseUrl = 'http://127.0.0.1:8000';
   // private baseUrl = 'http://160.153.181.186:8001';
-  private baseUrl = 'http://13.53.161.250:8000';
+  private baseUrl = 'http://13.53.161.250:8001';
   // private baseUrl = 'https://xli-360-backend-1.onrender.com'; //Base APi Url
   // Get the current user as an Observable
 
