@@ -109,7 +109,7 @@ export class AuthService {
     public router: Router,
     private auth: Auth,
     private firestore: Firestore,
-    private storage: Storage
+    private storage: Storage,
   ) {
     onAuthStateChanged(this.auth, (user) => {
       this.userSubject.next(user);
@@ -117,7 +117,8 @@ export class AuthService {
   }
   // private baseUrl = 'http://18.220.232.127'; // Base API URL
   // private baseUrl = 'http://127.0.0.1:8000';
-  private baseUrl = 'http://160.153.181.186:8001';
+  // private baseUrl = 'http://160.153.181.186:8001';
+  private baseUrl = 'http://13.60.183.12:8000';
   // private baseUrl = 'https://xli-360-backend-1.onrender.com'; //Base APi Url
   // Get the current user as an Observable
   getUserState(): Observable<User | null> {
@@ -128,7 +129,7 @@ export class AuthService {
     collectionName: string,
     docId: string,
     fileUrl: string,
-    newPrice: number
+    newPrice: number,
   ): Promise<void> {
     try {
       const docRef = doc(this.firestore, collectionName, docId);
@@ -140,7 +141,7 @@ export class AuthService {
 
         // Find the file to update
         const updatedFiles = files.map((file: any) =>
-          file.url === fileUrl ? { ...file, price: newPrice } : file
+          file.url === fileUrl ? { ...file, price: newPrice } : file,
         );
 
         // Update the document with the new file list
@@ -170,7 +171,7 @@ export class AuthService {
   initializeRealTimeListener(
     collectionName: string,
     docId: string,
-    onUpdateCallback: (updatedData: any) => void
+    onUpdateCallback: (updatedData: any) => void,
   ): () => void {
     const docRef = doc(this.firestore, collectionName, docId);
 
@@ -187,7 +188,7 @@ export class AuthService {
             const updatedData = allData.map((item: any) =>
               item.id === docId && item.collectionName === collectionName
                 ? { ...item, ...data }
-                : item
+                : item,
             );
             localStorage.setItem('fetchedData', JSON.stringify(updatedData));
           }
@@ -196,13 +197,13 @@ export class AuthService {
           onUpdateCallback(data);
         } else {
           console.error(
-            `Document ${docId} does not exist in collection ${collectionName}.`
+            `Document ${docId} does not exist in collection ${collectionName}.`,
           );
         }
       },
       (error) => {
         console.error('Error listening to Firestore document:', error);
-      }
+      },
     );
 
     return unsubscribe; // Return the unsubscribe function to clean up
@@ -221,7 +222,7 @@ export class AuthService {
   async updateDocInAllCollections(
     docId: string,
     field: string,
-    files: { fileName: string; fileType: string; url: string }[]
+    files: { fileName: string; fileType: string; url: string }[],
   ): Promise<void> {
     const collections = this.collectionNames; // Replace with your collection names
     let docFound = false;
@@ -256,7 +257,7 @@ export class AuthService {
   async fetchDocumentFiles(
     collectionName: string,
     docId: string,
-    field: string = 'files'
+    field: string = 'files',
   ): Promise<{ fileName: string; fileType: string; url: string }[]> {
     try {
       const docRef = doc(this.firestore, collectionName, docId);
@@ -267,7 +268,7 @@ export class AuthService {
         return data[field] || []; // Return the files array or an empty array
       } else {
         console.warn(
-          `No document found with ID: ${docId} in collection: ${collectionName}`
+          `No document found with ID: ${docId} in collection: ${collectionName}`,
         );
         return [];
       }
@@ -282,7 +283,7 @@ export class AuthService {
     docId: string,
     field: string,
     file: { fileName: string; fileType: string; url: string },
-    currentFiles: { fileName: string; fileType: string; url: string }[]
+    currentFiles: { fileName: string; fileType: string; url: string }[],
   ): Promise<void> {
     const fileRef = ref(this.storage, file.url);
 
@@ -292,7 +293,7 @@ export class AuthService {
 
         // Remove the file from the array
         const updatedFiles = currentFiles.filter(
-          (existingFile) => existingFile.url !== file.url
+          (existingFile) => existingFile.url !== file.url,
         );
 
         // Update the Firestore document
@@ -378,9 +379,9 @@ export class AuthService {
                 uid: result.user.uid,
                 token: response.token,
               };
-            })
+            }),
           );
-      })
+      }),
     );
   }
 
@@ -423,7 +424,7 @@ export class AuthService {
           console.error('No such document!');
           return null; // Return null if the document does not exist
         }
-      })
+      }),
     );
   }
 
@@ -443,7 +444,7 @@ export class AuthService {
     };
 
     return from(setDoc(userRef, userData, { merge: true })).pipe(
-      map(() => user) // Return the user after data is saved
+      map(() => user), // Return the user after data is saved
     );
   }
 
@@ -462,13 +463,13 @@ export class AuthService {
           // After saving, update the `docId` field in Firestore
           const itemDocRef = doc(this.firestore, 'excelDataNew', docRef.id);
           return from(updateDoc(itemDocRef, { docId: docRef.id })).pipe(
-            map(() => docRef.id) // Return the document ID
+            map(() => docRef.id), // Return the document ID
           );
         }),
         catchError((error) => {
           console.error('Error saving item:', error);
           throw error;
-        })
+        }),
       );
     });
 
@@ -502,13 +503,13 @@ export class AuthService {
           console.log(
             `Chunk ${chunkIndex + 1}/${totalChunks} of ${
               chunk.length
-            } rows saved successfully`
+            } rows saved successfully`,
           );
         }),
         catchError((error) => {
           console.error('Error saving chunk:', error);
           throw error;
-        })
+        }),
       );
     };
 
@@ -529,9 +530,9 @@ export class AuthService {
         endTime = Date.now();
         const timeTaken = (endTime - startTime) / 1000; // Calculate time in seconds
         console.log(
-          `All data saved successfully. Total time: ${timeTaken} seconds`
+          `All data saved successfully. Total time: ${timeTaken} seconds`,
         );
-      })
+      }),
     );
   }
 
@@ -559,13 +560,13 @@ export class AuthService {
         map(() => {
           processedChunks++;
           console.log(
-            `Chunk ${chunkIndex + 1}/${totalChunks} saved successfully`
+            `Chunk ${chunkIndex + 1}/${totalChunks} saved successfully`,
           );
         }),
         catchError((error) => {
           console.error(`Error saving chunk ${chunkIndex + 1}:`, error);
           throw error;
-        })
+        }),
       );
     };
 
@@ -586,9 +587,9 @@ export class AuthService {
         const endTime = Date.now();
         const totalTime = (endTime - startTime) / 1000; // Calculate total time in seconds
         console.log(
-          `All data saved successfully. Total time: ${totalTime} seconds`
+          `All data saved successfully. Total time: ${totalTime} seconds`,
         );
-      })
+      }),
     );
   }
 
@@ -603,7 +604,7 @@ export class AuthService {
 
     const saveChunks = (
       collectionName: string,
-      excelData: ExcelData[]
+      excelData: ExcelData[],
     ): Observable<void>[] => {
       const excelDataRef = collection(this.firestore, collectionName);
       const totalChunks = Math.ceil(excelData.length / CHUNK_SIZE);
@@ -625,7 +626,7 @@ export class AuthService {
             console.log(
               `Saved chunk ${
                 chunkIndex + 1
-              }/${totalChunks} for collection ${collectionName}`
+              }/${totalChunks} for collection ${collectionName}`,
             );
           }),
           catchError((error) => {
@@ -633,10 +634,10 @@ export class AuthService {
               `Error saving chunk ${
                 chunkIndex + 1
               }/${totalChunks} for collection ${collectionName}:`,
-              error
+              error,
             );
             throw error;
-          })
+          }),
         );
       });
     };
@@ -658,9 +659,9 @@ export class AuthService {
       finalize(() => {
         const totalTime = (Date.now() - startTime) / 1000;
         console.log(
-          `All data saved successfully. Total time: ${totalTime} seconds`
+          `All data saved successfully. Total time: ${totalTime} seconds`,
         );
-      })
+      }),
     );
   }
 
@@ -681,7 +682,7 @@ export class AuthService {
           return [key, this.sanitizeData(value)]; // Recursively sanitize nested objects
         }
         return [key, value];
-      })
+      }),
     );
   }
 
@@ -748,7 +749,7 @@ export class AuthService {
         { refresh: refreshToken },
         {
           headers: { 'Skip-Auth-Interceptor': 'true' }, // Custom header to signal interceptor to skip
-        }
+        },
       )
       .pipe(
         switchMap((response) => {
@@ -764,7 +765,7 @@ export class AuthService {
         catchError((err) => {
           this.logout();
           return throwError(() => err);
-        })
+        }),
       );
   }
 
@@ -788,7 +789,7 @@ export class AuthService {
         catchError((error: HttpErrorResponse) => {
           console.error('Login failed', error);
           return of(null);
-        })
+        }),
       );
   }
 
@@ -812,20 +813,20 @@ export class AuthService {
         catchError((error: HttpErrorResponse) => {
           console.error('Registration failed', error);
           return of(null);
-        })
+        }),
       );
   }
 
   getPaginatedData(
     collectionName: string,
     lastDoc: any = null,
-    batchSize: number = 50
+    batchSize: number = 50,
   ) {
     const collectionRef = collection(this.firestore, collectionName);
     let queryRef = query(
       collectionRef,
       orderBy('caseDetails.caseNumber'),
-      limit(batchSize)
+      limit(batchSize),
     );
 
     if (lastDoc) {
@@ -833,7 +834,7 @@ export class AuthService {
         collectionRef,
         orderBy('caseDetails.caseNumber'),
         startAfter(lastDoc),
-        limit(batchSize)
+        limit(batchSize),
       );
     }
 
@@ -849,13 +850,13 @@ export class AuthService {
   }
 
   getInitialData(
-    collectionName: string
+    collectionName: string,
   ): Observable<{ data: any[]; lastDoc: any }> {
     const collectionRef = collection(this.firestore, collectionName);
     const queryRef = query(
       collectionRef,
       orderBy('caseDetails.caseComplaintDate'),
-      limit(50)
+      limit(50),
     );
     return from(getDocs(queryRef)).pipe(
       map((querySnapshot) => {
@@ -867,20 +868,20 @@ export class AuthService {
           })),
           lastDoc,
         };
-      })
+      }),
     );
   }
 
   fetchMoreData(
     collectionName: string,
-    lastDoc: any
+    lastDoc: any,
   ): Observable<{ data: any[]; lastDoc: any }> {
     const collectionRef = collection(this.firestore, collectionName);
     const queryRef = query(
       collectionRef,
       orderBy('caseDetails.caseComplaintDate'),
       startAfter(lastDoc),
-      limit(50)
+      limit(50),
     );
     return from(getDocs(queryRef)).pipe(
       map((querySnapshot) => {
@@ -892,7 +893,7 @@ export class AuthService {
           })),
           lastDoc,
         };
-      })
+      }),
     );
   }
 
@@ -977,7 +978,7 @@ export class AuthService {
   async removeUrlFromArray(
     docId: string,
     field: string,
-    index: number
+    index: number,
   ): Promise<void> {
     const docRef = doc(this.firestore, 'excelData', docId);
 
@@ -1085,7 +1086,7 @@ export class AuthService {
   // y w
   async addFileToUpfileArray(
     docId: string,
-    newFile: UploadedFile
+    newFile: UploadedFile,
   ): Promise<void> {
     try {
       const docRef = doc(this.firestore, 'excelData', docId);
@@ -1118,7 +1119,7 @@ export class AuthService {
 
         // Find the index of the file to delete
         const index = currentUpfile.findIndex(
-          (file) => file.fileUrl === fileUrl
+          (file) => file.fileUrl === fileUrl,
         );
 
         if (index !== -1) {

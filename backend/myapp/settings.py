@@ -40,7 +40,15 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '=)6fvl-@-)f$%bwd@fsda(yp2p#&$-!_*o@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['18.216.104.19', '18.220.232.127', 'localhost', '127.0.0.1','xli-360-backend-1.onrender.com','160.153.181.186']
+ALLOWED_HOSTS = [
+    "18.216.104.19",
+    "18.220.232.127",
+    "localhost",
+    "127.0.0.1",
+    "xli-360-backend-1.onrender.com",
+    "160.153.181.186",
+    "13.60.183.12",
+]
 
 # Google OAuth credentials (use environment variables in production)
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '511014243371-d0q42ehfg2l40rc722t0n6oep2hl08pd.apps.googleusercontent.com')
@@ -88,8 +96,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://ec2-18-216-104-19.us-east-2.compute.amazonaws.com",
     "http://ec2-18-220-232-127.us-east-2.compute.amazonaws.com",
     "http://18.220.232.127",
-    "http://68.178.163.122:3050", 
+    "http://68.178.163.122:3050",
     "http://160.153.181.186:4201",
+    "http://13.60.183.12:4200",
 ]
 
 CORS_ALLOW_HEADERS = [

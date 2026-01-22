@@ -64,7 +64,8 @@ interface Report {
 export class ApiService {
   // private baseUrl = 'http://18.220.232.127'; // Base API URL
   // private baseUrl = 'http://127.0.0.1:8000';
-  private baseUrl = 'http://160.153.181.186:8001';
+  // private baseUrl = 'http://160.153.181.186:8001';
+  private baseUrl = 'http://13.60.183.12:8000';
   // private baseUrl='https://xli-360-backend-1.onrender.com'
   private tokenKey: string = 'access'; // Key to store token in localStorage
   allCases!: ExcelData[];
@@ -77,7 +78,10 @@ export class ApiService {
 
   private firestore = inject(Firestore);
 
-  constructor(private http: HttpClient, public router: Router) {}
+  constructor(
+    private http: HttpClient,
+    public router: Router,
+  ) {}
 
   // Get Authorization headers with JWT token
   private getAuthHeaders(): HttpHeaders {
@@ -126,7 +130,7 @@ export class ApiService {
       catchError((err) => {
         this.logout();
         return throwError(() => err);
-      })
+      }),
     );
   }
 
@@ -146,7 +150,7 @@ export class ApiService {
       catchError((error: HttpErrorResponse) => {
         console.error('Login failed', error);
         return of(null);
-      })
+      }),
     );
   }
 
@@ -158,7 +162,7 @@ export class ApiService {
       catchError((error: HttpErrorResponse) => {
         console.error('Registration failed', error);
         return of(null);
-      })
+      }),
     );
   }
 
@@ -209,7 +213,7 @@ export class ApiService {
           id: doc.id,
           data: doc.data(),
         }));
-      })
+      }),
     );
   }
 
@@ -238,7 +242,7 @@ export class ApiService {
           id: doc.id, // Firestore document ID
           collectionName: collectionName,
           ...doc.data(), // Spread all document data
-        }))
+        })),
       );
     });
 
@@ -253,7 +257,7 @@ export class ApiService {
       catchError((error) => {
         console.error('Error fetching data from Firestore:', error);
         return of([]); // Return an empty array on error
-      })
+      }),
     );
   }
 
@@ -313,7 +317,7 @@ export class ApiService {
 
   updateUserData(
     userId: string,
-    updates: Partial<User>
+    updates: Partial<User>,
   ): Observable<User | null> {
     if (!userId) {
       return of(null);
@@ -329,7 +333,7 @@ export class ApiService {
       map(() => ({
         ...user,
         ...updatedUserData,
-      }))
+      })),
     );
   }
 
@@ -342,17 +346,17 @@ export class ApiService {
         const updatedObject = { ...newObject, docId };
         return from(updateDoc(docRef, { docId })).pipe(
           switchMap(() =>
-            from(Promise.resolve({ id: docId, ...updatedObject }))
-          )
+            from(Promise.resolve({ id: docId, ...updatedObject })),
+          ),
         );
-      })
+      }),
     );
   }
 
   updateDocByIdAPI(
     collectionName: string,
     docId: string,
-    updatedFields: Partial<any>
+    updatedFields: Partial<any>,
   ): Observable<void> {
     const docRef = doc(this.firestore, `${collectionName}/${docId}`);
     return from(updateDoc(docRef, updatedFields));
@@ -367,7 +371,7 @@ export class ApiService {
   }
 
   getDocByIdFromCollections<T>(
-    docId: string
+    docId: string,
   ): Observable<{ collectionName: string; data: T } | undefined> {
     const collectionNames = this.collectionNames;
 
@@ -382,7 +386,7 @@ export class ApiService {
             } else {
               return undefined; // If not found, continue to the next collection
             }
-          })
+          }),
         );
       }),
       filter((result) => !!result), // Filter out undefined results
@@ -390,7 +394,7 @@ export class ApiService {
       catchError((error) => {
         console.error('Error searching for document:', error);
         throw error; // Propagate error
-      })
+      }),
     );
   }
 
@@ -400,7 +404,7 @@ export class ApiService {
       const collectionRef = collection(this.firestore, collectionName);
       const queryRef = query(
         collectionRef,
-        where('caseDetails.caseNumber', '==', caseNumber)
+        where('caseDetails.caseNumber', '==', caseNumber),
       );
 
       return from(getDocs(queryRef)).pipe(
@@ -409,8 +413,8 @@ export class ApiService {
             id: doc.id,
             collectionName,
             ...doc.data(),
-          }))
-        )
+          })),
+        ),
       );
     });
 
@@ -419,12 +423,12 @@ export class ApiService {
       catchError((error) => {
         console.error('Error fetching documents:', error);
         return of([]); // Return an empty array on error
-      })
+      }),
     );
   }
 
   getAllDocsFromCollection<T = any>(
-    collectionName: string
+    collectionName: string,
   ): Observable<{ id: string; data: T }[]> {
     const collectionRef = collection(this.firestore, collectionName);
 
@@ -433,8 +437,8 @@ export class ApiService {
         querySnapshot.docs.map((doc) => ({
           id: doc.id,
           data: doc.data() as T,
-        }))
-      )
+        })),
+      ),
     );
   }
 
@@ -449,7 +453,7 @@ export class ApiService {
       catchError((error) => {
         console.error('Error checking organization:', error);
         return of(false); // Return false if an error occurs
-      })
+      }),
     );
   }
 
@@ -468,12 +472,12 @@ export class ApiService {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           return this.handleUnauthorizedError().pipe(
-            switchMap(() => this.getReports()) // Retry after token refresh
+            switchMap(() => this.getReports()), // Retry after token refresh
           );
         }
         console.error('Error fetching reports:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -485,12 +489,12 @@ export class ApiService {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           return this.handleUnauthorizedError().pipe(
-            switchMap(() => this.viewReport(reportId))
+            switchMap(() => this.viewReport(reportId)),
           );
         }
         console.error('Error viewing report:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
 
@@ -502,12 +506,12 @@ export class ApiService {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           return this.handleUnauthorizedError().pipe(
-            switchMap(() => this.downloadReport(reportId))
+            switchMap(() => this.downloadReport(reportId)),
           );
         }
         console.error('Error downloading report:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
   private handleUnauthorizedError(): Observable<string> {
@@ -515,32 +519,32 @@ export class ApiService {
       catchError((err) => {
         this.logout();
         return throwError(() => err);
-      })
+      }),
     );
   }
 
   // src/app/services/api.service.ts (relevant excerpt)
   chat(
     message: string,
-    provider: 'openrouter' = 'openrouter'
+    provider: 'openrouter' = 'openrouter',
   ): Observable<{ response: string; model: string; timestamp: string | null }> {
     const endpoint = `${this.baseUrl}/api/chat/`;
     const headers = this.getAuthHeaders();
     return this.http
-      .post<{ response: string; model: string; timestamp: string | null }>(
-        endpoint,
-        { message, provider },
-        { headers }
-      )
+      .post<{
+        response: string;
+        model: string;
+        timestamp: string | null;
+      }>(endpoint, { message, provider }, { headers })
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.status === 401) {
             return this.handleUnauthorizedError().pipe(
-              switchMap(() => this.chat(message, provider)) // Retry after token refresh
+              switchMap(() => this.chat(message, provider)), // Retry after token refresh
             );
           }
           return throwError(() => error);
-        })
+        }),
       );
   }
 
@@ -551,17 +555,17 @@ export class ApiService {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           return this.handleUnauthorizedError().pipe(
-            switchMap(() => this.getTopCourts())
+            switchMap(() => this.getTopCourts()),
           );
         }
         console.error('Error fetching top courts:', error);
         return throwError(() => error);
-      })
+      }),
     );
   }
   getFirst100(): Observable<ExternalDataRow[]> {
     return this.http.get<ExternalDataRow[]>(
-      `${this.baseUrl}/api/external-data/`
+      `${this.baseUrl}/api/external-data/`,
     );
   }
 }
