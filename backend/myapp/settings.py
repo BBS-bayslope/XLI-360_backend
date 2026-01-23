@@ -47,7 +47,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "xli-360-backend-1.onrender.com",
     "160.153.181.186",
-    "13.53.161.250"
+    "16.16.188.128",
 ]
 
 # Google OAuth credentials (use environment variables in production)
@@ -97,8 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://ec2-18-220-232-127.us-east-2.compute.amazonaws.com",
     "http://18.220.232.127",
     "http://68.178.163.122:3050",
-    "http://13.53.161.250:4201",
-    "http://13.60.183.12:4200",
+    "http://16.16.188.128:4201",
 ]
 
 CORS_ALLOW_HEADERS = [
